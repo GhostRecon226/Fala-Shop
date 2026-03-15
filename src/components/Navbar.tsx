@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
-import { ShoppingBag, Search, Menu, X } from 'lucide-react';
+import { ShoppingBag, Menu, X } from 'lucide-react';
 import { useCart } from '@/contexts/CartContext';
+import logo from '@/assets/logo.png';
 import { useState } from 'react';
 
 const Navbar = () => {
