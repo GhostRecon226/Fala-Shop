@@ -12,8 +12,8 @@ const Navbar = () => {
     <nav className="sticky top-0 z-50 bg-background/95 backdrop-blur-sm" style={{ height: '72px' }}>
       <div className="container flex h-full items-center justify-between">
         {/* Logo */}
-        <Link to="/" className="text-lg font-semibold tracking-display text-foreground">
-          FALA PRODUCTION LTD.
+        <Link to="/" className="flex items-center gap-2">
+          <img src={logo} alt="Fala Production Ltd." className="h-10 w-auto" />
         </Link>
 
         {/* Desktop Links */}
