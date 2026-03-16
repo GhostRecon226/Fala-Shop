@@ -44,6 +44,7 @@ const App = () => (
           </div>
         </BrowserRouter>
       </CartProvider>
+      </WishlistProvider>
     </TooltipProvider>
   </QueryClientProvider>
 );
