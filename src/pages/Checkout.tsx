@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useCart } from '@/contexts/CartContext';
+import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
 import { z } from 'zod';
 
 const checkoutSchema = z.object({
@@ -18,7 +20,9 @@ type FormData = z.infer<typeof checkoutSchema>;
 
 const Checkout = () => {
   const { items, totalPrice, clearCart } = useCart();
+  const { user } = useAuth();
   const navigate = useNavigate();
+  const [submitting, setSubmitting] = useState(false);
   const [errors, setErrors] = useState<Partial<Record<keyof FormData, string>>>({});
   const [form, setForm] = useState<FormData>({
     firstName: '', lastName: '', email: '', phone: '',
@@ -41,7 +45,7 @@ const Checkout = () => {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const result = checkoutSchema.safeParse(form);
     if (!result.success) {
@@ -53,8 +57,42 @@ const Checkout = () => {
       setErrors(fieldErrors);
       return;
     }
+
+    setSubmitting(true);
+    try {
+      if (user) {
+        const { data: order, error: orderError } = await supabase
+          .from('orders')
+          .insert({
+            user_id: user.id,
+            total: totalPrice,
+            shipping_address: result.data,
+          })
+          .select('id')
+          .single();
+
+        if (orderError) throw orderError;
+
+        const { error: itemsError } = await supabase
+          .from('order_items')
+          .insert(
+            items.map(({ product, quantity }) => ({
+              order_id: order.id,
+              product_id: product.id,
+              quantity,
+              price: product.price,
+            }))
+          );
+
+        if (itemsError) throw itemsError;
+      }
+    } catch (err) {
+      console.error('Failed to save order:', err);
+    }
+
     clearCart();
     navigate('/order-confirmation');
+    setSubmitting(false);
   };
 
   const inputClass = (field: keyof FormData) =>
@@ -141,9 +179,10 @@ const Checkout = () => {
               </div>
               <button
                 type="submit"
-                className="block w-full text-center bg-primary text-primary-foreground py-3 rounded-md text-sm font-semibold hover:opacity-90 transition-all"
+                disabled={submitting}
+                className="block w-full text-center bg-primary text-primary-foreground py-3 rounded-md text-sm font-semibold hover:opacity-90 transition-all disabled:opacity-50"
               >
-                Place Order
+                {submitting ? 'Placing Order…' : 'Place Order'}
               </button>
             </div>
           </div>
