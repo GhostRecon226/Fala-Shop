@@ -1,0 +1,294 @@
+import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/contexts/AuthContext';
+import { useIsAdmin } from '@/hooks/useIsAdmin';
+import { useQueryClient } from '@tanstack/react-query';
+import { ShieldAlert, Plus, Pencil, Trash2 } from 'lucide-react';
+import { toast } from '@/hooks/use-toast';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Checkbox } from '@/components/ui/checkbox';
+import {
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription,
+} from '@/components/ui/dialog';
+import {
+  Table, TableHeader, TableBody, TableHead, TableRow, TableCell,
+} from '@/components/ui/table';
+import {
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+} from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
+import AdminNav from '@/components/AdminNav';
+
+const CATEGORIES = ['Solar Fans', 'Shirts', 'Sneakers', 'Bags'] as const;
+
+type Product = {
+  id: string;
+  name: string;
+  category: string;
+  price: number;
+  stock_quantity: number | null;
+  is_featured: boolean | null;
+  description: string | null;
+  image_url: string | null;
+};
+
+const emptyForm = {
+  name: '',
+  category: 'Solar Fans' as string,
+  price: '',
+  stock_quantity: '',
+  description: '',
+  image_url: '',
+  is_featured: false,
+};
+
+const AdminProducts = () => {
+  const { user, loading: authLoading } = useAuth();
+  const { data: isAdmin, isLoading: adminLoading } = useIsAdmin();
+  const queryClient = useQueryClient();
+
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [form, setForm] = useState(emptyForm);
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    if (isAdmin) loadProducts();
+  }, [isAdmin]);
+
+  const loadProducts = async () => {
+    setLoading(true);
+    const { data } = await supabase.from('products').select('*').order('created_at', { ascending: false });
+    setProducts((data || []) as Product[]);
+    setLoading(false);
+  };
+
+  const openAdd = () => {
+    setEditingId(null);
+    setForm(emptyForm);
+    setDialogOpen(true);
+  };
+
+  const openEdit = (p: Product) => {
+    setEditingId(p.id);
+    setForm({
+      name: p.name,
+      category: p.category,
+      price: String(p.price),
+      stock_quantity: String(p.stock_quantity ?? 0),
+      description: p.description || '',
+      image_url: p.image_url || '',
+      is_featured: !!p.is_featured,
+    });
+    setDialogOpen(true);
+  };
+
+  const handleSave = async () => {
+    if (!form.name || !form.price) {
+      toast({ title: 'Validation', description: 'Name and price are required', variant: 'destructive' });
+      return;
+    }
+    setSaving(true);
+    const payload = {
+      name: form.name,
+      category: form.category,
+      price: parseFloat(form.price),
+      stock_quantity: parseInt(form.stock_quantity || '0', 10),
+      description: form.description || null,
+      image_url: form.image_url || null,
+      is_featured: form.is_featured,
+    };
+
+    if (editingId) {
+      const { error } = await supabase.from('products').update(payload).eq('id', editingId);
+      if (error) {
+        toast({ title: 'Error', description: error.message, variant: 'destructive' });
+      } else {
+        toast({ title: 'Updated', description: 'Product updated successfully' });
+      }
+    } else {
+      const { error } = await supabase.from('products').insert(payload);
+      if (error) {
+        toast({ title: 'Error', description: error.message, variant: 'destructive' });
+      } else {
+        toast({ title: 'Created', description: 'Product created successfully' });
+      }
+    }
+    setSaving(false);
+    setDialogOpen(false);
+    queryClient.invalidateQueries({ queryKey: ['products'] });
+    loadProducts();
+  };
+
+  const handleDelete = async () => {
+    if (!deleteId) return;
+    const { error } = await supabase.from('products').delete().eq('id', deleteId);
+    if (error) {
+      toast({ title: 'Error', description: error.message, variant: 'destructive' });
+    } else {
+      toast({ title: 'Deleted', description: 'Product deleted' });
+      queryClient.invalidateQueries({ queryKey: ['products'] });
+      loadProducts();
+    }
+    setDeleteId(null);
+  };
+
+  if (authLoading || adminLoading) {
+    return <div className="container py-20 text-center text-muted-foreground">Loading...</div>;
+  }
+
+  if (!user) {
+    return (
+      <div className="container py-20 text-center">
+        <p className="text-muted-foreground mb-4">Please sign in to access this page.</p>
+        <Link to="/auth" className="text-primary text-sm font-medium">Sign In</Link>
+      </div>
+    );
+  }
+
+  if (!isAdmin) {
+    return (
+      <div className="container py-20 text-center">
+        <ShieldAlert size={48} className="mx-auto text-destructive mb-4" />
+        <p className="text-lg font-semibold text-foreground mb-2">Access Denied</p>
+        <p className="text-muted-foreground">You don't have permission to access the admin panel.</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="container py-10">
+      <div className="flex items-center gap-3 mb-4">
+        <ShieldAlert size={24} className="text-primary" />
+        <h1 className="text-3xl font-bold tracking-tight text-foreground">Admin Panel</h1>
+      </div>
+
+      <AdminNav />
+
+      <div className="flex items-center justify-between mb-6">
+        <h2 className="text-xl font-semibold text-foreground">Products ({products.length})</h2>
+        <Button onClick={openAdd} size="sm">
+          <Plus size={16} className="mr-1" /> Add Product
+        </Button>
+      </div>
+
+      {loading ? (
+        <div className="text-center py-10 text-muted-foreground">Loading products...</div>
+      ) : (
+        <div className="border border-border rounded-lg overflow-hidden">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Name</TableHead>
+                <TableHead>Category</TableHead>
+                <TableHead className="text-right">Price</TableHead>
+                <TableHead className="text-right">Stock</TableHead>
+                <TableHead>Featured</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {products.map(p => (
+                <TableRow key={p.id}>
+                  <TableCell className="font-medium">{p.name}</TableCell>
+                  <TableCell>{p.category}</TableCell>
+                  <TableCell className="text-right tabular-nums">${Number(p.price).toFixed(2)}</TableCell>
+                  <TableCell className="text-right tabular-nums">{p.stock_quantity ?? 0}</TableCell>
+                  <TableCell>{p.is_featured ? '✓' : '—'}</TableCell>
+                  <TableCell className="text-right">
+                    <div className="flex justify-end gap-1">
+                      <Button variant="ghost" size="icon" onClick={() => openEdit(p)}>
+                        <Pencil size={15} />
+                      </Button>
+                      <Button variant="ghost" size="icon" onClick={() => setDeleteId(p.id)}>
+                        <Trash2 size={15} className="text-destructive" />
+                      </Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
+      )}
+
+      {/* Add / Edit Dialog */}
+      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>{editingId ? 'Edit Product' : 'Add Product'}</DialogTitle>
+            <DialogDescription>
+              {editingId ? 'Update product details below.' : 'Fill in the details for the new product.'}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <label className="text-sm font-medium text-foreground">Name *</label>
+              <Input value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} />
+            </div>
+            <div>
+              <label className="text-sm font-medium text-foreground">Category</label>
+              <Select value={form.category} onValueChange={v => setForm(f => ({ ...f, category: v }))}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  {CATEGORIES.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="text-sm font-medium text-foreground">Price *</label>
+                <Input type="number" step="0.01" value={form.price} onChange={e => setForm(f => ({ ...f, price: e.target.value }))} />
+              </div>
+              <div>
+                <label className="text-sm font-medium text-foreground">Stock</label>
+                <Input type="number" value={form.stock_quantity} onChange={e => setForm(f => ({ ...f, stock_quantity: e.target.value }))} />
+              </div>
+            </div>
+            <div>
+              <label className="text-sm font-medium text-foreground">Image URL</label>
+              <Input value={form.image_url} onChange={e => setForm(f => ({ ...f, image_url: e.target.value }))} />
+            </div>
+            <div>
+              <label className="text-sm font-medium text-foreground">Description</label>
+              <Textarea rows={3} value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} />
+            </div>
+            <div className="flex items-center gap-2">
+              <Checkbox
+                id="featured"
+                checked={form.is_featured}
+                onCheckedChange={v => setForm(f => ({ ...f, is_featured: !!v }))}
+              />
+              <label htmlFor="featured" className="text-sm font-medium text-foreground cursor-pointer">Featured product</label>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setDialogOpen(false)}>Cancel</Button>
+            <Button onClick={handleSave} disabled={saving}>{saving ? 'Saving...' : 'Save'}</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Confirmation */}
+      <Dialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle>Delete Product</DialogTitle>
+            <DialogDescription>This action cannot be undone. Are you sure?</DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setDeleteId(null)}>Cancel</Button>
+            <Button variant="destructive" onClick={handleDelete}>Delete</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+};
+
+export default AdminProducts;

@@ -116,10 +116,12 @@ const AdminOrders = () => {
 
   return (
     <div className="container py-10">
-      <div className="flex items-center gap-3 mb-8">
+      <div className="flex items-center gap-3 mb-4">
         <ShieldAlert size={24} className="text-primary" />
-        <h1 className="text-3xl font-bold tracking-display text-foreground">Admin · Orders</h1>
+        <h1 className="text-3xl font-bold tracking-tight text-foreground">Admin Panel</h1>
       </div>
+
+      <AdminNav />
 
       {/* Summary cards */}
       <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mb-8">
