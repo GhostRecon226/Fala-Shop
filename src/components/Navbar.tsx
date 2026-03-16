@@ -196,6 +196,11 @@ const Navbar = () => {
                 <Link to="/orders" onClick={() => setMobileOpen(false)} className="text-sm font-medium py-2 text-foreground">
                   My Orders
                 </Link>
+                {isAdmin && (
+                  <Link to="/admin/orders" onClick={() => setMobileOpen(false)} className="text-sm font-medium py-2 text-primary">
+                    Admin Panel
+                  </Link>
+                )}
                 <button
                   onClick={() => { signOut(); setMobileOpen(false); }}
                   className="text-sm font-medium py-2 text-foreground text-left"
