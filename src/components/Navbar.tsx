@@ -9,6 +9,7 @@ import { Product } from '@/lib/supabase';
 
 const Navbar = () => {
   const { totalItems } = useCart();
+  const { totalItems: wishlistCount } = useWishlist();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [query, setQuery] = useState('');
