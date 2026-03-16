@@ -8,7 +8,9 @@ import { useReviewStats } from '@/hooks/useReviewStats';
 const ProductCard = ({ product }: { product: Product }) => {
   const { addItem } = useCart();
   const { toggleItem, isWishlisted } = useWishlist();
+  const { data: reviewStats } = useReviewStats();
   const wishlisted = isWishlisted(product.id);
+  const stats = reviewStats?.[product.id];
 
   return (
     <div className="group relative">
