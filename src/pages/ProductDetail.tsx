@@ -1,14 +1,17 @@
 import { useParams, Link } from 'react-router-dom';
 import { useProduct } from '@/hooks/useProducts';
 import { useCart } from '@/contexts/CartContext';
-import { ArrowLeft, Minus, Plus } from 'lucide-react';
+import { useWishlist } from '@/contexts/WishlistContext';
+import { ArrowLeft, Minus, Plus, Heart } from 'lucide-react';
 import { useState } from 'react';
 
 const ProductDetail = () => {
   const { id } = useParams<{ id: string }>();
   const { data: product, isLoading } = useProduct(id || '');
   const { addItem } = useCart();
+  const { toggleItem, isWishlisted } = useWishlist();
   const [quantity, setQuantity] = useState(1);
+  const wishlisted = product ? isWishlisted(product.id) : false;
 
   if (isLoading) {
     return (
@@ -107,6 +110,17 @@ const ProductDetail = () => {
                 : product.category === 'Solar Fans'
                 ? 'Equip Now'
                 : 'Add to Collection'}
+            </button>
+            <button
+              onClick={() => toggleItem(product)}
+              className={`p-3 rounded-md border transition-colors ${
+                wishlisted
+                  ? 'border-destructive/30 bg-destructive/10 text-destructive'
+                  : 'border-border text-muted-foreground hover:text-destructive hover:border-destructive/30'
+              }`}
+              aria-label={wishlisted ? 'Remove from wishlist' : 'Add to wishlist'}
+            >
+              <Heart size={20} className={wishlisted ? 'fill-current' : ''} />
             </button>
           </div>
         </div>

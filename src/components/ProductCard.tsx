@@ -1,12 +1,16 @@
 import { Link } from 'react-router-dom';
+import { Heart } from 'lucide-react';
 import { Product } from '@/lib/supabase';
 import { useCart } from '@/contexts/CartContext';
+import { useWishlist } from '@/contexts/WishlistContext';
 
 const ProductCard = ({ product }: { product: Product }) => {
   const { addItem } = useCart();
+  const { toggleItem, isWishlisted } = useWishlist();
+  const wishlisted = isWishlisted(product.id);
 
   return (
-    <div className="group">
+    <div className="group relative">
       <Link to={`/product/${product.id}`}>
         <div className="relative aspect-square overflow-hidden rounded-lg bg-muted card-shadow transition-all duration-150 ease-[cubic-bezier(0.4,0,0.2,1)] group-hover:card-shadow-hover">
           <img
@@ -23,6 +27,17 @@ const ProductCard = ({ product }: { product: Product }) => {
           </div>
         </div>
       </Link>
+      {/* Wishlist button */}
+      <button
+        onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleItem(product); }}
+        className="absolute top-2 right-2 p-1.5 rounded-full bg-background/80 backdrop-blur-sm hover:bg-background transition-colors z-10"
+        aria-label={wishlisted ? 'Remove from wishlist' : 'Add to wishlist'}
+      >
+        <Heart
+          size={16}
+          className={wishlisted ? 'fill-destructive text-destructive' : 'text-muted-foreground hover:text-destructive'}
+        />
+      </button>
       <div className="mt-3 space-y-1">
         <Link to={`/product/${product.id}`}>
           <h3 className="text-sm font-semibold text-foreground leading-tight">{product.name}</h3>

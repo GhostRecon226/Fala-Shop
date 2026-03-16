@@ -1,6 +1,7 @@
 import { Link, useNavigate } from 'react-router-dom';
-import { ShoppingBag, Menu, X, Search } from 'lucide-react';
+import { ShoppingBag, Menu, X, Search, Heart } from 'lucide-react';
 import { useCart } from '@/contexts/CartContext';
+import { useWishlist } from '@/contexts/WishlistContext';
 import logo from '@/assets/logo.png';
 import { useState, useRef, useEffect } from 'react';
 import { useProducts } from '@/hooks/useProducts';
@@ -8,6 +9,7 @@ import { Product } from '@/lib/supabase';
 
 const Navbar = () => {
   const { totalItems } = useCart();
+  const { totalItems: wishlistCount } = useWishlist();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [query, setQuery] = useState('');
@@ -122,6 +124,14 @@ const Navbar = () => {
             )}
           </div>
 
+          <Link to="/wishlist" className="relative p-2 text-foreground hover:text-primary transition-colors duration-150">
+            <Heart size={20} />
+            {wishlistCount > 0 && (
+              <span className="absolute -top-0.5 -right-0.5 flex h-5 w-5 items-center justify-center rounded-full bg-destructive text-[11px] font-semibold tabular-nums text-destructive-foreground">
+                {wishlistCount}
+              </span>
+            )}
+          </Link>
           <Link to="/cart" className="relative p-2 text-foreground hover:text-primary transition-colors duration-150">
             <ShoppingBag size={20} />
             {totalItems > 0 && (
