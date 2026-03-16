@@ -1,17 +1,19 @@
 import { Link, useNavigate } from 'react-router-dom';
-import { ShoppingBag, Menu, X, Search, Heart, User, LogOut, Package } from 'lucide-react';
+import { ShoppingBag, Menu, X, Search, Heart, User, LogOut, Package, ShieldAlert } from 'lucide-react';
 import { useCart } from '@/contexts/CartContext';
 import { useWishlist } from '@/contexts/WishlistContext';
 import { useAuth } from '@/contexts/AuthContext';
 import logo from '@/assets/logo.png';
 import { useState, useRef, useEffect } from 'react';
 import { useProducts } from '@/hooks/useProducts';
+import { useIsAdmin } from '@/hooks/useIsAdmin';
 import { Product } from '@/lib/supabase';
 
 const Navbar = () => {
   const { totalItems } = useCart();
   const { totalItems: wishlistCount } = useWishlist();
   const { user, signOut } = useAuth();
+  const { data: isAdmin } = useIsAdmin();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [query, setQuery] = useState('');
@@ -147,6 +149,11 @@ const Navbar = () => {
               <Link to="/orders" className="p-2 text-foreground hover:text-primary transition-colors duration-150" aria-label="My orders">
                 <Package size={20} />
               </Link>
+              {isAdmin && (
+                <Link to="/admin/orders" className="p-2 text-foreground hover:text-primary transition-colors duration-150" aria-label="Admin">
+                  <ShieldAlert size={20} />
+                </Link>
+              )}
               <button
                 onClick={() => signOut()}
                 className="p-2 text-foreground hover:text-primary transition-colors duration-150"
@@ -189,6 +196,11 @@ const Navbar = () => {
                 <Link to="/orders" onClick={() => setMobileOpen(false)} className="text-sm font-medium py-2 text-foreground">
                   My Orders
                 </Link>
+                {isAdmin && (
+                  <Link to="/admin/orders" onClick={() => setMobileOpen(false)} className="text-sm font-medium py-2 text-primary">
+                    Admin Panel
+                  </Link>
+                )}
                 <button
                   onClick={() => { signOut(); setMobileOpen(false); }}
                   className="text-sm font-medium py-2 text-foreground text-left"
