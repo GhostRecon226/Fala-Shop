@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
-import { Package } from 'lucide-react';
+import { Package, CheckCircle, Truck, BoxIcon, Clock } from 'lucide-react';
 
 type OrderItem = {
   id: string;
@@ -17,6 +17,61 @@ type Order = {
   status: string;
   created_at: string;
   items: OrderItem[];
+};
+
+const STAGES = ['confirmed', 'processing', 'shipped', 'delivered'] as const;
+
+const stageConfig: Record<string, { icon: typeof Clock; label: string }> = {
+  confirmed: { icon: Clock, label: 'Confirmed' },
+  processing: { icon: BoxIcon, label: 'Processing' },
+  shipped: { icon: Truck, label: 'Shipped' },
+  delivered: { icon: CheckCircle, label: 'Delivered' },
+};
+
+const OrderTracker = ({ status }: { status: string }) => {
+  const currentIdx = STAGES.indexOf(status as typeof STAGES[number]);
+  const activeIdx = currentIdx >= 0 ? currentIdx : 0;
+
+  return (
+    <div className="px-5 py-5">
+      <div className="flex items-center justify-between relative">
+        {/* Progress line */}
+        <div className="absolute top-4 left-0 right-0 h-0.5 bg-border" />
+        <div
+          className="absolute top-4 left-0 h-0.5 bg-primary transition-all duration-500"
+          style={{ width: `${(activeIdx / (STAGES.length - 1)) * 100}%` }}
+        />
+
+        {STAGES.map((stage, i) => {
+          const config = stageConfig[stage];
+          const Icon = config.icon;
+          const isComplete = i <= activeIdx;
+          const isCurrent = i === activeIdx;
+
+          return (
+            <div key={stage} className="relative flex flex-col items-center z-10">
+              <div
+                className={`flex items-center justify-center w-8 h-8 rounded-full border-2 transition-all duration-300 ${
+                  isComplete
+                    ? 'bg-primary border-primary text-primary-foreground'
+                    : 'bg-background border-border text-muted-foreground'
+                } ${isCurrent ? 'ring-4 ring-primary/20' : ''}`}
+              >
+                <Icon size={14} />
+              </div>
+              <span
+                className={`text-[11px] mt-1.5 font-medium ${
+                  isComplete ? 'text-primary' : 'text-muted-foreground'
+                }`}
+              >
+                {config.label}
+              </span>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
 };
 
 const Orders = () => {
@@ -106,6 +161,9 @@ const Orders = () => {
                 {order.status}
               </span>
             </div>
+
+            <OrderTracker status={order.status} />
+
             <div className="divide-y divide-border">
               {order.items.map(item => (
                 <div key={item.id} className="flex items-center gap-4 px-5 py-4">
