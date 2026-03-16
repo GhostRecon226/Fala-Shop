@@ -185,12 +185,17 @@ const Navbar = () => {
             </Link>
             <div className="border-t border-border my-1" />
             {user ? (
-              <button
-                onClick={() => { signOut(); setMobileOpen(false); }}
-                className="text-sm font-medium py-2 text-foreground text-left"
-              >
-                Sign Out
-              </button>
+              <>
+                <Link to="/orders" onClick={() => setMobileOpen(false)} className="text-sm font-medium py-2 text-foreground">
+                  My Orders
+                </Link>
+                <button
+                  onClick={() => { signOut(); setMobileOpen(false); }}
+                  className="text-sm font-medium py-2 text-foreground text-left"
+                >
+                  Sign Out
+                </button>
+              </>
             ) : (
               <Link to="/auth" onClick={() => setMobileOpen(false)} className="text-sm font-medium py-2 text-foreground">
                 Sign In / Sign Up

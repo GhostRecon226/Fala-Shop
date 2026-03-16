@@ -179,9 +179,10 @@ const Checkout = () => {
               </div>
               <button
                 type="submit"
-                className="block w-full text-center bg-primary text-primary-foreground py-3 rounded-md text-sm font-semibold hover:opacity-90 transition-all"
+                disabled={submitting}
+                className="block w-full text-center bg-primary text-primary-foreground py-3 rounded-md text-sm font-semibold hover:opacity-90 transition-all disabled:opacity-50"
               >
-                Place Order
+                {submitting ? 'Placing Order…' : 'Place Order'}
               </button>
             </div>
           </div>
