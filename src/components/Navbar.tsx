@@ -1,12 +1,48 @@
-import { Link } from 'react-router-dom';
-import { ShoppingBag, Menu, X } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
+import { ShoppingBag, Menu, X, Search } from 'lucide-react';
 import { useCart } from '@/contexts/CartContext';
 import logo from '@/assets/logo.png';
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
+import { useProducts } from '@/hooks/useProducts';
+import { Product } from '@/lib/supabase';
 
 const Navbar = () => {
   const { totalItems } = useCart();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [query, setQuery] = useState('');
+  const inputRef = useRef<HTMLInputElement>(null);
+  const searchRef = useRef<HTMLDivElement>(null);
+  const navigate = useNavigate();
+  const { data: allProducts } = useProducts();
+
+  const results: Product[] = query.trim().length >= 2
+    ? (allProducts || []).filter(p =>
+        p.name.toLowerCase().includes(query.toLowerCase()) ||
+        p.category.toLowerCase().includes(query.toLowerCase())
+      ).slice(0, 5)
+    : [];
+
+  useEffect(() => {
+    if (searchOpen) inputRef.current?.focus();
+  }, [searchOpen]);
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (searchRef.current && !searchRef.current.contains(e.target as Node)) {
+        setSearchOpen(false);
+        setQuery('');
+      }
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
+
+  const selectProduct = (id: string) => {
+    setSearchOpen(false);
+    setQuery('');
+    navigate(`/product/${id}`);
+  };
 
   return (
     <nav className="sticky top-0 z-50 bg-background/95 backdrop-blur-sm" style={{ height: '72px' }}>
@@ -30,7 +66,62 @@ const Navbar = () => {
         </div>
 
         {/* Utility */}
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2">
+          {/* Search */}
+          <div ref={searchRef} className="relative">
+            {searchOpen ? (
+              <div className="flex items-center">
+                <input
+                  ref={inputRef}
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Escape') { setSearchOpen(false); setQuery(''); }
+                    if (e.key === 'Enter' && results.length > 0) selectProduct(results[0].id);
+                  }}
+                  placeholder="Search products…"
+                  className="w-44 md:w-56 pl-8 pr-3 py-1.5 text-sm rounded-md bg-secondary text-foreground border border-border placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary transition-all"
+                />
+                <Search size={14} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
+              </div>
+            ) : (
+              <button
+                onClick={() => setSearchOpen(true)}
+                className="p-2 text-foreground hover:text-primary transition-colors duration-150"
+                aria-label="Search"
+              >
+                <Search size={20} />
+              </button>
+            )}
+
+            {/* Dropdown results */}
+            {searchOpen && query.trim().length >= 2 && (
+              <div className="absolute top-full right-0 mt-1 w-72 bg-background border border-border rounded-lg shadow-lg overflow-hidden z-50">
+                {results.length > 0 ? (
+                  results.map(product => (
+                    <button
+                      key={product.id}
+                      onClick={() => selectProduct(product.id)}
+                      className="flex items-center gap-3 w-full px-3 py-2.5 text-left hover:bg-muted transition-colors"
+                    >
+                      <img
+                        src={product.image_url || '/placeholder.svg'}
+                        alt={product.name}
+                        className="h-10 w-10 rounded object-cover bg-muted flex-shrink-0"
+                      />
+                      <div className="min-w-0">
+                        <p className="text-sm font-medium text-foreground truncate">{product.name}</p>
+                        <p className="text-xs text-muted-foreground">{product.category} · ${product.price.toFixed(2)}</p>
+                      </div>
+                    </button>
+                  ))
+                ) : (
+                  <p className="px-3 py-4 text-sm text-muted-foreground text-center">No products found</p>
+                )}
+              </div>
+            )}
+          </div>
+
           <Link to="/cart" className="relative p-2 text-foreground hover:text-primary transition-colors duration-150">
             <ShoppingBag size={20} />
             {totalItems > 0 && (
