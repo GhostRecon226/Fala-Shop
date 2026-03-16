@@ -20,7 +20,9 @@ type FormData = z.infer<typeof checkoutSchema>;
 
 const Checkout = () => {
   const { items, totalPrice, clearCart } = useCart();
+  const { user } = useAuth();
   const navigate = useNavigate();
+  const [submitting, setSubmitting] = useState(false);
   const [errors, setErrors] = useState<Partial<Record<keyof FormData, string>>>({});
   const [form, setForm] = useState<FormData>({
     firstName: '', lastName: '', email: '', phone: '',
