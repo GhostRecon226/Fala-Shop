@@ -1,7 +1,8 @@
 import { Link, useNavigate } from 'react-router-dom';
-import { ShoppingBag, Menu, X, Search, Heart } from 'lucide-react';
+import { ShoppingBag, Menu, X, Search, Heart, User, LogOut } from 'lucide-react';
 import { useCart } from '@/contexts/CartContext';
 import { useWishlist } from '@/contexts/WishlistContext';
+import { useAuth } from '@/contexts/AuthContext';
 import logo from '@/assets/logo.png';
 import { useState, useRef, useEffect } from 'react';
 import { useProducts } from '@/hooks/useProducts';
@@ -10,6 +11,7 @@ import { Product } from '@/lib/supabase';
 const Navbar = () => {
   const { totalItems } = useCart();
   const { totalItems: wishlistCount } = useWishlist();
+  const { user, signOut } = useAuth();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [query, setQuery] = useState('');
@@ -140,6 +142,20 @@ const Navbar = () => {
               </span>
             )}
           </Link>
+          {user ? (
+            <button
+              onClick={() => signOut()}
+              className="p-2 text-foreground hover:text-primary transition-colors duration-150"
+              aria-label="Sign out"
+              title={user.email || 'Sign out'}
+            >
+              <LogOut size={20} />
+            </button>
+          ) : (
+            <Link to="/auth" className="p-2 text-foreground hover:text-primary transition-colors duration-150" aria-label="Sign in">
+              <User size={20} />
+            </Link>
+          )}
           <button
             className="md:hidden p-2 text-foreground"
             onClick={() => setMobileOpen(!mobileOpen)}
@@ -162,6 +178,19 @@ const Navbar = () => {
             <Link to="/shop?category=Shirts" onClick={() => setMobileOpen(false)} className="text-sm font-medium py-2 text-foreground">
               Clothing
             </Link>
+            <div className="border-t border-border my-1" />
+            {user ? (
+              <button
+                onClick={() => { signOut(); setMobileOpen(false); }}
+                className="text-sm font-medium py-2 text-foreground text-left"
+              >
+                Sign Out
+              </button>
+            ) : (
+              <Link to="/auth" onClick={() => setMobileOpen(false)} className="text-sm font-medium py-2 text-foreground">
+                Sign In / Sign Up
+              </Link>
+            )}
           </div>
         </div>
       )}
