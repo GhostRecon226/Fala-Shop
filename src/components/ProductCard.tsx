@@ -45,6 +45,13 @@ const ProductCard = ({ product }: { product: Product }) => {
         <Link to={`/product/${product.id}`}>
           <h3 className="text-sm font-semibold text-foreground leading-tight">{product.name}</h3>
         </Link>
+        {stats && (
+          <div className="flex items-center gap-1">
+            <Star size={12} className="fill-primary text-primary" />
+            <span className="text-xs font-medium text-foreground tabular-nums">{stats.avg.toFixed(1)}</span>
+            <span className="text-xs text-muted-foreground">({stats.count})</span>
+          </div>
+        )}
         <p className="text-xs text-muted-foreground">{product.category}</p>
         <div className="flex items-center justify-between">
           <p className="text-sm font-semibold text-primary tabular-nums">
