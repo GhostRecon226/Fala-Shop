@@ -111,6 +111,17 @@ const ProductDetail = () => {
                 ? 'Equip Now'
                 : 'Add to Collection'}
             </button>
+            <button
+              onClick={() => toggleItem(product)}
+              className={`p-3 rounded-md border transition-colors ${
+                wishlisted
+                  ? 'border-destructive/30 bg-destructive/10 text-destructive'
+                  : 'border-border text-muted-foreground hover:text-destructive hover:border-destructive/30'
+              }`}
+              aria-label={wishlisted ? 'Remove from wishlist' : 'Add to wishlist'}
+            >
+              <Heart size={20} className={wishlisted ? 'fill-current' : ''} />
+            </button>
           </div>
         </div>
       </div>

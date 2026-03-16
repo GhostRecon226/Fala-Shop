@@ -1,6 +1,7 @@
 import { Link, useNavigate } from 'react-router-dom';
-import { ShoppingBag, Menu, X, Search } from 'lucide-react';
+import { ShoppingBag, Menu, X, Search, Heart } from 'lucide-react';
 import { useCart } from '@/contexts/CartContext';
+import { useWishlist } from '@/contexts/WishlistContext';
 import logo from '@/assets/logo.png';
 import { useState, useRef, useEffect } from 'react';
 import { useProducts } from '@/hooks/useProducts';
