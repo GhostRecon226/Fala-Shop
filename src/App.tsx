@@ -17,6 +17,7 @@ import OrderConfirmation from "./pages/OrderConfirmation";
 import NotFound from "./pages/NotFound";
 import Wishlist from "./pages/Wishlist";
 import Auth from "./pages/Auth";
+import Orders from "./pages/Orders";
 
 const queryClient = new QueryClient();
 
