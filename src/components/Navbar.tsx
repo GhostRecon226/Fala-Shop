@@ -149,6 +149,11 @@ const Navbar = () => {
               <Link to="/orders" className="p-2 text-foreground hover:text-primary transition-colors duration-150" aria-label="My orders">
                 <Package size={20} />
               </Link>
+              {isAdmin && (
+                <Link to="/admin/orders" className="p-2 text-foreground hover:text-primary transition-colors duration-150" aria-label="Admin">
+                  <ShieldAlert size={20} />
+                </Link>
+              )}
               <button
                 onClick={() => signOut()}
                 className="p-2 text-foreground hover:text-primary transition-colors duration-150"
