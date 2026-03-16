@@ -18,6 +18,7 @@ import NotFound from "./pages/NotFound";
 import Wishlist from "./pages/Wishlist";
 import Auth from "./pages/Auth";
 import Orders from "./pages/Orders";
+import AdminOrders from "./pages/AdminOrders";
 
 const queryClient = new QueryClient();
 
