@@ -1,8 +1,9 @@
 import { Link } from 'react-router-dom';
-import { Heart } from 'lucide-react';
+import { Heart, Star } from 'lucide-react';
 import { Product } from '@/lib/supabase';
 import { useCart } from '@/contexts/CartContext';
 import { useWishlist } from '@/contexts/WishlistContext';
+import { useReviewStats } from '@/hooks/useReviewStats';
 
 const ProductCard = ({ product }: { product: Product }) => {
   const { addItem } = useCart();
