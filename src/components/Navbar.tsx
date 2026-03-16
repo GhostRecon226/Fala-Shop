@@ -143,14 +143,19 @@ const Navbar = () => {
             )}
           </Link>
           {user ? (
-            <button
-              onClick={() => signOut()}
-              className="p-2 text-foreground hover:text-primary transition-colors duration-150"
-              aria-label="Sign out"
-              title={user.email || 'Sign out'}
-            >
-              <LogOut size={20} />
-            </button>
+            <>
+              <Link to="/orders" className="p-2 text-foreground hover:text-primary transition-colors duration-150" aria-label="My orders">
+                <Package size={20} />
+              </Link>
+              <button
+                onClick={() => signOut()}
+                className="p-2 text-foreground hover:text-primary transition-colors duration-150"
+                aria-label="Sign out"
+                title={user.email || 'Sign out'}
+              >
+                <LogOut size={20} />
+              </button>
+            </>
           ) : (
             <Link to="/auth" className="p-2 text-foreground hover:text-primary transition-colors duration-150" aria-label="Sign in">
               <User size={20} />
