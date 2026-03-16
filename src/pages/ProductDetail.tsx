@@ -4,6 +4,7 @@ import { useCart } from '@/contexts/CartContext';
 import { useWishlist } from '@/contexts/WishlistContext';
 import { ArrowLeft, Minus, Plus, Heart } from 'lucide-react';
 import { useState } from 'react';
+import ProductReviews from '@/components/ProductReviews';
 
 const ProductDetail = () => {
   const { id } = useParams<{ id: string }>();
