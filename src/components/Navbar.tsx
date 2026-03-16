@@ -124,6 +124,14 @@ const Navbar = () => {
             )}
           </div>
 
+          <Link to="/wishlist" className="relative p-2 text-foreground hover:text-primary transition-colors duration-150">
+            <Heart size={20} />
+            {wishlistCount > 0 && (
+              <span className="absolute -top-0.5 -right-0.5 flex h-5 w-5 items-center justify-center rounded-full bg-destructive text-[11px] font-semibold tabular-nums text-destructive-foreground">
+                {wishlistCount}
+              </span>
+            )}
+          </Link>
           <Link to="/cart" className="relative p-2 text-foreground hover:text-primary transition-colors duration-150">
             <ShoppingBag size={20} />
             {totalItems > 0 && (
