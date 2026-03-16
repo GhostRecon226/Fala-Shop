@@ -9,7 +9,9 @@ const ProductDetail = () => {
   const { id } = useParams<{ id: string }>();
   const { data: product, isLoading } = useProduct(id || '');
   const { addItem } = useCart();
+  const { toggleItem, isWishlisted } = useWishlist();
   const [quantity, setQuantity] = useState(1);
+  const wishlisted = product ? isWishlisted(product.id) : false;
 
   if (isLoading) {
     return (
