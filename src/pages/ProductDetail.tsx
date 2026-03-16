@@ -1,7 +1,8 @@
 import { useParams, Link } from 'react-router-dom';
 import { useProduct } from '@/hooks/useProducts';
 import { useCart } from '@/contexts/CartContext';
-import { ArrowLeft, Minus, Plus } from 'lucide-react';
+import { useWishlist } from '@/contexts/WishlistContext';
+import { ArrowLeft, Minus, Plus, Heart } from 'lucide-react';
 import { useState } from 'react';
 
 const ProductDetail = () => {
