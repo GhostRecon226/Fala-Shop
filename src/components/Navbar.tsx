@@ -6,6 +6,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import logo from '@/assets/logo.png';
 import { useState, useRef, useEffect } from 'react';
 import { useProducts } from '@/hooks/useProducts';
+import { useIsAdmin } from '@/hooks/useIsAdmin';
 import { Product } from '@/lib/supabase';
 
 const Navbar = () => {
