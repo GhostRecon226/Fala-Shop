@@ -50,6 +50,8 @@ const emptyForm = {
   description: '',
   image_url: '',
   is_featured: false,
+  available_sizes: [] as string[],
+  available_colors: [] as string[],
 };
 
 const AdminProducts = () => {
