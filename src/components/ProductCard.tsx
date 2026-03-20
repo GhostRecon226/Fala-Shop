@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { formatPrice } from '@/lib/utils';
 import { Heart, Star } from 'lucide-react';
 import { Product } from '@/lib/supabase';
 import { useCart } from '@/contexts/CartContext';
@@ -55,7 +56,7 @@ const ProductCard = ({ product }: { product: Product }) => {
         <p className="text-xs text-muted-foreground">{product.category}</p>
         <div className="flex items-center justify-between">
           <p className="text-sm font-semibold text-primary tabular-nums">
-            ${product.price.toFixed(2)}
+            {formatPrice(product.price)}
           </p>
           <button
             onClick={() => addItem(product)}

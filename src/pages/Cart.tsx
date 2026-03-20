@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { formatPrice } from '@/lib/utils';
 import { useCart } from '@/contexts/CartContext';
 import { Minus, Plus, Trash2, ShoppingBag } from 'lucide-react';
 
@@ -41,7 +42,7 @@ const Cart = () => {
                 </Link>
                 <p className="text-xs text-muted-foreground">{product.category}</p>
                 <p className="text-sm font-semibold text-primary tabular-nums mt-1">
-                  ${product.price.toFixed(2)}
+                  {formatPrice(product.price)}
                 </p>
               </div>
               <div className="flex flex-col items-end justify-between">
@@ -68,7 +69,7 @@ const Cart = () => {
             <h2 className="text-lg font-semibold text-foreground">Order Summary</h2>
             <div className="flex justify-between text-sm">
               <span className="text-muted-foreground">Subtotal</span>
-              <span className="font-medium tabular-nums">${totalPrice.toFixed(2)}</span>
+              <span className="font-medium tabular-nums">{formatPrice(totalPrice)}</span>
             </div>
             <div className="flex justify-between text-sm">
               <span className="text-muted-foreground">Shipping</span>
@@ -76,7 +77,7 @@ const Cart = () => {
             </div>
             <div className="border-t border-border pt-4 flex justify-between">
               <span className="font-semibold text-foreground">Total</span>
-              <span className="font-bold text-primary tabular-nums">${totalPrice.toFixed(2)}</span>
+              <span className="font-bold text-primary tabular-nums">{formatPrice(totalPrice)}</span>
             </div>
             <Link
               to="/checkout"

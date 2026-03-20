@@ -1,4 +1,5 @@
 import { useEffect, useState, useRef } from 'react';
+import { formatPrice } from '@/lib/utils';
 import { Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
@@ -252,7 +253,7 @@ const AdminProducts = () => {
                   </TableCell>
                   <TableCell className="font-medium">{p.name}</TableCell>
                   <TableCell>{p.category}</TableCell>
-                  <TableCell className="text-right tabular-nums">${Number(p.price).toFixed(2)}</TableCell>
+                  <TableCell className="text-right tabular-nums">{formatPrice(Number(p.price))}</TableCell>
                   <TableCell className="text-right tabular-nums">{p.stock_quantity ?? 0}</TableCell>
                   <TableCell>{p.is_featured ? '✓' : '—'}</TableCell>
                   <TableCell className="text-right">

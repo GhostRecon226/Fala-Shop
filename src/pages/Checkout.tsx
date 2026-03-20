@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { formatPrice } from '@/lib/utils';
 import { useNavigate, Link, Navigate } from 'react-router-dom';
 import { useCart } from '@/contexts/CartContext';
 import { useAuth } from '@/contexts/AuthContext';
@@ -181,13 +182,13 @@ const Checkout = () => {
                 {items.map(({ product, quantity }) => (
                   <div key={product.id} className="flex justify-between text-sm">
                     <span className="text-muted-foreground truncate mr-2">{product.name} × {quantity}</span>
-                    <span className="font-medium tabular-nums">${(product.price * quantity).toFixed(2)}</span>
+                    <span className="font-medium tabular-nums">{formatPrice(product.price * quantity)}</span>
                   </div>
                 ))}
               </div>
               <div className="border-t border-border pt-4 flex justify-between">
                 <span className="font-semibold text-foreground">Total</span>
-                <span className="font-bold text-primary tabular-nums">${totalPrice.toFixed(2)}</span>
+                <span className="font-bold text-primary tabular-nums">{formatPrice(totalPrice)}</span>
               </div>
               <button
                 type="submit"

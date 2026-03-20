@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { formatPrice } from '@/lib/utils';
 import { Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
@@ -166,7 +167,7 @@ const AdminOrders = () => {
                     </div>
                     <div>
                       <span className="text-muted-foreground">Total</span>
-                      <p className="font-medium text-foreground tabular-nums">${Number(order.total).toFixed(2)}</p>
+                      <p className="font-medium text-foreground tabular-nums">{formatPrice(Number(order.total))}</p>
                     </div>
                     <div>
                       <span className="text-muted-foreground">Customer</span>
@@ -203,7 +204,7 @@ const AdminOrders = () => {
                   {items.map(item => (
                     <div key={item.id} className="flex items-center justify-between px-5 py-3 text-sm">
                       <span className="text-foreground">{item.product_name || 'Unknown'} <span className="text-muted-foreground">× {item.quantity}</span></span>
-                      <span className="font-medium text-foreground tabular-nums">${(Number(item.price) * item.quantity).toFixed(2)}</span>
+                      <span className="font-medium text-foreground tabular-nums">{formatPrice(Number(item.price) * item.quantity)}</span>
                     </div>
                   ))}
                 </div>

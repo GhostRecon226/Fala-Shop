@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { formatPrice } from '@/lib/utils';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
@@ -154,7 +155,7 @@ const Orders = () => {
                 </div>
                 <div>
                   <span className="text-muted-foreground">Total</span>
-                  <p className="font-medium text-foreground tabular-nums">${Number(order.total).toFixed(2)}</p>
+                  <p className="font-medium text-foreground tabular-nums">{formatPrice(Number(order.total))}</p>
                 </div>
               </div>
               <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary/10 text-primary capitalize">
@@ -174,10 +175,10 @@ const Orders = () => {
                   />
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium text-foreground truncate">{item.product?.name || 'Unknown Product'}</p>
-                    <p className="text-xs text-muted-foreground">Qty: {item.quantity} · ${Number(item.price).toFixed(2)} each</p>
+                    <p className="text-xs text-muted-foreground">Qty: {item.quantity} · {formatPrice(Number(item.price))} each</p>
                   </div>
                   <p className="text-sm font-medium text-foreground tabular-nums">
-                    ${(Number(item.price) * item.quantity).toFixed(2)}
+                    {formatPrice(Number(item.price) * item.quantity)}
                   </p>
                 </div>
               ))}

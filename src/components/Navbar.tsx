@@ -1,4 +1,5 @@
 import { Link, useNavigate } from 'react-router-dom';
+import { formatPrice } from '@/lib/utils';
 import { ShoppingBag, Menu, X, Search, Heart, User, LogOut, Package, ShieldAlert } from 'lucide-react';
 import { useCart } from '@/contexts/CartContext';
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from '@/components/ui/tooltip';
@@ -124,7 +125,7 @@ const Navbar = () => {
                         />
                         <div className="min-w-0">
                           <p className="text-sm font-medium text-foreground truncate">{product.name}</p>
-                          <p className="text-xs text-muted-foreground">{product.category} · ${product.price.toFixed(2)}</p>
+                          <p className="text-xs text-muted-foreground">{product.category} · {formatPrice(product.price)}</p>
                         </div>
                       </button>
                     ))
