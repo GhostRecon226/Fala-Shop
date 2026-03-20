@@ -25,6 +25,7 @@ type OrderItemRow = {
   product_id: string;
   quantity: number;
   price: number;
+  size?: string | null;
   product_name?: string;
 };
 
@@ -54,7 +55,7 @@ const AdminOrders = () => {
     if (allOrders.length > 0) {
       const { data: items } = await supabase
         .from('order_items')
-        .select('id, order_id, product_id, quantity, price')
+        .select('id, order_id, product_id, quantity, price, size')
         .in('order_id', allOrders.map(o => o.id));
 
       const productIds = [...new Set((items || []).map(i => i.product_id))];
@@ -203,7 +204,7 @@ const AdminOrders = () => {
                 <div className="divide-y divide-border">
                   {items.map(item => (
                     <div key={item.id} className="flex items-center justify-between px-5 py-3 text-sm">
-                      <span className="text-foreground">{item.product_name || 'Unknown'} <span className="text-muted-foreground">× {item.quantity}</span></span>
+                      <span className="text-foreground">{item.product_name || 'Unknown'}{item.size ? ` (${item.size})` : ''} <span className="text-muted-foreground">× {item.quantity}</span></span>
                       <span className="font-medium text-foreground tabular-nums">{formatPrice(Number(item.price) * item.quantity)}</span>
                     </div>
                   ))}

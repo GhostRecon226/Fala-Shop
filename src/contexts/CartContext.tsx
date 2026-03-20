@@ -6,13 +6,14 @@ import { useAuth } from '@/contexts/AuthContext';
 export type CartItem = {
   product: Product;
   quantity: number;
+  size?: string | null;
 };
 
 type CartContextType = {
   items: CartItem[];
-  addItem: (product: Product) => void;
-  removeItem: (productId: string) => void;
-  updateQuantity: (productId: string, quantity: number) => void;
+  addItem: (product: Product, size?: string | null) => void;
+  removeItem: (productId: string, size?: string | null) => void;
+  updateQuantity: (productId: string, size: string | null | undefined, quantity: number) => void;
   clearCart: () => void;
   totalItems: number;
   totalPrice: number;
@@ -22,6 +23,11 @@ type CartContextType = {
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
 const LOCAL_KEY = 'cart_items';
+
+const itemKey = (productId: string, size?: string | null) => `${productId}::${size || ''}`;
+
+const matchItem = (item: CartItem, productId: string, size?: string | null) =>
+  item.product.id === productId && (item.size || null) === (size || null);
 
 const readLocal = (): CartItem[] => {
   try {
@@ -42,7 +48,6 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   const [loading, setLoading] = useState(true);
   const syncing = useRef(false);
 
-  // Load cart on mount / auth change
   useEffect(() => {
     if (user) {
       loadFromDb();
@@ -56,10 +61,9 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     setLoading(true);
     const { data: cartRows } = await supabase
       .from('cart_items')
-      .select('product_id, quantity');
+      .select('product_id, quantity, size');
 
     if (!cartRows || cartRows.length === 0) {
-      // If user just logged in and had local cart items, merge them
       const local = readLocal();
       if (local.length > 0) {
         await mergeLocalToDb(local);
@@ -84,13 +88,13 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
       .map(r => ({
         product: productMap[r.product_id] as Product,
         quantity: r.quantity,
+        size: r.size || null,
       }));
 
-    // Merge any local items
     const local = readLocal();
     if (local.length > 0) {
       for (const li of local) {
-        const existing = loaded.find(i => i.product.id === li.product.id);
+        const existing = loaded.find(i => matchItem(i, li.product.id, li.size));
         if (existing) {
           existing.quantity += li.quantity;
         } else {
@@ -111,32 +115,38 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
       await supabase
         .from('cart_items')
         .upsert(
-          { user_id: user.id, product_id: item.product.id, quantity: item.quantity },
-          { onConflict: 'user_id,product_id' }
+          { user_id: user.id, product_id: item.product.id, quantity: item.quantity, size: item.size || null },
+          { onConflict: 'user_id,product_id,size' }
         );
     }
   };
 
-  const persistItem = useCallback(async (productId: string, quantity: number) => {
+  const persistItem = useCallback(async (productId: string, quantity: number, size?: string | null) => {
     if (!user) return;
     if (syncing.current) return;
     syncing.current = true;
     await supabase
       .from('cart_items')
       .upsert(
-        { user_id: user.id, product_id: productId, quantity },
-        { onConflict: 'user_id,product_id' }
+        { user_id: user.id, product_id: productId, quantity, size: size || null },
+        { onConflict: 'user_id,product_id,size' }
       );
     syncing.current = false;
   }, [user]);
 
-  const removeFromDb = useCallback(async (productId: string) => {
+  const removeFromDb = useCallback(async (productId: string, size?: string | null) => {
     if (!user) return;
-    await supabase
+    let query = supabase
       .from('cart_items')
       .delete()
       .eq('user_id', user.id)
       .eq('product_id', productId);
+    if (size) {
+      query = query.eq('size', size);
+    } else {
+      query = query.is('size', null);
+    }
+    await query;
   }, [user]);
 
   const clearDb = useCallback(async () => {
@@ -147,46 +157,46 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
       .eq('user_id', user.id);
   }, [user]);
 
-  const addItem = (product: Product) => {
+  const addItem = (product: Product, size?: string | null) => {
     setItems(prev => {
-      const existing = prev.find(i => i.product.id === product.id);
+      const existing = prev.find(i => matchItem(i, product.id, size));
       let updated: CartItem[];
       if (existing) {
         updated = prev.map(i =>
-          i.product.id === product.id
+          matchItem(i, product.id, size)
             ? { ...i, quantity: i.quantity + 1 }
             : i
         );
-        persistItem(product.id, existing.quantity + 1);
+        persistItem(product.id, existing.quantity + 1, size);
       } else {
-        updated = [...prev, { product, quantity: 1 }];
-        persistItem(product.id, 1);
+        updated = [...prev, { product, quantity: 1, size: size || null }];
+        persistItem(product.id, 1, size);
       }
       if (!user) writeLocal(updated);
       return updated;
     });
   };
 
-  const removeItem = (productId: string) => {
+  const removeItem = (productId: string, size?: string | null) => {
     setItems(prev => {
-      const updated = prev.filter(i => i.product.id !== productId);
+      const updated = prev.filter(i => !matchItem(i, productId, size));
       if (!user) writeLocal(updated);
-      removeFromDb(productId);
+      removeFromDb(productId, size);
       return updated;
     });
   };
 
-  const updateQuantity = (productId: string, quantity: number) => {
+  const updateQuantity = (productId: string, size: string | null | undefined, quantity: number) => {
     if (quantity <= 0) {
-      removeItem(productId);
+      removeItem(productId, size);
       return;
     }
     setItems(prev => {
       const updated = prev.map(i =>
-        i.product.id === productId ? { ...i, quantity } : i
+        matchItem(i, productId, size) ? { ...i, quantity } : i
       );
       if (!user) writeLocal(updated);
-      persistItem(productId, quantity);
+      persistItem(productId, quantity, size);
       return updated;
     });
   };

@@ -9,6 +9,7 @@ type OrderItem = {
   id: string;
   quantity: number;
   price: number;
+  size?: string | null;
   product: { name: string; image_url: string | null } | null;
 };
 
@@ -96,7 +97,7 @@ const Orders = () => {
 
       const { data: itemsData } = await supabase
         .from('order_items')
-        .select('id, order_id, quantity, price, product_id')
+        .select('id, order_id, quantity, price, product_id, size')
         .in('order_id', ordersData.map(o => o.id));
 
       const productIds = [...new Set((itemsData || []).map(i => i.product_id))];
@@ -174,7 +175,9 @@ const Orders = () => {
                     className="h-14 w-14 rounded object-cover bg-muted flex-shrink-0"
                   />
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-foreground truncate">{item.product?.name || 'Unknown Product'}</p>
+                    <p className="text-sm font-medium text-foreground truncate">
+                      {item.product?.name || 'Unknown Product'}{item.size ? ` (${item.size})` : ''}
+                    </p>
                     <p className="text-xs text-muted-foreground">Qty: {item.quantity} · {formatPrice(Number(item.price))} each</p>
                   </div>
                   <p className="text-sm font-medium text-foreground tabular-nums">
