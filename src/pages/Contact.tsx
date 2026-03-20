@@ -29,7 +29,7 @@ const Contact = () => {
 
   const onSubmit = async (values: ContactValues) => {
     setSubmitting(true);
-    const { error } = await supabase.from('contact_messages').insert(values);
+    const { error } = await supabase.from('contact_messages').insert([values]);
     setSubmitting(false);
 
     if (error) {
