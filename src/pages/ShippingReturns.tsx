@@ -29,7 +29,7 @@ const faqs = [
     value: 'refund-process',
     title: 'Refund Process',
     content:
-      'Once we receive and inspect your return, refunds are processed within 5 business days to your original payment method. You'll receive an email confirmation when your refund has been issued.',
+      "Once we receive and inspect your return, refunds are processed within 5 business days to your original payment method. You'll receive an email confirmation when your refund has been issued.",
   },
   {
     value: 'exchanges',
