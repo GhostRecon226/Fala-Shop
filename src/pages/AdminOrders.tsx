@@ -6,6 +6,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useIsAdmin } from '@/hooks/useIsAdmin';
 import { ShieldAlert, Package, ChevronDown } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
+import { logAdminAction } from '@/hooks/useAdminLog';
 import AdminNav from '@/components/AdminNav';
 
 const STATUSES = ['confirmed', 'processing', 'shipped', 'delivered'] as const;
