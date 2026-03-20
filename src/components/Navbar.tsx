@@ -249,6 +249,9 @@ const Navbar = () => {
             <div className="border-t border-border my-1" />
             {user ? (
               <>
+                <Link to="/account/settings" onClick={() => setMobileOpen(false)} className="text-sm font-medium py-2 text-foreground">
+                  Account Settings
+                </Link>
                 <Link to="/orders" onClick={() => setMobileOpen(false)} className="text-sm font-medium py-2 text-foreground">
                   My Orders
                 </Link>
