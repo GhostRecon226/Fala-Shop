@@ -244,6 +244,9 @@ const Navbar = () => {
                 <Link to="/orders" onClick={() => setMobileOpen(false)} className="text-sm font-medium py-2 text-foreground">
                   My Orders
                 </Link>
+                <Link to="/account/change-password" onClick={() => setMobileOpen(false)} className="text-sm font-medium py-2 text-foreground">
+                  Change Password
+                </Link>
                 {isAdmin && (
                   <Link to="/admin/orders" onClick={() => setMobileOpen(false)} className="text-sm font-medium py-2 text-primary">
                     Admin Panel
