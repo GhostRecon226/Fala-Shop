@@ -86,6 +86,7 @@ const AdminProducts = () => {
     setEditingId(null);
     setForm(emptyForm);
     setImagePreview(null);
+    setColorInput('');
     setDialogOpen(true);
   };
 
