@@ -21,6 +21,7 @@ import {
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import AdminNav from '@/components/AdminNav';
+import AdminProductImages from '@/components/AdminProductImages';
 
 const CATEGORIES = ['Solar Fans', 'Clothing', 'Sneakers', 'Bags'] as const;
 
