@@ -4,7 +4,8 @@ import { useIsAdmin } from '@/hooks/useIsAdmin';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 import AdminNav from '@/components/AdminNav';
-import { ShieldAlert, Loader2, Users, Search, X } from 'lucide-react';
+import { ShieldAlert, Loader2, Users, Search, X, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import {
