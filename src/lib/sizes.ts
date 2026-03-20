@@ -5,7 +5,7 @@ export type Size = typeof SIZES[number];
 export const CLOTHING_COLORS = ['Black', 'White', 'Navy', 'Red', 'Grey', 'Blue', 'Green', 'Brown', 'Beige', 'Pink'] as const;
 
 const SIZE_CATEGORIES = ['Clothing', 'Sneakers', 'Bags'];
-const COLOR_CATEGORIES = ['Clothing'];
+const COLOR_CATEGORIES = ['Clothing', 'Sneakers', 'Bags'];
 
 export const requiresSize = (category: string) => SIZE_CATEGORIES.includes(category);
 export const requiresColor = (category: string) => COLOR_CATEGORIES.includes(category);
