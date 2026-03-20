@@ -1,21 +1,15 @@
 
 
-## Plan: Require Login Before Checkout
+## Plan: Add Tooltips to Navbar Icons
 
-### Overview
-Redirect unauthenticated users to the auth page when they attempt to checkout, then return them to checkout after login.
+Wrap each icon button/link in the navbar's utility area with the existing `Tooltip` component from `src/components/ui/tooltip.tsx` so hovering displays a label.
 
 ### Changes
 
-1. **`src/pages/Checkout.tsx`**
-   - Add auth check at top: if `!user && !loading`, redirect to `/auth?redirect=/checkout`
+**`src/components/Navbar.tsx`**
+- Import `Tooltip, TooltipTrigger, TooltipContent, TooltipProvider` from `@/components/ui/tooltip`
+- Wrap the utility icons section in `<TooltipProvider>`
+- Add tooltips to: Search, Wishlist, Cart, My Orders, Admin, Sign Out, Sign In icons with labels like "Search", "Wishlist", "Cart", "My Orders", "Admin", "Sign Out", "Sign In"
 
-2. **`src/contexts/AuthContext.tsx`** (or `src/pages/Auth.tsx`)
-   - Read `redirect` query param after successful login
-   - Navigate to that URL instead of defaulting to `/`
-
-### Technical Details
-- No database or RLS changes needed
-- Cart persists via localStorage for guests, merges on login, so items won't be lost
-- The "Place Order" button's `if (user)` guard in Checkout becomes unnecessary but harmless
+No other files need changes — the tooltip component already exists.
 
