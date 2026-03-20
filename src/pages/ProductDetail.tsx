@@ -6,7 +6,7 @@ import { useWishlist } from '@/contexts/WishlistContext';
 import { ArrowLeft, Minus, Plus, Heart } from 'lucide-react';
 import { useState } from 'react';
 import ProductReviews from '@/components/ProductReviews';
-import { SIZES, requiresSize } from '@/lib/sizes';
+import { getSizesForCategory, requiresSize } from '@/lib/sizes';
 
 const ProductDetail = () => {
   const { id } = useParams<{ id: string }>();
