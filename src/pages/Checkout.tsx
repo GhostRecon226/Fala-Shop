@@ -89,11 +89,12 @@ const Checkout = () => {
         const { error: itemsError } = await supabase
           .from('order_items')
           .insert(
-            items.map(({ product, quantity }) => ({
+            items.map(({ product, quantity, size }) => ({
               order_id: order.id,
               product_id: product.id,
               quantity,
               price: product.price,
+              size: size || null,
             }))
           );
 
