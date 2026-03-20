@@ -10,6 +10,8 @@ const Auth = () => {
   const [submitting, setSubmitting] = useState(false);
   const { signIn, signUp, user, loading } = useAuth();
   const { toast } = useToast();
+  const [searchParams] = useSearchParams();
+  const redirectTo = searchParams.get('redirect') || '/';
 
   if (loading) {
     return (
