@@ -175,7 +175,7 @@ const Orders = () => {
                   />
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium text-foreground truncate">{item.product?.name || 'Unknown Product'}</p>
-                    <p className="text-xs text-muted-foreground">Qty: {item.quantity} · ${Number(item.price).toFixed(2)} each</p>
+                    <p className="text-xs text-muted-foreground">Qty: {item.quantity} · {formatPrice(Number(item.price))} each</p>
                   </div>
                   <p className="text-sm font-medium text-foreground tabular-nums">
                     ${(Number(item.price) * item.quantity).toFixed(2)}
