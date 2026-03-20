@@ -5,7 +5,7 @@ export type Product = {
   created_at: string;
   name: string;
   price: number;
-  category: 'Solar Fans' | 'Shirts' | 'Sneakers' | 'Bags';
+  category: 'Solar Fans' | 'Clothing' | 'Sneakers' | 'Bags';
   description: string | null;
   image_url: string | null;
   stock_quantity: number;

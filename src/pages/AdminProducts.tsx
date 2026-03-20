@@ -21,7 +21,7 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import AdminNav from '@/components/AdminNav';
 
-const CATEGORIES = ['Solar Fans', 'Shirts', 'Sneakers', 'Bags'] as const;
+const CATEGORIES = ['Solar Fans', 'Clothing', 'Sneakers', 'Bags'] as const;
 
 type Product = {
   id: string;
