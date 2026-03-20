@@ -41,6 +41,16 @@ const AdminUsers = () => {
   const [users, setUsers] = useState<UserWithRole[]>([]);
   const [loading, setLoading] = useState(true);
   const [updatingId, setUpdatingId] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [roleFilter, setRoleFilter] = useState<string>('all');
+
+  const filteredUsers = users.filter(u => {
+    const matchesSearch = searchQuery.trim().length === 0 ||
+      u.email.toLowerCase().includes(searchQuery.toLowerCase());
+    const effectiveRole = u.role || 'user';
+    const matchesRole = roleFilter === 'all' || effectiveRole === roleFilter;
+    return matchesSearch && matchesRole;
+  });
 
   useEffect(() => {
     if (authLoading || adminLoading || !isAdmin) return;
