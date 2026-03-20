@@ -2,7 +2,8 @@ import { useState, useRef, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
-import { Upload, X, ImageIcon, GripVertical } from 'lucide-react';
+import { Upload, X, Star } from 'lucide-react';
+import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from '@/components/ui/tooltip';
 
 type GalleryImage = {
   id: string;
@@ -12,10 +13,12 @@ type GalleryImage = {
 
 interface AdminProductImagesProps {
   productId: string | null;
+  currentCoverUrl?: string | null;
+  onSetCover?: (imageUrl: string) => void;
   onImagesChanged?: () => void;
 }
 
-const AdminProductImages = ({ productId, onImagesChanged }: AdminProductImagesProps) => {
+const AdminProductImages = ({ productId, currentCoverUrl, onSetCover, onImagesChanged }: AdminProductImagesProps) => {
   const [images, setImages] = useState<GalleryImage[]>([]);
   const [uploading, setUploading] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -111,20 +114,48 @@ const AdminProductImages = ({ productId, onImagesChanged }: AdminProductImagesPr
         <>
           {images.length > 0 && (
             <div className="grid grid-cols-3 gap-2 mb-3">
-              {images.map(img => (
-                <div key={img.id} className="relative group aspect-square rounded-md overflow-hidden border border-border bg-muted">
-                  <img src={img.image_url} alt="" className="w-full h-full object-cover" />
-                  <Button
-                    variant="destructive"
-                    size="icon"
-                    className="absolute top-1 right-1 h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
-                    onClick={() => handleDelete(img.id)}
-                    type="button"
-                  >
-                    <X size={12} />
-                  </Button>
-                </div>
-              ))}
+              {images.map(img => {
+                const isCover = currentCoverUrl === img.image_url;
+                return (
+                  <div key={img.id} className={`relative group aspect-square rounded-md overflow-hidden border-2 bg-muted ${isCover ? 'border-primary' : 'border-border'}`}>
+                    <img src={img.image_url} alt="" className="w-full h-full object-cover" />
+                    {isCover && (
+                      <span className="absolute bottom-1 left-1 bg-primary text-primary-foreground text-[10px] font-semibold px-1.5 py-0.5 rounded">
+                        Cover
+                      </span>
+                    )}
+                    <div className="absolute top-1 right-1 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                      {!isCover && onSetCover && (
+                        <TooltipProvider delayDuration={200}>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button
+                                variant="secondary"
+                                size="icon"
+                                className="h-6 w-6"
+                                onClick={() => onSetCover(img.image_url)}
+                                type="button"
+                              >
+                                <Star size={12} />
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent side="bottom"><p>Set as cover</p></TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                      )}
+                      <Button
+                        variant="destructive"
+                        size="icon"
+                        className="h-6 w-6"
+                        onClick={() => handleDelete(img.id)}
+                        type="button"
+                      >
+                        <X size={12} />
+                      </Button>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           )}
 
