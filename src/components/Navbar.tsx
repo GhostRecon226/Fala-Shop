@@ -1,4 +1,5 @@
 import { Link, useNavigate } from 'react-router-dom';
+import { formatPrice } from '@/lib/utils';
 import { ShoppingBag, Menu, X, Search, Heart, User, LogOut, Package, ShieldAlert } from 'lucide-react';
 import { useCart } from '@/contexts/CartContext';
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from '@/components/ui/tooltip';
