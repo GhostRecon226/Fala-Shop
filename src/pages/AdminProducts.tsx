@@ -1,10 +1,10 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useIsAdmin } from '@/hooks/useIsAdmin';
 import { useQueryClient } from '@tanstack/react-query';
-import { ShieldAlert, Plus, Pencil, Trash2 } from 'lucide-react';
+import { ShieldAlert, Plus, Pencil, Trash2, Upload, X, Image as ImageIcon } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -56,6 +56,9 @@ const AdminProducts = () => {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState(emptyForm);
   const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (isAdmin) loadProducts();
@@ -71,6 +74,7 @@ const AdminProducts = () => {
   const openAdd = () => {
     setEditingId(null);
     setForm(emptyForm);
+    setImagePreview(null);
     setDialogOpen(true);
   };
 
@@ -85,7 +89,48 @@ const AdminProducts = () => {
       image_url: p.image_url || '',
       is_featured: !!p.is_featured,
     });
+    setImagePreview(p.image_url || null);
     setDialogOpen(true);
+  };
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      toast({ title: 'Invalid file', description: 'Please select an image file', variant: 'destructive' });
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      toast({ title: 'File too large', description: 'Image must be under 5 MB', variant: 'destructive' });
+      return;
+    }
+
+    setUploading(true);
+    const ext = file.name.split('.').pop();
+    const fileName = `${crypto.randomUUID()}.${ext}`;
+
+    const { error } = await supabase.storage.from('product-images').upload(fileName, file);
+    if (error) {
+      toast({ title: 'Upload failed', description: error.message, variant: 'destructive' });
+      setUploading(false);
+      return;
+    }
+
+    const { data: urlData } = supabase.storage.from('product-images').getPublicUrl(fileName);
+    const publicUrl = urlData.publicUrl;
+
+    setForm(f => ({ ...f, image_url: publicUrl }));
+    setImagePreview(publicUrl);
+    setUploading(false);
+    toast({ title: 'Uploaded', description: 'Image uploaded successfully' });
+  };
+
+  const removeImage = () => {
+    setForm(f => ({ ...f, image_url: '' }));
+    setImagePreview(null);
+    if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
   const handleSave = async () => {
@@ -184,6 +229,7 @@ const AdminProducts = () => {
           <Table>
             <TableHeader>
               <TableRow>
+                <TableHead className="w-12">Image</TableHead>
                 <TableHead>Name</TableHead>
                 <TableHead>Category</TableHead>
                 <TableHead className="text-right">Price</TableHead>
@@ -195,6 +241,15 @@ const AdminProducts = () => {
             <TableBody>
               {products.map(p => (
                 <TableRow key={p.id}>
+                  <TableCell>
+                    {p.image_url ? (
+                      <img src={p.image_url} alt={p.name} className="w-10 h-10 rounded object-cover" />
+                    ) : (
+                      <div className="w-10 h-10 rounded bg-muted flex items-center justify-center">
+                        <ImageIcon size={16} className="text-muted-foreground" />
+                      </div>
+                    )}
+                  </TableCell>
                   <TableCell className="font-medium">{p.name}</TableCell>
                   <TableCell>{p.category}</TableCell>
                   <TableCell className="text-right tabular-nums">${Number(p.price).toFixed(2)}</TableCell>
@@ -250,10 +305,44 @@ const AdminProducts = () => {
                 <Input type="number" value={form.stock_quantity} onChange={e => setForm(f => ({ ...f, stock_quantity: e.target.value }))} />
               </div>
             </div>
+
+            {/* Image Upload */}
             <div>
-              <label className="text-sm font-medium text-foreground">Image URL</label>
-              <Input value={form.image_url} onChange={e => setForm(f => ({ ...f, image_url: e.target.value }))} />
+              <label className="text-sm font-medium text-foreground mb-2 block">Product Image</label>
+              {imagePreview ? (
+                <div className="relative w-full h-40 rounded-lg overflow-hidden border border-border bg-muted">
+                  <img src={imagePreview} alt="Preview" className="w-full h-full object-contain" />
+                  <Button
+                    variant="destructive"
+                    size="icon"
+                    className="absolute top-2 right-2 h-7 w-7"
+                    onClick={removeImage}
+                    type="button"
+                  >
+                    <X size={14} />
+                  </Button>
+                </div>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={uploading}
+                  className="w-full h-32 border-2 border-dashed border-border rounded-lg flex flex-col items-center justify-center gap-2 text-muted-foreground hover:border-primary/50 hover:text-foreground transition-colors cursor-pointer disabled:opacity-50"
+                >
+                  <Upload size={24} />
+                  <span className="text-sm">{uploading ? 'Uploading...' : 'Click to upload image'}</span>
+                  <span className="text-xs">PNG, JPG, WebP · Max 5 MB</span>
+                </button>
+              )}
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={handleImageUpload}
+              />
             </div>
+
             <div>
               <label className="text-sm font-medium text-foreground">Description</label>
               <Textarea rows={3} value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} />
@@ -269,7 +358,7 @@ const AdminProducts = () => {
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setDialogOpen(false)}>Cancel</Button>
-            <Button onClick={handleSave} disabled={saving}>{saving ? 'Saving...' : 'Save'}</Button>
+            <Button onClick={handleSave} disabled={saving || uploading}>{saving ? 'Saving...' : 'Save'}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
