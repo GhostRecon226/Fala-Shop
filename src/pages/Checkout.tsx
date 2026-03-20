@@ -182,7 +182,7 @@ const Checkout = () => {
                 {items.map(({ product, quantity }) => (
                   <div key={product.id} className="flex justify-between text-sm">
                     <span className="text-muted-foreground truncate mr-2">{product.name} × {quantity}</span>
-                    <span className="font-medium tabular-nums">${(product.price * quantity).toFixed(2)}</span>
+                    <span className="font-medium tabular-nums">{formatPrice(product.price * quantity)}</span>
                   </div>
                 ))}
               </div>
