@@ -10,4 +10,6 @@ export type Product = {
   image_url: string | null;
   stock_quantity: number;
   is_featured: boolean;
+  available_colors: string[];
+  available_sizes: string[];
 };

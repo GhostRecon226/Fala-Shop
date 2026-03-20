@@ -5,6 +5,7 @@ import { Product } from '@/lib/supabase';
 import { useCart } from '@/contexts/CartContext';
 import { useWishlist } from '@/contexts/WishlistContext';
 import { useReviewStats } from '@/hooks/useReviewStats';
+import { COLOR_SWATCHES } from '@/lib/sizes';
 
 const ProductCard = ({ product }: { product: Product }) => {
   const { addItem } = useCart();
@@ -12,6 +13,9 @@ const ProductCard = ({ product }: { product: Product }) => {
   const { data: reviewStats } = useReviewStats();
   const wishlisted = isWishlisted(product.id);
   const stats = reviewStats?.[product.id];
+
+  const colors = product.available_colors || [];
+  const sizes = product.available_sizes || [];
 
   return (
     <div className="group relative">
@@ -54,6 +58,41 @@ const ProductCard = ({ product }: { product: Product }) => {
           </div>
         )}
         <p className="text-xs text-muted-foreground">{product.category}</p>
+
+        {/* Color swatches */}
+        {colors.length > 0 && (
+          <div className="flex items-center gap-1 flex-wrap">
+            {colors.slice(0, 6).map(color => (
+              <span
+                key={color}
+                title={color}
+                className="w-3.5 h-3.5 rounded-full border border-border/60 flex-shrink-0"
+                style={{ backgroundColor: COLOR_SWATCHES[color] || '#9CA3AF' }}
+              />
+            ))}
+            {colors.length > 6 && (
+              <span className="text-[10px] text-muted-foreground">+{colors.length - 6}</span>
+            )}
+          </div>
+        )}
+
+        {/* Size badges */}
+        {sizes.length > 0 && (
+          <div className="flex items-center gap-1 flex-wrap">
+            {sizes.slice(0, 5).map(size => (
+              <span
+                key={size}
+                className="text-[10px] font-medium px-1.5 py-0.5 rounded bg-muted text-muted-foreground"
+              >
+                {size}
+              </span>
+            ))}
+            {sizes.length > 5 && (
+              <span className="text-[10px] text-muted-foreground">+{sizes.length - 5}</span>
+            )}
+          </div>
+        )}
+
         <div className="flex items-center justify-between">
           <p className="text-sm font-semibold text-primary tabular-nums">
             {formatPrice(product.price)}
