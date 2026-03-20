@@ -70,7 +70,7 @@ const ProductDetail = () => {
           </div>
 
           <p className="text-2xl font-bold text-primary tabular-nums">
-            ${product.price.toFixed(2)}
+            {formatPrice(product.price)}
           </p>
 
           {product.description && (

@@ -125,7 +125,7 @@ const Navbar = () => {
                         />
                         <div className="min-w-0">
                           <p className="text-sm font-medium text-foreground truncate">{product.name}</p>
-                          <p className="text-xs text-muted-foreground">{product.category} · ${product.price.toFixed(2)}</p>
+                          <p className="text-xs text-muted-foreground">{product.category} · {formatPrice(product.price)}</p>
                         </div>
                       </button>
                     ))

@@ -178,7 +178,7 @@ const Orders = () => {
                     <p className="text-xs text-muted-foreground">Qty: {item.quantity} · {formatPrice(Number(item.price))} each</p>
                   </div>
                   <p className="text-sm font-medium text-foreground tabular-nums">
-                    ${(Number(item.price) * item.quantity).toFixed(2)}
+                    {formatPrice(Number(item.price) * item.quantity)}
                   </p>
                 </div>
               ))}

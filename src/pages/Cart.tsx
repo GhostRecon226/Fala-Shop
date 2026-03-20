@@ -77,7 +77,7 @@ const Cart = () => {
             </div>
             <div className="border-t border-border pt-4 flex justify-between">
               <span className="font-semibold text-foreground">Total</span>
-              <span className="font-bold text-primary tabular-nums">${totalPrice.toFixed(2)}</span>
+              <span className="font-bold text-primary tabular-nums">{formatPrice(totalPrice)}</span>
             </div>
             <Link
               to="/checkout"
