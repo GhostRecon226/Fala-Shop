@@ -32,6 +32,7 @@ const AdminDashboard = () => {
   const [metrics, setMetrics] = useState<Metrics>({ totalOrders: 0, totalRevenue: 0, totalProducts: 0, lowStock: 0 });
   const [recentOrders, setRecentOrders] = useState<RecentOrder[]>([]);
   const [chartData, setChartData] = useState<ChartPoint[]>([]);
+  const [lowStockProducts, setLowStockProducts] = useState<LowStockProduct[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
