@@ -45,6 +45,7 @@ const App = () => (
                 <Route path="/order-confirmation" element={<OrderConfirmation />} />
                 <Route path="/auth" element={<Auth />} />
                 <Route path="/orders" element={<Orders />} />
+                <Route path="/admin" element={<AdminDashboard />} />
                 <Route path="/admin/orders" element={<AdminOrders />} />
                 <Route path="/admin/products" element={<AdminProducts />} />
                 <Route path="/wishlist" element={<Wishlist />} />
