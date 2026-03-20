@@ -96,6 +96,7 @@ const Checkout = () => {
               price: product.price,
               size: size || null,
             }))
+
           );
 
         if (itemsError) throw itemsError;
