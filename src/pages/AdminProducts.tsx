@@ -158,13 +158,15 @@ const AdminProducts = () => {
         toast({ title: 'Error', description: error.message, variant: 'destructive' });
       } else {
         toast({ title: 'Updated', description: 'Product updated successfully' });
+        logAdminAction('updated', 'product', editingId, { name: payload.name, price: payload.price });
       }
     } else {
-      const { error } = await supabase.from('products').insert(payload);
+      const { data: inserted, error } = await supabase.from('products').insert(payload).select('id').single();
       if (error) {
         toast({ title: 'Error', description: error.message, variant: 'destructive' });
       } else {
         toast({ title: 'Created', description: 'Product created successfully' });
+        logAdminAction('created', 'product', inserted?.id, { name: payload.name, price: payload.price });
       }
     }
     setSaving(false);
