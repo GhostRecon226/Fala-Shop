@@ -11,6 +11,9 @@ import { logAdminAction } from '@/hooks/useAdminLog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
+import { getSizesForCategory, requiresSize, requiresColor, CLOTHING_COLORS, COLOR_SWATCHES } from '@/lib/sizes';
+import { Input } from '@/components/ui/input';
+import { Checkbox } from '@/components/ui/checkbox';
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription,
 } from '@/components/ui/dialog';
