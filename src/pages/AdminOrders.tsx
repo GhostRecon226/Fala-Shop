@@ -167,7 +167,7 @@ const AdminOrders = () => {
                     </div>
                     <div>
                       <span className="text-muted-foreground">Total</span>
-                      <p className="font-medium text-foreground tabular-nums">${Number(order.total).toFixed(2)}</p>
+                      <p className="font-medium text-foreground tabular-nums">{formatPrice(Number(order.total))}</p>
                     </div>
                     <div>
                       <span className="text-muted-foreground">Customer</span>
