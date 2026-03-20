@@ -345,6 +345,9 @@ const AdminProducts = () => {
               />
             </div>
 
+            {/* Gallery Images */}
+            <AdminProductImages productId={editingId} />
+
             <div>
               <label className="text-sm font-medium text-foreground">Description</label>
               <Textarea rows={3} value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} />
