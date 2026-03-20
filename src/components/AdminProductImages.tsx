@@ -18,7 +18,7 @@ interface AdminProductImagesProps {
   onImagesChanged?: () => void;
 }
 
-const AdminProductImages = ({ productId, onImagesChanged }: AdminProductImagesProps) => {
+const AdminProductImages = ({ productId, currentCoverUrl, onSetCover, onImagesChanged }: AdminProductImagesProps) => {
   const [images, setImages] = useState<GalleryImage[]>([]);
   const [uploading, setUploading] = useState(false);
   const [loading, setLoading] = useState(false);
