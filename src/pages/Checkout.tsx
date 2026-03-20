@@ -73,41 +73,59 @@ const Checkout = () => {
 
     setSubmitting(true);
     try {
-      if (user) {
-        const { data: order, error: orderError } = await supabase
-          .from('orders')
-          .insert({
-            user_id: user.id,
-            total: totalPrice,
-            shipping_address: result.data,
-          })
-          .select('id')
-          .single();
+      // Create order with pending status
+      const { data: order, error: orderError } = await supabase
+        .from('orders')
+        .insert({
+          user_id: user.id,
+          total: totalPrice,
+          shipping_address: result.data,
+          status: 'pending',
+        })
+        .select('id')
+        .single();
 
-        if (orderError) throw orderError;
+      if (orderError) throw orderError;
 
-        const { error: itemsError } = await supabase
-          .from('order_items')
-          .insert(
-            items.map(({ product, quantity, size }) => ({
-              order_id: order.id,
-              product_id: product.id,
-              quantity,
-              price: product.price,
-              size: size || null,
-            }))
+      const { error: itemsError } = await supabase
+        .from('order_items')
+        .insert(
+          items.map(({ product, quantity, size }) => ({
+            order_id: order.id,
+            product_id: product.id,
+            quantity,
+            price: product.price,
+            size: size || null,
+          }))
+        );
 
-          );
+      if (itemsError) throw itemsError;
 
-        if (itemsError) throw itemsError;
+      // Initialize Flutterwave payment
+      const redirectUrl = `${window.location.origin}/order-confirmation`;
+      const { data: paymentData, error: paymentError } = await supabase.functions.invoke('flutterwave-init', {
+        body: {
+          order_id: order.id,
+          amount: totalPrice,
+          email: result.data.email,
+          name: `${result.data.firstName} ${result.data.lastName}`,
+          phone: result.data.phone,
+          redirect_url: redirectUrl,
+        },
+      });
+
+      if (paymentError || !paymentData?.payment_link) {
+        throw new Error(paymentData?.error || 'Failed to initialize payment');
       }
-    } catch (err) {
-      console.error('Failed to save order:', err);
-    }
 
-    clearCart();
-    navigate('/order-confirmation');
-    setSubmitting(false);
+      // Clear cart and redirect to Flutterwave
+      clearCart();
+      window.location.href = paymentData.payment_link;
+      return;
+    } catch (err) {
+      console.error('Failed to process order:', err);
+      setSubmitting(false);
+    }
   };
 
   const inputClass = (field: keyof FormData) =>
@@ -199,7 +217,7 @@ const Checkout = () => {
                 disabled={submitting}
                 className="block w-full text-center bg-primary text-primary-foreground py-3 rounded-md text-sm font-semibold hover:opacity-90 transition-all disabled:opacity-50"
               >
-                {submitting ? 'Placing Order…' : 'Place Order'}
+                {submitting ? 'Redirecting to Payment…' : 'Pay with Flutterwave'}
               </button>
             </div>
           </div>
