@@ -1,21 +1,18 @@
 
 
-## Plan: Merge Change Password into Account Settings
+## Plan: Auto-refresh Admin Role Detection
 
-### Overview
-Move the change password form into the Account Settings page as a section below the profile fields, and remove the standalone Change Password page and its navbar icon.
+### Problem
+When an admin assigns a role to a user, that user's `useIsAdmin` React Query result is cached and doesn't update until they log out and back in.
 
-### Changes
+### Solution
+Update `src/hooks/useIsAdmin.ts` to enable automatic refetching:
+- Set `refetchOnWindowFocus: true` (already default, but be explicit)
+- Add `staleTime: 30_000` (30 seconds) so it re-checks periodically
+- Add `refetchInterval: 60_000` (poll every 60 seconds in background)
 
-**1. Update `src/pages/AccountSettings.tsx`**
-- Add a "Change Password" section below the profile form with new password and confirm password fields
-- Include the same validation and `supabase.auth.updateUser()` logic from `ChangePassword.tsx`
+This ensures that within ~60 seconds of a role change, the user's UI updates automatically — no logout required.
 
-**2. Update `src/components/Navbar.tsx`**
-- Remove the `KeyRound` icon/link to `/account/change-password` from both desktop and mobile menus
-
-**3. Update `src/App.tsx`**
-- Remove the `/account/change-password` route and `ChangePassword` import
-
-**4. Delete `src/pages/ChangePassword.tsx`**
+### Single file change
+**`src/hooks/useIsAdmin.ts`** — add `staleTime`, `refetchInterval`, and `refetchOnWindowFocus` to the query options.
 
