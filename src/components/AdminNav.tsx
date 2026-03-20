@@ -2,6 +2,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 
 const tabs = [
+  { label: 'Dashboard', path: '/admin' },
   { label: 'Orders', path: '/admin/orders' },
   { label: 'Products', path: '/admin/products' },
 ];
