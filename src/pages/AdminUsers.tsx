@@ -4,7 +4,8 @@ import { useIsAdmin } from '@/hooks/useIsAdmin';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 import AdminNav from '@/components/AdminNav';
-import { ShieldAlert, Loader2, Users } from 'lucide-react';
+import { ShieldAlert, Loader2, Users, Search, X } from 'lucide-react';
+import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import {
   Select,
@@ -40,6 +41,16 @@ const AdminUsers = () => {
   const [users, setUsers] = useState<UserWithRole[]>([]);
   const [loading, setLoading] = useState(true);
   const [updatingId, setUpdatingId] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [roleFilter, setRoleFilter] = useState<string>('all');
+
+  const filteredUsers = users.filter(u => {
+    const matchesSearch = searchQuery.trim().length === 0 ||
+      u.email.toLowerCase().includes(searchQuery.toLowerCase());
+    const effectiveRole = u.role || 'user';
+    const matchesRole = roleFilter === 'all' || effectiveRole === roleFilter;
+    return matchesSearch && matchesRole;
+  });
 
   useEffect(() => {
     if (authLoading || adminLoading || !isAdmin) return;
@@ -114,7 +125,45 @@ const AdminUsers = () => {
       <div className="flex items-center gap-3 mb-6">
         <Users className="h-6 w-6 text-primary" />
         <h1 className="text-2xl font-semibold tracking-tight">User Management</h1>
+        {!loading && (
+          <span className="text-sm text-muted-foreground ml-auto">
+            {filteredUsers.length} of {users.length} users
+          </span>
+        )}
       </div>
+
+      {!loading && users.length > 0 && (
+        <div className="flex flex-col sm:flex-row gap-3 mb-4">
+          <div className="relative flex-1">
+            <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
+            <Input
+              value={searchQuery}
+              onChange={e => setSearchQuery(e.target.value)}
+              placeholder="Search by email…"
+              className="pl-8 pr-8 h-9 text-sm"
+            />
+            {searchQuery && (
+              <button
+                onClick={() => setSearchQuery('')}
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+              >
+                <X size={14} />
+              </button>
+            )}
+          </div>
+          <Select value={roleFilter} onValueChange={setRoleFilter}>
+            <SelectTrigger className="w-full sm:w-36 h-9 text-sm">
+              <SelectValue placeholder="Filter by role" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Roles</SelectItem>
+              {ROLES.map(r => (
+                <SelectItem key={r} value={r} className="capitalize">{r}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      )}
 
       {loading ? (
         <div className="flex justify-center py-12">
@@ -122,6 +171,8 @@ const AdminUsers = () => {
         </div>
       ) : users.length === 0 ? (
         <p className="text-muted-foreground text-center py-12">No users found.</p>
+      ) : filteredUsers.length === 0 ? (
+        <p className="text-muted-foreground text-center py-12">No users match your search.</p>
       ) : (
         <div className="rounded-lg border border-border overflow-hidden">
           <div className="overflow-x-auto">
@@ -135,7 +186,7 @@ const AdminUsers = () => {
                 </tr>
               </thead>
               <tbody>
-                {users.map(u => {
+                {filteredUsers.map(u => {
                   const effectiveRole = u.role || 'user';
                   const isSelf = u.user_id === user?.id;
 
