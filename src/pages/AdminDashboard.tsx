@@ -151,6 +151,26 @@ const AdminDashboard = () => {
             </div>
           </div>
 
+          {/* Low stock alerts */}
+          {lowStockProducts.length > 0 && (
+            <div className="rounded-lg border border-destructive/30 bg-destructive/5 overflow-hidden mb-8">
+              <div className="px-5 py-4 border-b border-destructive/20 flex items-center gap-2">
+                <AlertTriangle size={16} className="text-destructive" />
+                <h2 className="text-sm font-medium text-destructive uppercase tracking-wide">Low Stock Alerts</h2>
+              </div>
+              <div className="divide-y divide-destructive/10">
+                {lowStockProducts.map(p => (
+                  <div key={p.id} className="flex items-center justify-between px-5 py-3 text-sm">
+                    <span className="font-medium text-foreground">{p.name}</span>
+                    <span className={`font-bold tabular-nums ${p.stock_quantity === 0 ? 'text-destructive' : 'text-amber-600'}`}>
+                      {p.stock_quantity === 0 ? 'Out of stock' : `${p.stock_quantity} left`}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* Recent orders */}
           <div className="rounded-lg border border-border bg-card overflow-hidden">
             <div className="px-5 py-4 border-b border-border flex items-center justify-between">
