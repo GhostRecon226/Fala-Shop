@@ -24,6 +24,7 @@ type RecentOrder = {
 };
 
 type ChartPoint = { date: string; revenue: number };
+type LowStockProduct = { id: string; name: string; stock_quantity: number };
 
 const AdminDashboard = () => {
   const { user, loading: authLoading } = useAuth();
@@ -31,6 +32,7 @@ const AdminDashboard = () => {
   const [metrics, setMetrics] = useState<Metrics>({ totalOrders: 0, totalRevenue: 0, totalProducts: 0, lowStock: 0 });
   const [recentOrders, setRecentOrders] = useState<RecentOrder[]>([]);
   const [chartData, setChartData] = useState<ChartPoint[]>([]);
+  const [lowStockProducts, setLowStockProducts] = useState<LowStockProduct[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -42,20 +44,23 @@ const AdminDashboard = () => {
 
     const [ordersRes, productsRes] = await Promise.all([
       supabase.from('orders').select('id, total, status, created_at, shipping_address').order('created_at', { ascending: false }),
-      supabase.from('products').select('id, stock_quantity'),
+      supabase.from('products').select('id, name, stock_quantity'),
     ]);
 
     const orders = (ordersRes.data || []) as RecentOrder[];
     const products = productsRes.data || [];
 
     const totalRevenue = orders.reduce((sum, o) => sum + Number(o.total), 0);
-    const lowStock = products.filter(p => (p.stock_quantity ?? 0) < 5).length;
+    const lowItems = products
+      .filter(p => (p.stock_quantity ?? 0) < 5)
+      .sort((a, b) => (a.stock_quantity ?? 0) - (b.stock_quantity ?? 0)) as LowStockProduct[];
+    setLowStockProducts(lowItems);
 
     setMetrics({
       totalOrders: orders.length,
       totalRevenue,
       totalProducts: products.length,
-      lowStock,
+      lowStock: lowItems.length,
     });
 
     setRecentOrders(orders.slice(0, 5));
@@ -145,6 +150,26 @@ const AdminDashboard = () => {
               </ResponsiveContainer>
             </div>
           </div>
+
+          {/* Low stock alerts */}
+          {lowStockProducts.length > 0 && (
+            <div className="rounded-lg border border-destructive/30 bg-destructive/5 overflow-hidden mb-8">
+              <div className="px-5 py-4 border-b border-destructive/20 flex items-center gap-2">
+                <AlertTriangle size={16} className="text-destructive" />
+                <h2 className="text-sm font-medium text-destructive uppercase tracking-wide">Low Stock Alerts</h2>
+              </div>
+              <div className="divide-y divide-destructive/10">
+                {lowStockProducts.map(p => (
+                  <div key={p.id} className="flex items-center justify-between px-5 py-3 text-sm">
+                    <span className="font-medium text-foreground">{p.name}</span>
+                    <span className={`font-bold tabular-nums ${p.stock_quantity === 0 ? 'text-destructive' : 'text-amber-600'}`}>
+                      {p.stock_quantity === 0 ? 'Out of stock' : `${p.stock_quantity} left`}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* Recent orders */}
           <div className="rounded-lg border border-border bg-card overflow-hidden">
