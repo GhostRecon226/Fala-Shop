@@ -6,6 +6,7 @@ import { useWishlist } from '@/contexts/WishlistContext';
 import { ArrowLeft, Minus, Plus, Heart } from 'lucide-react';
 import { useState } from 'react';
 import ProductReviews from '@/components/ProductReviews';
+import { SIZES, requiresSize } from '@/lib/sizes';
 
 const ProductDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -13,7 +14,10 @@ const ProductDetail = () => {
   const { addItem } = useCart();
   const { toggleItem, isWishlisted } = useWishlist();
   const [quantity, setQuantity] = useState(1);
+  const [selectedSize, setSelectedSize] = useState<string | null>(null);
   const wishlisted = product ? isWishlisted(product.id) : false;
+
+  const needsSize = product ? requiresSize(product.category) : false;
 
   if (isLoading) {
     return (
@@ -42,9 +46,11 @@ const ProductDetail = () => {
 
   const handleAddToCart = () => {
     for (let i = 0; i < quantity; i++) {
-      addItem(product);
+      addItem(product, needsSize ? selectedSize : null);
     }
   };
+
+  const canAdd = product.stock_quantity > 0 && (!needsSize || selectedSize);
 
   return (
     <div className="container py-10">
@@ -85,6 +91,31 @@ const ProductDetail = () => {
             </span>
           </div>
 
+          {/* Size selector */}
+          {needsSize && (
+            <div>
+              <p className="text-xs font-medium text-foreground mb-2">Select Size</p>
+              <div className="flex flex-wrap gap-2">
+                {SIZES.map(size => (
+                  <button
+                    key={size}
+                    onClick={() => setSelectedSize(size)}
+                    className={`px-4 py-2 rounded-md border text-sm font-medium transition-all duration-150 active:scale-[0.97] ${
+                      selectedSize === size
+                        ? 'border-primary bg-primary text-primary-foreground'
+                        : 'border-border text-foreground hover:border-primary/50'
+                    }`}
+                  >
+                    {size}
+                  </button>
+                ))}
+              </div>
+              {!selectedSize && (
+                <p className="text-xs text-muted-foreground mt-1.5">Please select a size to continue</p>
+              )}
+            </div>
+          )}
+
           {/* Quantity & Add to Cart */}
           <div className="flex items-center gap-4">
             <div className="flex items-center border border-border rounded-md">
@@ -104,7 +135,7 @@ const ProductDetail = () => {
             </div>
             <button
               onClick={handleAddToCart}
-              disabled={product.stock_quantity === 0}
+              disabled={!canAdd}
               className="flex-1 bg-primary text-primary-foreground py-3 rounded-md text-sm font-semibold transition-all duration-150 hover:opacity-90 disabled:opacity-50"
             >
               {product.stock_quantity === 0

@@ -204,7 +204,7 @@ const AdminOrders = () => {
                 <div className="divide-y divide-border">
                   {items.map(item => (
                     <div key={item.id} className="flex items-center justify-between px-5 py-3 text-sm">
-                      <span className="text-foreground">{item.product_name || 'Unknown'} <span className="text-muted-foreground">× {item.quantity}</span></span>
+                      <span className="text-foreground">{item.product_name || 'Unknown'}{item.size ? ` (${item.size})` : ''} <span className="text-muted-foreground">× {item.quantity}</span></span>
                       <span className="font-medium text-foreground tabular-nums">{formatPrice(Number(item.price) * item.quantity)}</span>
                     </div>
                   ))}

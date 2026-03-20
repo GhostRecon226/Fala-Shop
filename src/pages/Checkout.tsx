@@ -180,9 +180,11 @@ const Checkout = () => {
             <div className="p-6 rounded-lg card-shadow space-y-4">
               <h2 className="text-lg font-semibold text-foreground">Order Summary</h2>
               <div className="space-y-3">
-                {items.map(({ product, quantity }) => (
-                  <div key={product.id} className="flex justify-between text-sm">
-                    <span className="text-muted-foreground truncate mr-2">{product.name} × {quantity}</span>
+                {items.map(({ product, quantity, size }) => (
+                  <div key={`${product.id}::${size || ''}`} className="flex justify-between text-sm">
+                    <span className="text-muted-foreground truncate mr-2">
+                      {product.name}{size ? ` (${size})` : ''} × {quantity}
+                    </span>
                     <span className="font-medium tabular-nums">{formatPrice(product.price * quantity)}</span>
                   </div>
                 ))}

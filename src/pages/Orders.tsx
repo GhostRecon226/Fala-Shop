@@ -175,7 +175,9 @@ const Orders = () => {
                     className="h-14 w-14 rounded object-cover bg-muted flex-shrink-0"
                   />
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-foreground truncate">{item.product?.name || 'Unknown Product'}</p>
+                    <p className="text-sm font-medium text-foreground truncate">
+                      {item.product?.name || 'Unknown Product'}{item.size ? ` (${item.size})` : ''}
+                    </p>
                     <p className="text-xs text-muted-foreground">Qty: {item.quantity} · {formatPrice(Number(item.price))} each</p>
                   </div>
                   <p className="text-sm font-medium text-foreground tabular-nums">

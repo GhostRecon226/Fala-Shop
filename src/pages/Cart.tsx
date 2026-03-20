@@ -32,8 +32,8 @@ const Cart = () => {
       <div className="grid lg:grid-cols-3 gap-10">
         {/* Items */}
         <div className="lg:col-span-2 space-y-4">
-          {items.map(({ product, quantity }) => (
-            <div key={product.id} className="flex gap-4 p-4 rounded-lg card-shadow">
+          {items.map(({ product, quantity, size }) => (
+            <div key={`${product.id}::${size || ''}`} className="flex gap-4 p-4 rounded-lg card-shadow">
               <img
                 src={product.image_url || '/placeholder.svg'}
                 alt={product.name}
@@ -43,21 +43,23 @@ const Cart = () => {
                 <Link to={`/product/${product.id}`} className="text-sm font-semibold text-foreground hover:text-primary transition-colors">
                   {product.name}
                 </Link>
-                <p className="text-xs text-muted-foreground">{product.category}</p>
+                <p className="text-xs text-muted-foreground">
+                  {product.category}{size ? ` · Size ${size}` : ''}
+                </p>
                 <p className="text-sm font-semibold text-primary tabular-nums mt-1">
                   {formatPrice(product.price)}
                 </p>
               </div>
               <div className="flex flex-col items-end justify-between">
-                <button onClick={() => removeItem(product.id)} className="text-muted-foreground hover:text-destructive transition-colors">
+                <button onClick={() => removeItem(product.id, size)} className="text-muted-foreground hover:text-destructive transition-colors">
                   <Trash2 size={14} />
                 </button>
                 <div className="flex items-center border border-border rounded-md">
-                  <button onClick={() => updateQuantity(product.id, quantity - 1)} className="p-1 text-foreground hover:bg-muted transition-colors">
+                  <button onClick={() => updateQuantity(product.id, size, quantity - 1)} className="p-1 text-foreground hover:bg-muted transition-colors">
                     <Minus size={12} />
                   </button>
                   <span className="px-2 text-xs font-medium tabular-nums">{quantity}</span>
-                  <button onClick={() => updateQuantity(product.id, quantity + 1)} className="p-1 text-foreground hover:bg-muted transition-colors">
+                  <button onClick={() => updateQuantity(product.id, size, quantity + 1)} className="p-1 text-foreground hover:bg-muted transition-colors">
                     <Plus size={12} />
                   </button>
                 </div>
