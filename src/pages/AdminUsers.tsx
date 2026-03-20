@@ -186,7 +186,7 @@ const AdminUsers = () => {
                 </tr>
               </thead>
               <tbody>
-                {users.map(u => {
+                {filteredUsers.map(u => {
                   const effectiveRole = u.role || 'user';
                   const isSelf = u.user_id === user?.id;
 
