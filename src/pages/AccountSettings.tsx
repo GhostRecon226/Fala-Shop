@@ -6,7 +6,8 @@ import { useToast } from '@/hooks/use-toast';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
-import { UserCog, Loader2 } from 'lucide-react';
+import { UserCog, Loader2, KeyRound } from 'lucide-react';
+import { Separator } from '@/components/ui/separator';
 
 const AccountSettings = () => {
   const { user, loading: authLoading } = useAuth();
@@ -16,6 +17,11 @@ const AccountSettings = () => {
   const [phone, setPhone] = useState('');
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+
+  // Password state
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [changingPassword, setChangingPassword] = useState(false);
 
   useEffect(() => {
     if (!authLoading && !user) navigate('/auth');
@@ -58,6 +64,28 @@ const AccountSettings = () => {
       toast({ title: 'Error', description: error.message, variant: 'destructive' });
     } else {
       toast({ title: 'Profile updated', description: 'Your details have been saved.' });
+    }
+  };
+
+  const handlePasswordChange = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (newPassword.length < 6) {
+      toast({ title: 'Password too short', description: 'Must be at least 6 characters.', variant: 'destructive' });
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      toast({ title: 'Passwords do not match', description: 'Please make sure both fields match.', variant: 'destructive' });
+      return;
+    }
+    setChangingPassword(true);
+    const { error } = await supabase.auth.updateUser({ password: newPassword });
+    setChangingPassword(false);
+    if (error) {
+      toast({ title: 'Error', description: error.message, variant: 'destructive' });
+    } else {
+      toast({ title: 'Password updated', description: 'Your password has been changed successfully.' });
+      setNewPassword('');
+      setConfirmPassword('');
     }
   };
 
@@ -115,6 +143,43 @@ const AccountSettings = () => {
 
         <Button type="submit" disabled={saving} className="w-full">
           {saving ? 'Saving…' : 'Save Changes'}
+        </Button>
+      </form>
+
+      <Separator className="my-8" />
+
+      <div className="flex items-center gap-3 mb-6">
+        <KeyRound className="h-5 w-5 text-primary" />
+        <h2 className="text-lg font-semibold tracking-tight">Change Password</h2>
+      </div>
+
+      <form onSubmit={handlePasswordChange} className="space-y-5">
+        <div className="space-y-2">
+          <Label htmlFor="new-password">New Password</Label>
+          <Input
+            id="new-password"
+            type="password"
+            value={newPassword}
+            onChange={e => setNewPassword(e.target.value)}
+            placeholder="At least 6 characters"
+            required
+            minLength={6}
+          />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="confirm-password">Confirm New Password</Label>
+          <Input
+            id="confirm-password"
+            type="password"
+            value={confirmPassword}
+            onChange={e => setConfirmPassword(e.target.value)}
+            placeholder="Re-enter new password"
+            required
+            minLength={6}
+          />
+        </div>
+        <Button type="submit" disabled={changingPassword} variant="outline" className="w-full">
+          {changingPassword ? 'Updating…' : 'Update Password'}
         </Button>
       </form>
     </div>
