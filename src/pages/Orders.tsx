@@ -97,7 +97,7 @@ const Orders = () => {
 
       const { data: itemsData } = await supabase
         .from('order_items')
-        .select('id, order_id, quantity, price, product_id')
+        .select('id, order_id, quantity, price, product_id, size')
         .in('order_id', ordersData.map(o => o.id));
 
       const productIds = [...new Set((itemsData || []).map(i => i.product_id))];
