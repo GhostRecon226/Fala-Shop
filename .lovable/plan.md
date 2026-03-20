@@ -1,25 +1,21 @@
 
 
-## Plan: Add Change Password Page
+## Plan: Merge Change Password into Account Settings
 
 ### Overview
-Create a simple account settings page where logged-in users can change their password using Supabase's `updateUser` API.
+Move the change password form into the Account Settings page as a section below the profile fields, and remove the standalone Change Password page and its navbar icon.
 
 ### Changes
 
-**1. Create `src/pages/ChangePassword.tsx`**
-- Protected page — redirects to `/auth` if not logged in
-- Form with current password field (for confirmation UX), new password, and confirm new password fields
-- Validates new password matches confirmation and is at least 6 characters
-- Calls `supabase.auth.updateUser({ password: newPassword })` on submit
-- Shows success/error toast
+**1. Update `src/pages/AccountSettings.tsx`**
+- Add a "Change Password" section below the profile form with new password and confirm password fields
+- Include the same validation and `supabase.auth.updateUser()` logic from `ChangePassword.tsx`
 
-**2. Update `src/App.tsx`**
-- Add route: `<Route path="/account/change-password" element={<ChangePassword />} />`
+**2. Update `src/components/Navbar.tsx`**
+- Remove the `KeyRound` icon/link to `/account/change-password` from both desktop and mobile menus
 
-**3. Update `src/components/Navbar.tsx`**
-- Add a "Change Password" link in the logged-in user section (both desktop dropdown area and mobile menu), using a `KeyRound` icon or similar, linking to `/account/change-password`
+**3. Update `src/App.tsx`**
+- Remove the `/account/change-password` route and `ChangePassword` import
 
-### No database changes needed
-Supabase Auth handles password updates natively via `updateUser`.
+**4. Delete `src/pages/ChangePassword.tsx`**
 
