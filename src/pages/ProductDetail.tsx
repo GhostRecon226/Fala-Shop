@@ -62,14 +62,12 @@ const ProductDetail = () => {
       </Link>
 
       <div className="grid md:grid-cols-2 gap-10">
-        {/* Image */}
-        <div className="aspect-square overflow-hidden rounded-lg bg-muted card-shadow">
-          <img
-            src={product.image_url || '/placeholder.svg'}
-            alt={product.name}
-            className="h-full w-full object-cover"
-          />
-        </div>
+        {/* Image Gallery */}
+        <ProductImageGallery
+          mainImage={product.image_url}
+          additionalImages={additionalImages}
+          productName={product.name}
+        />
 
         {/* Details */}
         <div className="flex flex-col justify-center space-y-6">
