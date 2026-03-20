@@ -100,8 +100,11 @@ const AdminProducts = () => {
       description: p.description || '',
       image_url: p.image_url || '',
       is_featured: !!p.is_featured,
+      available_sizes: p.available_sizes || [],
+      available_colors: p.available_colors || [],
     });
     setImagePreview(p.image_url || null);
+    setColorInput('');
     setDialogOpen(true);
   };
 
