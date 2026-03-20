@@ -7,7 +7,7 @@ import { ArrowLeft, Minus, Plus, Heart } from 'lucide-react';
 import { useState } from 'react';
 import ProductReviews from '@/components/ProductReviews';
 import ProductImageGallery from '@/components/ProductImageGallery';
-import { getSizesForCategory, requiresSize } from '@/lib/sizes';
+import { getSizesForCategory, requiresSize, requiresColor, COLOR_SWATCHES } from '@/lib/sizes';
 import { useProductImages } from '@/hooks/useProductImages';
 
 const ProductDetail = () => {
@@ -18,9 +18,21 @@ const ProductDetail = () => {
   const { data: additionalImages = [] } = useProductImages(id || '');
   const [quantity, setQuantity] = useState(1);
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
+  const [selectedColor, setSelectedColor] = useState<string | null>(null);
   const wishlisted = product ? isWishlisted(product.id) : false;
 
   const needsSize = product ? requiresSize(product.category) : false;
+
+  // Color/size from product or defaults
+  const availableSizes = product && (product as any).available_sizes?.length > 0
+    ? (product as any).available_sizes as string[]
+    : needsSize ? [...getSizesForCategory(product?.category || '')] : [];
+
+  const availableColors = product && (product as any).available_colors?.length > 0
+    ? (product as any).available_colors as string[]
+    : [];
+
+  const needsColor = availableColors.length > 0;
 
   if (isLoading) {
     return (
@@ -49,11 +61,13 @@ const ProductDetail = () => {
 
   const handleAddToCart = () => {
     for (let i = 0; i < quantity; i++) {
-      addItem(product, needsSize ? selectedSize : null);
+      addItem(product, needsSize ? selectedSize : null, needsColor ? selectedColor : null);
     }
   };
 
-  const canAdd = product.stock_quantity > 0 && (!needsSize || selectedSize);
+  const canAdd = product.stock_quantity > 0
+    && (!needsSize || selectedSize)
+    && (!needsColor || selectedColor);
 
   return (
     <div className="container py-10">
@@ -62,14 +76,12 @@ const ProductDetail = () => {
       </Link>
 
       <div className="grid md:grid-cols-2 gap-10">
-        {/* Image Gallery */}
         <ProductImageGallery
           mainImage={product.image_url}
           additionalImages={additionalImages}
           productName={product.name}
         />
 
-        {/* Details */}
         <div className="flex flex-col justify-center space-y-6">
           <div>
             <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">{product.category}</p>
@@ -92,12 +104,46 @@ const ProductDetail = () => {
             </span>
           </div>
 
+          {/* Color selector */}
+          {needsColor && (
+            <div>
+              <p className="text-xs font-medium text-foreground mb-2">Select Color</p>
+              <div className="flex flex-wrap gap-2">
+                {availableColors.map(color => {
+                  const swatch = COLOR_SWATCHES[color];
+                  return (
+                    <button
+                      key={color}
+                      onClick={() => setSelectedColor(color)}
+                      className={`inline-flex items-center gap-2 px-4 py-2 rounded-md border text-sm font-medium transition-all duration-150 active:scale-[0.97] ${
+                        selectedColor === color
+                          ? 'border-primary bg-primary/5 text-foreground ring-2 ring-primary/20'
+                          : 'border-border text-foreground hover:border-primary/50'
+                      }`}
+                    >
+                      {swatch && (
+                        <span
+                          className="w-4 h-4 rounded-full border border-border/50 flex-shrink-0"
+                          style={{ backgroundColor: swatch }}
+                        />
+                      )}
+                      {color}
+                    </button>
+                  );
+                })}
+              </div>
+              {!selectedColor && (
+                <p className="text-xs text-muted-foreground mt-1.5">Please select a color to continue</p>
+              )}
+            </div>
+          )}
+
           {/* Size selector */}
-          {needsSize && (
+          {needsSize && availableSizes.length > 0 && (
             <div>
               <p className="text-xs font-medium text-foreground mb-2">Select Size</p>
               <div className="flex flex-wrap gap-2">
-                {getSizesForCategory(product.category).map(size => (
+                {availableSizes.map(size => (
                   <button
                     key={size}
                     onClick={() => setSelectedSize(size)}

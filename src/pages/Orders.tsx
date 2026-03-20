@@ -176,7 +176,7 @@ const Orders = () => {
                   />
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium text-foreground truncate">
-                      {item.product?.name || 'Unknown Product'}{item.size ? ` (${item.size})` : ''}
+                      {item.product?.name || 'Unknown Product'}{item.size ? ` (${item.size})` : ''}{(item as any).color ? ` · ${(item as any).color}` : ''}
                     </p>
                     <p className="text-xs text-muted-foreground">Qty: {item.quantity} · {formatPrice(Number(item.price))} each</p>
                   </div>

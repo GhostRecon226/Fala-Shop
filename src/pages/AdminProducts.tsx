@@ -11,6 +11,7 @@ import { logAdminAction } from '@/hooks/useAdminLog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
+import { getSizesForCategory, requiresSize, requiresColor, CLOTHING_COLORS, COLOR_SWATCHES } from '@/lib/sizes';
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription,
 } from '@/components/ui/dialog';
@@ -35,6 +36,8 @@ type Product = {
   is_featured: boolean | null;
   description: string | null;
   image_url: string | null;
+  available_sizes: string[];
+  available_colors: string[];
 };
 
 const emptyForm = {
@@ -45,6 +48,8 @@ const emptyForm = {
   description: '',
   image_url: '',
   is_featured: false,
+  available_sizes: [] as string[],
+  available_colors: [] as string[],
 };
 
 const AdminProducts = () => {
@@ -61,6 +66,7 @@ const AdminProducts = () => {
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [colorInput, setColorInput] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -78,6 +84,7 @@ const AdminProducts = () => {
     setEditingId(null);
     setForm(emptyForm);
     setImagePreview(null);
+    setColorInput('');
     setDialogOpen(true);
   };
 
@@ -91,8 +98,11 @@ const AdminProducts = () => {
       description: p.description || '',
       image_url: p.image_url || '',
       is_featured: !!p.is_featured,
+      available_sizes: p.available_sizes || [],
+      available_colors: p.available_colors || [],
     });
     setImagePreview(p.image_url || null);
+    setColorInput('');
     setDialogOpen(true);
   };
 
@@ -150,6 +160,8 @@ const AdminProducts = () => {
       description: form.description || null,
       image_url: form.image_url || null,
       is_featured: form.is_featured,
+      available_sizes: form.available_sizes,
+      available_colors: form.available_colors,
     };
 
     if (editingId) {
@@ -359,6 +371,102 @@ const AdminProducts = () => {
                 setImagePreview(url);
               }}
             />
+
+            {/* Available Sizes */}
+            {requiresSize(form.category) && (
+              <div>
+                <label className="text-sm font-medium text-foreground mb-2 block">Available Sizes</label>
+                <p className="text-xs text-muted-foreground mb-2">Leave unchecked for all sizes. Check specific sizes to limit availability.</p>
+                <div className="flex flex-wrap gap-2">
+                  {getSizesForCategory(form.category).map(size => (
+                    <label
+                      key={size}
+                      className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md border text-sm cursor-pointer transition-colors ${
+                        form.available_sizes.includes(size)
+                          ? 'border-primary bg-primary/10 text-foreground'
+                          : 'border-border text-muted-foreground hover:border-primary/50'
+                      }`}
+                    >
+                      <input
+                        type="checkbox"
+                        className="sr-only"
+                        checked={form.available_sizes.includes(size)}
+                        onChange={e => {
+                          setForm(f => ({
+                            ...f,
+                            available_sizes: e.target.checked
+                              ? [...f.available_sizes, size]
+                              : f.available_sizes.filter(s => s !== size),
+                          }));
+                        }}
+                      />
+                      {size}
+                    </label>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Available Colors */}
+            {requiresColor(form.category) && (
+              <div>
+                <label className="text-sm font-medium text-foreground mb-2 block">Available Colors</label>
+                {form.available_colors.length > 0 && (
+                  <div className="flex flex-wrap gap-1.5 mb-2">
+                    {form.available_colors.map(color => (
+                      <span
+                        key={color}
+                        className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-muted text-sm text-foreground"
+                      >
+                        {COLOR_SWATCHES[color] && (
+                          <span className="w-3 h-3 rounded-full border border-border/50" style={{ backgroundColor: COLOR_SWATCHES[color] }} />
+                        )}
+                        {color}
+                        <button
+                          type="button"
+                          onClick={() => setForm(f => ({ ...f, available_colors: f.available_colors.filter(c => c !== color) }))}
+                          className="ml-0.5 text-muted-foreground hover:text-destructive"
+                        >
+                          <X size={12} />
+                        </button>
+                      </span>
+                    ))}
+                  </div>
+                )}
+                <div className="flex gap-2">
+                  <Input
+                    placeholder="Type a color name and press Enter"
+                    value={colorInput}
+                    onChange={e => setColorInput(e.target.value)}
+                    onKeyDown={e => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault();
+                        const val = colorInput.trim();
+                        if (val && !form.available_colors.includes(val)) {
+                          setForm(f => ({ ...f, available_colors: [...f.available_colors, val] }));
+                        }
+                        setColorInput('');
+                      }
+                    }}
+                  />
+                </div>
+                <div className="flex flex-wrap gap-1.5 mt-2">
+                  {CLOTHING_COLORS.filter(c => !form.available_colors.includes(c)).map(color => (
+                    <button
+                      key={color}
+                      type="button"
+                      onClick={() => setForm(f => ({ ...f, available_colors: [...f.available_colors, color] }))}
+                      className="inline-flex items-center gap-1 px-2 py-1 rounded border border-border text-xs text-muted-foreground hover:border-primary/50 hover:text-foreground transition-colors"
+                    >
+                      {COLOR_SWATCHES[color] && (
+                        <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: COLOR_SWATCHES[color] }} />
+                      )}
+                      {color}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
 
             <div>
               <label className="text-sm font-medium text-foreground">Description</label>
