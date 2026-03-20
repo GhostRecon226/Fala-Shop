@@ -1,6 +1,6 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { formatPrice } from '@/lib/utils';
-import { ShoppingBag, Menu, X, Search, Heart, User, LogOut, Package, ShieldAlert } from 'lucide-react';
+import { ShoppingBag, Menu, X, Search, Heart, User, LogOut, Package, ShieldAlert, KeyRound } from 'lucide-react';
 import { useCart } from '@/contexts/CartContext';
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from '@/components/ui/tooltip';
 import { useWishlist } from '@/contexts/WishlistContext';
@@ -174,6 +174,14 @@ const Navbar = () => {
                   </TooltipTrigger>
                   <TooltipContent>My Orders</TooltipContent>
                 </Tooltip>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Link to="/account/change-password" className="p-2 text-foreground hover:text-primary transition-colors duration-150" aria-label="Change password">
+                      <KeyRound size={20} />
+                    </Link>
+                  </TooltipTrigger>
+                  <TooltipContent>Change Password</TooltipContent>
+                </Tooltip>
                 {isAdmin && (
                   <Tooltip>
                     <TooltipTrigger asChild>
@@ -235,6 +243,9 @@ const Navbar = () => {
               <>
                 <Link to="/orders" onClick={() => setMobileOpen(false)} className="text-sm font-medium py-2 text-foreground">
                   My Orders
+                </Link>
+                <Link to="/account/change-password" onClick={() => setMobileOpen(false)} className="text-sm font-medium py-2 text-foreground">
+                  Change Password
                 </Link>
                 {isAdmin && (
                   <Link to="/admin/orders" onClick={() => setMobileOpen(false)} className="text-sm font-medium py-2 text-primary">
