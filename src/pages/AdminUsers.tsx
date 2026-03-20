@@ -91,8 +91,10 @@ const AdminUsers = () => {
       if (error) {
         toast({ title: 'Error', description: error.message, variant: 'destructive' });
       } else {
+        const targetUser = users.find(u => u.user_id === targetUserId);
         toast({ title: 'Role updated', description: 'User role has been removed.' });
         setUsers(prev => prev.map(u => u.user_id === targetUserId ? { ...u, role: null } : u));
+        logAdminAction('role_removed', 'user', targetUserId, { email: targetUser?.email, old_role: targetUser?.role || 'user', new_role: 'user' });
       }
     } else {
       const { error } = await supabase.rpc('set_user_role', {
