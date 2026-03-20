@@ -20,7 +20,7 @@ type FormData = z.infer<typeof checkoutSchema>;
 
 const Checkout = () => {
   const { items, totalPrice, clearCart } = useCart();
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
   const navigate = useNavigate();
   const [submitting, setSubmitting] = useState(false);
   const [errors, setErrors] = useState<Partial<Record<keyof FormData, string>>>({});
@@ -28,6 +28,18 @@ const Checkout = () => {
     firstName: '', lastName: '', email: '', phone: '',
     address: '', city: '', state: '', zip: '',
   });
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <div className="h-6 w-6 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+      </div>
+    );
+  }
+
+  if (!user) {
+    return <Navigate to="/auth?redirect=/checkout" replace />;
+  }
 
   if (items.length === 0) {
     return (
