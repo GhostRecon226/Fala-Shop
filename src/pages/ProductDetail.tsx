@@ -6,13 +6,16 @@ import { useWishlist } from '@/contexts/WishlistContext';
 import { ArrowLeft, Minus, Plus, Heart } from 'lucide-react';
 import { useState } from 'react';
 import ProductReviews from '@/components/ProductReviews';
+import ProductImageGallery from '@/components/ProductImageGallery';
 import { getSizesForCategory, requiresSize } from '@/lib/sizes';
+import { useProductImages } from '@/hooks/useProductImages';
 
 const ProductDetail = () => {
   const { id } = useParams<{ id: string }>();
   const { data: product, isLoading } = useProduct(id || '');
   const { addItem } = useCart();
   const { toggleItem, isWishlisted } = useWishlist();
+  const { data: additionalImages = [] } = useProductImages(id || '');
   const [quantity, setQuantity] = useState(1);
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
   const wishlisted = product ? isWishlisted(product.id) : false;
@@ -59,14 +62,12 @@ const ProductDetail = () => {
       </Link>
 
       <div className="grid md:grid-cols-2 gap-10">
-        {/* Image */}
-        <div className="aspect-square overflow-hidden rounded-lg bg-muted card-shadow">
-          <img
-            src={product.image_url || '/placeholder.svg'}
-            alt={product.name}
-            className="h-full w-full object-cover"
-          />
-        </div>
+        {/* Image Gallery */}
+        <ProductImageGallery
+          mainImage={product.image_url}
+          additionalImages={additionalImages}
+          productName={product.name}
+        />
 
         {/* Details */}
         <div className="flex flex-col justify-center space-y-6">
