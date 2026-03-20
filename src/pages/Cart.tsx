@@ -82,8 +82,14 @@ const Cart = () => {
               <span className="font-semibold text-foreground">Total</span>
               <span className="font-bold text-primary tabular-nums">{formatPrice(totalPrice)}</span>
             </div>
+            {!user && (
+              <div className="flex items-start gap-2 rounded-md bg-accent/50 border border-accent px-3 py-2.5 text-xs text-accent-foreground">
+                <Info size={14} className="mt-0.5 flex-shrink-0" />
+                <p>You'll need to <Link to="/auth?redirect=/checkout" className="font-semibold underline underline-offset-2 hover:text-primary transition-colors">sign in</Link> before completing your purchase.</p>
+              </div>
+            )}
             <Link
-              to="/checkout"
+              to={user ? "/checkout" : "/auth?redirect=/checkout"}
               className="block w-full text-center bg-primary text-primary-foreground py-3 rounded-md text-sm font-semibold hover:opacity-90 transition-all"
             >
               Proceed to Checkout
