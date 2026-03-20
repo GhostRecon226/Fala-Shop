@@ -49,6 +49,7 @@ export type Database = {
       }
       cart_items: {
         Row: {
+          color: string | null
           created_at: string
           id: string
           product_id: string
@@ -57,6 +58,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          color?: string | null
           created_at?: string
           id?: string
           product_id: string
@@ -65,6 +67,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          color?: string | null
           created_at?: string
           id?: string
           product_id?: string
@@ -185,6 +188,8 @@ export type Database = {
       }
       products: {
         Row: {
+          available_colors: string[]
+          available_sizes: string[]
           category: string
           created_at: string
           description: string | null
@@ -196,6 +201,8 @@ export type Database = {
           stock_quantity: number | null
         }
         Insert: {
+          available_colors?: string[]
+          available_sizes?: string[]
           category: string
           created_at?: string
           description?: string | null
@@ -207,6 +214,8 @@ export type Database = {
           stock_quantity?: number | null
         }
         Update: {
+          available_colors?: string[]
+          available_sizes?: string[]
           category?: string
           created_at?: string
           description?: string | null
