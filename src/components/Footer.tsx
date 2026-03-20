@@ -15,7 +15,7 @@ const Footer = () => {
             <h4 className="text-sm font-semibold text-foreground mb-3">Shop</h4>
             <div className="flex flex-col gap-2">
               <Link to="/shop?category=Solar+Fans" className="text-sm text-muted-foreground hover:text-foreground transition-colors">Solar Fans</Link>
-              <Link to="/shop?category=Shirts" className="text-sm text-muted-foreground hover:text-foreground transition-colors">Shirts</Link>
+              <Link to="/shop?category=Clothing" className="text-sm text-muted-foreground hover:text-foreground transition-colors">Clothing</Link>
               <Link to="/shop?category=Sneakers" className="text-sm text-muted-foreground hover:text-foreground transition-colors">Sneakers</Link>
               <Link to="/shop?category=Bags" className="text-sm text-muted-foreground hover:text-foreground transition-colors">Bags</Link>
             </div>

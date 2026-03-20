@@ -66,7 +66,7 @@ const Navbar = () => {
           <Link to="/shop?category=Solar+Fans" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors duration-150">
             Solar Fans
           </Link>
-          <Link to="/shop?category=Shirts" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors duration-150">
+          <Link to="/shop?category=Clothing" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors duration-150">
             Clothing
           </Link>
         </div>
@@ -187,7 +187,7 @@ const Navbar = () => {
             <Link to="/shop?category=Solar+Fans" onClick={() => setMobileOpen(false)} className="text-sm font-medium py-2 text-foreground">
               Solar Fans
             </Link>
-            <Link to="/shop?category=Shirts" onClick={() => setMobileOpen(false)} className="text-sm font-medium py-2 text-foreground">
+            <Link to="/shop?category=Clothing" onClick={() => setMobileOpen(false)} className="text-sm font-medium py-2 text-foreground">
               Clothing
             </Link>
             <div className="border-t border-border my-1" />

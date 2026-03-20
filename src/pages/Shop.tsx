@@ -4,7 +4,7 @@ import { useProducts } from '@/hooks/useProducts';
 import ProductCard from '@/components/ProductCard';
 import { ArrowUpDown } from 'lucide-react';
 
-const categories = ['All', 'Solar Fans', 'Shirts', 'Sneakers', 'Bags'];
+const categories = ['All', 'Solar Fans', 'Clothing', 'Sneakers', 'Bags'];
 
 type SortOption = 'newest' | 'price-asc' | 'price-desc';
 

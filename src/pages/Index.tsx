@@ -6,7 +6,7 @@ import heroImage from '@/assets/hero-image.jpg';
 
 const categories = [
   { name: 'Solar Fans', slug: 'Solar+Fans', description: 'Engineered for efficiency' },
-  { name: 'Shirts', slug: 'Shirts', description: 'Refined essentials' },
+  { name: 'Clothing', slug: 'Clothing', description: 'Refined essentials' },
   { name: 'Sneakers', slug: 'Sneakers', description: 'Built to move' },
   { name: 'Bags', slug: 'Bags', description: 'Structured utility' },
 ];
