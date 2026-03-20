@@ -44,6 +44,8 @@ const AdminUsers = () => {
   const [updatingId, setUpdatingId] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [roleFilter, setRoleFilter] = useState<string>('all');
+  const [page, setPage] = useState(1);
+  const perPage = 10;
 
   const filteredUsers = users.filter(u => {
     const matchesSearch = searchQuery.trim().length === 0 ||
@@ -52,6 +54,12 @@ const AdminUsers = () => {
     const matchesRole = roleFilter === 'all' || effectiveRole === roleFilter;
     return matchesSearch && matchesRole;
   });
+
+  const totalPages = Math.max(1, Math.ceil(filteredUsers.length / perPage));
+  const paginatedUsers = filteredUsers.slice((page - 1) * perPage, page * perPage);
+
+  // Reset to page 1 when filters change
+  useEffect(() => { setPage(1); }, [searchQuery, roleFilter]);
 
   useEffect(() => {
     if (authLoading || adminLoading || !isAdmin) return;
