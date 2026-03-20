@@ -24,6 +24,9 @@ import AdminDashboard from "./pages/AdminDashboard";
 import AdminUsers from "./pages/AdminUsers";
 import AdminActivityLog from "./pages/AdminActivityLog";
 import AccountSettings from "./pages/AccountSettings";
+import About from "./pages/About";
+import Contact from "./pages/Contact";
+import ShippingReturns from "./pages/ShippingReturns";
 
 const queryClient = new QueryClient();
 
@@ -55,6 +58,9 @@ const App = () => (
                 <Route path="/admin/activity" element={<AdminActivityLog />} />
                 <Route path="/account/settings" element={<AccountSettings />} />
                 <Route path="/wishlist" element={<Wishlist />} />
+                <Route path="/about" element={<About />} />
+                <Route path="/contact" element={<Contact />} />
+                <Route path="/shipping-returns" element={<ShippingReturns />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </main>
