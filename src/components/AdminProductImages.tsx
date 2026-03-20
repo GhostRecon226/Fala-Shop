@@ -1,8 +1,8 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
-import { Upload, X, Star } from 'lucide-react';
+import { Upload, X, Star, GripVertical } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from '@/components/ui/tooltip';
 
 type GalleryImage = {
@@ -22,6 +22,8 @@ const AdminProductImages = ({ productId, currentCoverUrl, onSetCover, onImagesCh
   const [images, setImages] = useState<GalleryImage[]>([]);
   const [uploading, setUploading] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [dragIndex, setDragIndex] = useState<number | null>(null);
+  const [overIndex, setOverIndex] = useState<number | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -98,6 +100,47 @@ const AdminProductImages = ({ productId, currentCoverUrl, onSetCover, onImagesCh
     }
   };
 
+  const persistOrder = useCallback(async (reordered: GalleryImage[]) => {
+    const updates = reordered.map((img, i) => 
+      supabase.from('product_images').update({ display_order: i }).eq('id', img.id)
+    );
+    await Promise.all(updates);
+    onImagesChanged?.();
+  }, [onImagesChanged]);
+
+  const handleDragStart = (index: number) => {
+    setDragIndex(index);
+  };
+
+  const handleDragOver = (e: React.DragEvent, index: number) => {
+    e.preventDefault();
+    if (dragIndex === null || dragIndex === index) return;
+    setOverIndex(index);
+  };
+
+  const handleDrop = (e: React.DragEvent, dropIndex: number) => {
+    e.preventDefault();
+    if (dragIndex === null || dragIndex === dropIndex) {
+      setDragIndex(null);
+      setOverIndex(null);
+      return;
+    }
+
+    const reordered = [...images];
+    const [moved] = reordered.splice(dragIndex, 1);
+    reordered.splice(dropIndex, 0, moved);
+
+    setImages(reordered);
+    setDragIndex(null);
+    setOverIndex(null);
+    persistOrder(reordered);
+  };
+
+  const handleDragEnd = () => {
+    setDragIndex(null);
+    setOverIndex(null);
+  };
+
   if (!productId) {
     return (
       <p className="text-xs text-muted-foreground italic">Save the product first, then add gallery images.</p>
@@ -106,7 +149,12 @@ const AdminProductImages = ({ productId, currentCoverUrl, onSetCover, onImagesCh
 
   return (
     <div>
-      <label className="text-sm font-medium text-foreground mb-2 block">Gallery Images</label>
+      <label className="text-sm font-medium text-foreground mb-2 block">
+        Gallery Images
+        {images.length > 1 && (
+          <span className="text-xs font-normal text-muted-foreground ml-2">Drag to reorder</span>
+        )}
+      </label>
 
       {loading ? (
         <div className="text-xs text-muted-foreground py-4 text-center">Loading...</div>
@@ -114,16 +162,35 @@ const AdminProductImages = ({ productId, currentCoverUrl, onSetCover, onImagesCh
         <>
           {images.length > 0 && (
             <div className="grid grid-cols-3 gap-2 mb-3">
-              {images.map(img => {
+              {images.map((img, index) => {
                 const isCover = currentCoverUrl === img.image_url;
+                const isDragging = dragIndex === index;
+                const isOver = overIndex === index;
                 return (
-                  <div key={img.id} className={`relative group aspect-square rounded-md overflow-hidden border-2 bg-muted ${isCover ? 'border-primary' : 'border-border'}`}>
-                    <img src={img.image_url} alt="" className="w-full h-full object-cover" />
+                  <div
+                    key={img.id}
+                    draggable
+                    onDragStart={() => handleDragStart(index)}
+                    onDragOver={(e) => handleDragOver(e, index)}
+                    onDrop={(e) => handleDrop(e, index)}
+                    onDragEnd={handleDragEnd}
+                    className={`relative group aspect-square rounded-md overflow-hidden border-2 bg-muted cursor-grab active:cursor-grabbing transition-all duration-150 ${
+                      isCover ? 'border-primary' : isOver ? 'border-primary/50' : 'border-border'
+                    } ${isDragging ? 'opacity-40 scale-95' : ''}`}
+                  >
+                    <img src={img.image_url} alt="" className="w-full h-full object-cover pointer-events-none" />
+
+                    {/* Drag handle indicator */}
+                    <div className="absolute top-1 left-1 opacity-0 group-hover:opacity-70 transition-opacity text-foreground bg-background/80 rounded p-0.5">
+                      <GripVertical size={12} />
+                    </div>
+
                     {isCover && (
                       <span className="absolute bottom-1 left-1 bg-primary text-primary-foreground text-[10px] font-semibold px-1.5 py-0.5 rounded">
                         Cover
                       </span>
                     )}
+
                     <div className="absolute top-1 right-1 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                       {!isCover && onSetCover && (
                         <TooltipProvider delayDuration={200}>
