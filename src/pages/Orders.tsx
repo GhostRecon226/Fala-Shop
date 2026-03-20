@@ -9,6 +9,7 @@ type OrderItem = {
   id: string;
   quantity: number;
   price: number;
+  size?: string | null;
   product: { name: string; image_url: string | null } | null;
 };
 
