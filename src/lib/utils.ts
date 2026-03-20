@@ -5,4 +5,5 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-export const formatPrice = (amount: number) => `₦${amount.toFixed(2)}`;
+export const formatPrice = (amount: number) =>
+  '₦' + amount.toLocaleString('en-NG', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
