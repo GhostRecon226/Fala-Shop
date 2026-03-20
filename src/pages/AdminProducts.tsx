@@ -38,6 +38,8 @@ type Product = {
   is_featured: boolean | null;
   description: string | null;
   image_url: string | null;
+  available_sizes: string[];
+  available_colors: string[];
 };
 
 const emptyForm = {
