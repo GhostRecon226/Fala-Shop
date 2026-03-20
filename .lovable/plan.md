@@ -1,19 +1,26 @@
 
 
-## Plan: Use Numeric Sizes for Sneakers
+## Plan: Add Admin Dashboard Overview Page
 
 ### Overview
-Sneakers should display numeric sizes (38–46) while Clothing and Bags keep letter sizes (S, M, L, XL, XXL).
+Create a new dashboard page at `/admin` showing key metrics (total orders, total revenue, product count, recent orders) using data from existing tables. Add it as the first tab in the admin navigation.
 
 ### Changes
 
-**`src/lib/sizes.ts`**
-- Add a separate `SNEAKER_SIZES` array: `['38', '39', '40', '41', '42', '43', '44', '45', '46']`
-- Add a helper function `getSizesForCategory(category: string)` that returns `SNEAKER_SIZES` for "Sneakers" and `SIZES` for other size-requiring categories
+**1. Create `src/pages/AdminDashboard.tsx`**
+- Fetch aggregated data from `orders`, `products` tables
+- Display metric cards: Total Orders, Total Revenue (₦), Total Products, Low Stock count
+- Show a recent orders list (last 5)
+- Optional: simple revenue-over-time bar chart using recharts (already installed)
+- Reuse existing admin access guard pattern (useIsAdmin + useAuth)
+- Use `AdminNav` for navigation consistency
 
-**`src/pages/ProductDetail.tsx`**
-- Replace `SIZES` import with `getSizesForCategory`
-- Use `getSizesForCategory(product.category)` instead of the static `SIZES` array in the size selector
+**2. Update `src/components/AdminNav.tsx`**
+- Add "Dashboard" tab at the beginning: `{ label: 'Dashboard', path: '/admin' }`
 
-No database or other file changes needed — sizes are stored as text strings, so numeric strings like "42" work as-is.
+**3. Update `src/App.tsx`**
+- Import `AdminDashboard` and add route: `<Route path="/admin" element={<AdminDashboard />} />`
+
+### No database changes needed
+All metrics are derived from existing `orders` and `products` tables using aggregate queries via the client SDK.
 
