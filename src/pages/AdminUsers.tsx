@@ -4,7 +4,8 @@ import { useIsAdmin } from '@/hooks/useIsAdmin';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 import AdminNav from '@/components/AdminNav';
-import { ShieldAlert, Loader2, Users, Search, X } from 'lucide-react';
+import { ShieldAlert, Loader2, Users, Search, X, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import {
@@ -43,6 +44,8 @@ const AdminUsers = () => {
   const [updatingId, setUpdatingId] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [roleFilter, setRoleFilter] = useState<string>('all');
+  const [page, setPage] = useState(1);
+  const perPage = 10;
 
   const filteredUsers = users.filter(u => {
     const matchesSearch = searchQuery.trim().length === 0 ||
@@ -51,6 +54,12 @@ const AdminUsers = () => {
     const matchesRole = roleFilter === 'all' || effectiveRole === roleFilter;
     return matchesSearch && matchesRole;
   });
+
+  const totalPages = Math.max(1, Math.ceil(filteredUsers.length / perPage));
+  const paginatedUsers = filteredUsers.slice((page - 1) * perPage, page * perPage);
+
+  // Reset to page 1 when filters change
+  useEffect(() => { setPage(1); }, [searchQuery, roleFilter]);
 
   useEffect(() => {
     if (authLoading || adminLoading || !isAdmin) return;
@@ -186,7 +195,7 @@ const AdminUsers = () => {
                 </tr>
               </thead>
               <tbody>
-                {filteredUsers.map(u => {
+                {paginatedUsers.map(u => {
                   const effectiveRole = u.role || 'user';
                   const isSelf = u.user_id === user?.id;
 
@@ -229,6 +238,34 @@ const AdminUsers = () => {
               </tbody>
             </table>
           </div>
+
+          {totalPages > 1 && (
+            <div className="flex items-center justify-between px-4 py-3 border-t border-border bg-muted/30">
+              <span className="text-xs text-muted-foreground">
+                Page {page} of {totalPages}
+              </span>
+              <div className="flex gap-1">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-7 w-7 p-0"
+                  disabled={page <= 1}
+                  onClick={() => setPage(p => p - 1)}
+                >
+                  <ChevronLeft size={14} />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-7 w-7 p-0"
+                  disabled={page >= totalPages}
+                  onClick={() => setPage(p => p + 1)}
+                >
+                  <ChevronRight size={14} />
+                </Button>
+              </div>
+            </div>
+          )}
         </div>
       )}
     </div>
