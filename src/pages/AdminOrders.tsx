@@ -25,6 +25,7 @@ type OrderItemRow = {
   product_id: string;
   quantity: number;
   price: number;
+  size?: string | null;
   product_name?: string;
 };
 
