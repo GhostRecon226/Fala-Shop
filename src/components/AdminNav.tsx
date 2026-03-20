@@ -5,6 +5,7 @@ const tabs = [
   { label: 'Dashboard', path: '/admin' },
   { label: 'Orders', path: '/admin/orders' },
   { label: 'Products', path: '/admin/products' },
+  { label: 'Users', path: '/admin/users' },
 ];
 
 const AdminNav = () => {
