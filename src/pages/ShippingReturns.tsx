@@ -35,7 +35,7 @@ const faqs = [
     value: 'exchanges',
     title: 'Exchanges',
     content:
-      'Need a different size or colour? Contact us within 14 days of delivery and we'll arrange an exchange at no extra shipping cost (subject to stock availability).',
+      "Need a different size or colour? Contact us within 14 days of delivery and we'll arrange an exchange at no extra shipping cost (subject to stock availability).",
   },
 ];
 
