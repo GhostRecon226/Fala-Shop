@@ -2,7 +2,8 @@ import { useState, useRef, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
-import { Upload, X, ImageIcon, GripVertical } from 'lucide-react';
+import { Upload, X, Star } from 'lucide-react';
+import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from '@/components/ui/tooltip';
 
 type GalleryImage = {
   id: string;
