@@ -13,6 +13,8 @@ type GalleryImage = {
 
 interface AdminProductImagesProps {
   productId: string | null;
+  currentCoverUrl?: string | null;
+  onSetCover?: (imageUrl: string) => void;
   onImagesChanged?: () => void;
 }
 
