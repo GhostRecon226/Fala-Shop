@@ -69,7 +69,7 @@ const Cart = () => {
             <h2 className="text-lg font-semibold text-foreground">Order Summary</h2>
             <div className="flex justify-between text-sm">
               <span className="text-muted-foreground">Subtotal</span>
-              <span className="font-medium tabular-nums">${totalPrice.toFixed(2)}</span>
+              <span className="font-medium tabular-nums">{formatPrice(totalPrice)}</span>
             </div>
             <div className="flex justify-between text-sm">
               <span className="text-muted-foreground">Shipping</span>
