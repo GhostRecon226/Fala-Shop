@@ -1,6 +1,7 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { ShoppingBag, Menu, X, Search, Heart, User, LogOut, Package, ShieldAlert } from 'lucide-react';
 import { useCart } from '@/contexts/CartContext';
+import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from '@/components/ui/tooltip';
 import { useWishlist } from '@/contexts/WishlistContext';
 import { useAuth } from '@/contexts/AuthContext';
 import logo from '@/assets/logo.png';
@@ -72,109 +73,147 @@ const Navbar = () => {
         </div>
 
         {/* Utility */}
-        <div className="flex items-center gap-2">
-          {/* Search */}
-          <div ref={searchRef} className="relative">
-            {searchOpen ? (
-              <div className="flex items-center">
-                <input
-                  ref={inputRef}
-                  value={query}
-                  onChange={(e) => setQuery(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Escape') { setSearchOpen(false); setQuery(''); }
-                    if (e.key === 'Enter' && results.length > 0) selectProduct(results[0].id);
-                  }}
-                  placeholder="Search products…"
-                  className="w-44 md:w-56 pl-8 pr-3 py-1.5 text-sm rounded-md bg-secondary text-foreground border border-border placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary transition-all"
-                />
-                <Search size={14} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
-              </div>
-            ) : (
-              <button
-                onClick={() => setSearchOpen(true)}
-                className="p-2 text-foreground hover:text-primary transition-colors duration-150"
-                aria-label="Search"
-              >
-                <Search size={20} />
-              </button>
-            )}
-
-            {/* Dropdown results */}
-            {searchOpen && query.trim().length >= 2 && (
-              <div className="absolute top-full right-0 mt-1 w-72 bg-background border border-border rounded-lg shadow-lg overflow-hidden z-50">
-                {results.length > 0 ? (
-                  results.map(product => (
+        <TooltipProvider delayDuration={300}>
+          <div className="flex items-center gap-2">
+            {/* Search */}
+            <div ref={searchRef} className="relative">
+              {searchOpen ? (
+                <div className="flex items-center">
+                  <input
+                    ref={inputRef}
+                    value={query}
+                    onChange={(e) => setQuery(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Escape') { setSearchOpen(false); setQuery(''); }
+                      if (e.key === 'Enter' && results.length > 0) selectProduct(results[0].id);
+                    }}
+                    placeholder="Search products…"
+                    className="w-44 md:w-56 pl-8 pr-3 py-1.5 text-sm rounded-md bg-secondary text-foreground border border-border placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary transition-all"
+                  />
+                  <Search size={14} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
+                </div>
+              ) : (
+                <Tooltip>
+                  <TooltipTrigger asChild>
                     <button
-                      key={product.id}
-                      onClick={() => selectProduct(product.id)}
-                      className="flex items-center gap-3 w-full px-3 py-2.5 text-left hover:bg-muted transition-colors"
+                      onClick={() => setSearchOpen(true)}
+                      className="p-2 text-foreground hover:text-primary transition-colors duration-150"
+                      aria-label="Search"
                     >
-                      <img
-                        src={product.image_url || '/placeholder.svg'}
-                        alt={product.name}
-                        className="h-10 w-10 rounded object-cover bg-muted flex-shrink-0"
-                      />
-                      <div className="min-w-0">
-                        <p className="text-sm font-medium text-foreground truncate">{product.name}</p>
-                        <p className="text-xs text-muted-foreground">{product.category} · ${product.price.toFixed(2)}</p>
-                      </div>
+                      <Search size={20} />
                     </button>
-                  ))
-                ) : (
-                  <p className="px-3 py-4 text-sm text-muted-foreground text-center">No products found</p>
-                )}
-              </div>
-            )}
-          </div>
-
-          <Link to="/wishlist" className="relative p-2 text-foreground hover:text-primary transition-colors duration-150">
-            <Heart size={20} />
-            {wishlistCount > 0 && (
-              <span className="absolute -top-0.5 -right-0.5 flex h-5 w-5 items-center justify-center rounded-full bg-destructive text-[11px] font-semibold tabular-nums text-destructive-foreground">
-                {wishlistCount}
-              </span>
-            )}
-          </Link>
-          <Link to="/cart" className="relative p-2 text-foreground hover:text-primary transition-colors duration-150">
-            <ShoppingBag size={20} />
-            {totalItems > 0 && (
-              <span className="absolute -top-0.5 -right-0.5 flex h-5 w-5 items-center justify-center rounded-full bg-accent text-[11px] font-semibold tabular-nums text-accent-foreground">
-                {totalItems}
-              </span>
-            )}
-          </Link>
-          {user ? (
-            <>
-              <Link to="/orders" className="p-2 text-foreground hover:text-primary transition-colors duration-150" aria-label="My orders">
-                <Package size={20} />
-              </Link>
-              {isAdmin && (
-                <Link to="/admin/orders" className="p-2 text-foreground hover:text-primary transition-colors duration-150" aria-label="Admin">
-                  <ShieldAlert size={20} />
-                </Link>
+                  </TooltipTrigger>
+                  <TooltipContent>Search</TooltipContent>
+                </Tooltip>
               )}
-              <button
-                onClick={() => signOut()}
-                className="p-2 text-foreground hover:text-primary transition-colors duration-150"
-                aria-label="Sign out"
-                title={user.email || 'Sign out'}
-              >
-                <LogOut size={20} />
-              </button>
-            </>
-          ) : (
-            <Link to="/auth" className="p-2 text-foreground hover:text-primary transition-colors duration-150" aria-label="Sign in">
-              <User size={20} />
-            </Link>
-          )}
-          <button
-            className="md:hidden p-2 text-foreground"
-            onClick={() => setMobileOpen(!mobileOpen)}
-          >
-            {mobileOpen ? <X size={20} /> : <Menu size={20} />}
-          </button>
-        </div>
+
+              {/* Dropdown results */}
+              {searchOpen && query.trim().length >= 2 && (
+                <div className="absolute top-full right-0 mt-1 w-72 bg-background border border-border rounded-lg shadow-lg overflow-hidden z-50">
+                  {results.length > 0 ? (
+                    results.map(product => (
+                      <button
+                        key={product.id}
+                        onClick={() => selectProduct(product.id)}
+                        className="flex items-center gap-3 w-full px-3 py-2.5 text-left hover:bg-muted transition-colors"
+                      >
+                        <img
+                          src={product.image_url || '/placeholder.svg'}
+                          alt={product.name}
+                          className="h-10 w-10 rounded object-cover bg-muted flex-shrink-0"
+                        />
+                        <div className="min-w-0">
+                          <p className="text-sm font-medium text-foreground truncate">{product.name}</p>
+                          <p className="text-xs text-muted-foreground">{product.category} · ${product.price.toFixed(2)}</p>
+                        </div>
+                      </button>
+                    ))
+                  ) : (
+                    <p className="px-3 py-4 text-sm text-muted-foreground text-center">No products found</p>
+                  )}
+                </div>
+              )}
+            </div>
+
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Link to="/wishlist" className="relative p-2 text-foreground hover:text-primary transition-colors duration-150">
+                  <Heart size={20} />
+                  {wishlistCount > 0 && (
+                    <span className="absolute -top-0.5 -right-0.5 flex h-5 w-5 items-center justify-center rounded-full bg-destructive text-[11px] font-semibold tabular-nums text-destructive-foreground">
+                      {wishlistCount}
+                    </span>
+                  )}
+                </Link>
+              </TooltipTrigger>
+              <TooltipContent>Wishlist</TooltipContent>
+            </Tooltip>
+
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Link to="/cart" className="relative p-2 text-foreground hover:text-primary transition-colors duration-150">
+                  <ShoppingBag size={20} />
+                  {totalItems > 0 && (
+                    <span className="absolute -top-0.5 -right-0.5 flex h-5 w-5 items-center justify-center rounded-full bg-accent text-[11px] font-semibold tabular-nums text-accent-foreground">
+                      {totalItems}
+                    </span>
+                  )}
+                </Link>
+              </TooltipTrigger>
+              <TooltipContent>Cart</TooltipContent>
+            </Tooltip>
+
+            {user ? (
+              <>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Link to="/orders" className="p-2 text-foreground hover:text-primary transition-colors duration-150" aria-label="My orders">
+                      <Package size={20} />
+                    </Link>
+                  </TooltipTrigger>
+                  <TooltipContent>My Orders</TooltipContent>
+                </Tooltip>
+                {isAdmin && (
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Link to="/admin/orders" className="p-2 text-foreground hover:text-primary transition-colors duration-150" aria-label="Admin">
+                        <ShieldAlert size={20} />
+                      </Link>
+                    </TooltipTrigger>
+                    <TooltipContent>Admin</TooltipContent>
+                  </Tooltip>
+                )}
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <button
+                      onClick={() => signOut()}
+                      className="p-2 text-foreground hover:text-primary transition-colors duration-150"
+                      aria-label="Sign out"
+                    >
+                      <LogOut size={20} />
+                    </button>
+                  </TooltipTrigger>
+                  <TooltipContent>Sign Out</TooltipContent>
+                </Tooltip>
+              </>
+            ) : (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Link to="/auth" className="p-2 text-foreground hover:text-primary transition-colors duration-150" aria-label="Sign in">
+                    <User size={20} />
+                  </Link>
+                </TooltipTrigger>
+                <TooltipContent>Sign In</TooltipContent>
+              </Tooltip>
+            )}
+            <button
+              className="md:hidden p-2 text-foreground"
+              onClick={() => setMobileOpen(!mobileOpen)}
+            >
+              {mobileOpen ? <X size={20} /> : <Menu size={20} />}
+            </button>
+          </div>
+        </TooltipProvider>
       </div>
 
       {/* Mobile Menu */}
