@@ -24,6 +24,7 @@ type RecentOrder = {
 };
 
 type ChartPoint = { date: string; revenue: number };
+type LowStockProduct = { id: string; name: string; stock_quantity: number };
 
 const AdminDashboard = () => {
   const { user, loading: authLoading } = useAuth();
