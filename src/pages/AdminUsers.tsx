@@ -195,7 +195,7 @@ const AdminUsers = () => {
                 </tr>
               </thead>
               <tbody>
-                {filteredUsers.map(u => {
+                {paginatedUsers.map(u => {
                   const effectiveRole = u.role || 'user';
                   const isSelf = u.user_id === user?.id;
 
@@ -238,6 +238,34 @@ const AdminUsers = () => {
               </tbody>
             </table>
           </div>
+
+          {totalPages > 1 && (
+            <div className="flex items-center justify-between px-4 py-3 border-t border-border bg-muted/30">
+              <span className="text-xs text-muted-foreground">
+                Page {page} of {totalPages}
+              </span>
+              <div className="flex gap-1">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-7 w-7 p-0"
+                  disabled={page <= 1}
+                  onClick={() => setPage(p => p - 1)}
+                >
+                  <ChevronLeft size={14} />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-7 w-7 p-0"
+                  disabled={page >= totalPages}
+                  onClick={() => setPage(p => p + 1)}
+                >
+                  <ChevronRight size={14} />
+                </Button>
+              </div>
+            </div>
+          )}
         </div>
       )}
     </div>
