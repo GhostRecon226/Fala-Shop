@@ -60,7 +60,7 @@ const AdminDashboard = () => {
       totalOrders: orders.length,
       totalRevenue,
       totalProducts: products.length,
-      lowStock,
+      lowStock: lowItems.length,
     });
 
     setRecentOrders(orders.slice(0, 5));
