@@ -7,6 +7,7 @@ import { Minus, Plus, Trash2, ShoppingBag, Info } from 'lucide-react';
 
 const Cart = () => {
   const { items, updateQuantity, removeItem, totalPrice } = useCart();
+  const { user } = useAuth();
 
   if (items.length === 0) {
     return (
