@@ -20,6 +20,7 @@ import Auth from "./pages/Auth";
 import Orders from "./pages/Orders";
 import AdminOrders from "./pages/AdminOrders";
 import AdminProducts from "./pages/AdminProducts";
+import AdminDashboard from "./pages/AdminDashboard";
 
 const queryClient = new QueryClient();
 
