@@ -217,7 +217,7 @@ const Checkout = () => {
                 disabled={submitting}
                 className="block w-full text-center bg-primary text-primary-foreground py-3 rounded-md text-sm font-semibold hover:opacity-90 transition-all disabled:opacity-50"
               >
-                {submitting ? 'Placing Order…' : 'Place Order'}
+                {submitting ? 'Redirecting to Payment…' : 'Pay with Flutterwave'}
               </button>
             </div>
           </div>
