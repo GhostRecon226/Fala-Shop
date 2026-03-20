@@ -1,4 +1,5 @@
 import { useParams, Link } from 'react-router-dom';
+import { formatPrice } from '@/lib/utils';
 import { useProduct } from '@/hooks/useProducts';
 import { useCart } from '@/contexts/CartContext';
 import { useWishlist } from '@/contexts/WishlistContext';
