@@ -72,6 +72,7 @@ const AdminOrders = () => {
   };
 
   const updateStatus = async (orderId: string, newStatus: string) => {
+    const oldStatus = orders.find(o => o.id === orderId)?.status;
     setUpdatingId(orderId);
     const { error } = await supabase
       .from('orders')
@@ -83,6 +84,7 @@ const AdminOrders = () => {
     } else {
       setOrders(prev => prev.map(o => o.id === orderId ? { ...o, status: newStatus } : o));
       toast({ title: 'Updated', description: `Order status changed to ${newStatus}` });
+      logAdminAction('status_changed', 'order', orderId, { old_status: oldStatus, new_status: newStatus });
     }
     setUpdatingId(null);
   };

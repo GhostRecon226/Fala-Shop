@@ -177,11 +177,13 @@ const AdminProducts = () => {
 
   const handleDelete = async () => {
     if (!deleteId) return;
+    const deletedProduct = products.find(p => p.id === deleteId);
     const { error } = await supabase.from('products').delete().eq('id', deleteId);
     if (error) {
       toast({ title: 'Error', description: error.message, variant: 'destructive' });
     } else {
       toast({ title: 'Deleted', description: 'Product deleted' });
+      logAdminAction('deleted', 'product', deleteId, { name: deletedProduct?.name });
       queryClient.invalidateQueries({ queryKey: ['products'] });
       loadProducts();
     }

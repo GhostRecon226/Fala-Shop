@@ -104,8 +104,10 @@ const AdminUsers = () => {
       if (error) {
         toast({ title: 'Error', description: error.message, variant: 'destructive' });
       } else {
+        const targetUser = users.find(u => u.user_id === targetUserId);
         toast({ title: 'Role updated', description: `User is now ${newRole}.` });
         setUsers(prev => prev.map(u => u.user_id === targetUserId ? { ...u, role: newRole } : u));
+        logAdminAction('role_changed', 'user', targetUserId, { email: targetUser?.email, old_role: targetUser?.role || 'user', new_role: newRole });
       }
     }
 
