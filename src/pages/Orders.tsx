@@ -155,7 +155,7 @@ const Orders = () => {
                 </div>
                 <div>
                   <span className="text-muted-foreground">Total</span>
-                  <p className="font-medium text-foreground tabular-nums">${Number(order.total).toFixed(2)}</p>
+                  <p className="font-medium text-foreground tabular-nums">{formatPrice(Number(order.total))}</p>
                 </div>
               </div>
               <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary/10 text-primary capitalize">
