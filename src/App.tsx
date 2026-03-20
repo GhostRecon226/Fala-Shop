@@ -24,6 +24,9 @@ import AdminDashboard from "./pages/AdminDashboard";
 import AdminUsers from "./pages/AdminUsers";
 import AdminActivityLog from "./pages/AdminActivityLog";
 import AccountSettings from "./pages/AccountSettings";
+import About from "./pages/About";
+import Contact from "./pages/Contact";
+import ShippingReturns from "./pages/ShippingReturns";
 
 const queryClient = new QueryClient();
 
