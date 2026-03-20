@@ -44,14 +44,17 @@ const AdminDashboard = () => {
 
     const [ordersRes, productsRes] = await Promise.all([
       supabase.from('orders').select('id, total, status, created_at, shipping_address').order('created_at', { ascending: false }),
-      supabase.from('products').select('id, stock_quantity'),
+      supabase.from('products').select('id, name, stock_quantity'),
     ]);
 
     const orders = (ordersRes.data || []) as RecentOrder[];
     const products = productsRes.data || [];
 
     const totalRevenue = orders.reduce((sum, o) => sum + Number(o.total), 0);
-    const lowStock = products.filter(p => (p.stock_quantity ?? 0) < 5).length;
+    const lowItems = products
+      .filter(p => (p.stock_quantity ?? 0) < 5)
+      .sort((a, b) => (a.stock_quantity ?? 0) - (b.stock_quantity ?? 0)) as LowStockProduct[];
+    setLowStockProducts(lowItems);
 
     setMetrics({
       totalOrders: orders.length,
