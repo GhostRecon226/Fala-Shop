@@ -162,6 +162,8 @@ const AdminProducts = () => {
       description: form.description || null,
       image_url: form.image_url || null,
       is_featured: form.is_featured,
+      available_sizes: form.available_sizes,
+      available_colors: form.available_colors,
     };
 
     if (editingId) {
