@@ -15,6 +15,7 @@ const ProductDetail = () => {
   const { data: product, isLoading } = useProduct(id || '');
   const { addItem } = useCart();
   const { toggleItem, isWishlisted } = useWishlist();
+  const { data: additionalImages = [] } = useProductImages(id || '');
   const [quantity, setQuantity] = useState(1);
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
   const wishlisted = product ? isWishlisted(product.id) : false;
