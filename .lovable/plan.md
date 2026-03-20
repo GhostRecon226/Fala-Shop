@@ -1,36 +1,55 @@
 
 
-## Plan: Create About, Contact, and Shipping & Returns Pages
+## Plan: Integrate Flutterwave Payment Gateway
 
-### New Pages
+### Overview
+Replace the current direct "Place Order" flow with Flutterwave's hosted payment page. Orders are created first, then the user is redirected to Flutterwave to pay. On successful payment, a webhook confirms the payment and updates the order status.
 
-**1. `src/pages/About.tsx`** — Simple brand overview
-- Company name, tagline, brief description of Fala Production Ltd.
-- Product categories and brand values (utility, quality, style)
-- Clean layout matching existing page styling
+### Flow
+```text
+Checkout Form → Create Order (status: "pending") → Call Edge Function
+→ Flutterwave Hosted Payment Page → User Pays → Redirect back to /order-confirmation?tx_ref=...
+→ Webhook Edge Function verifies payment → Updates order status to "confirmed"
+```
 
-**2. `src/pages/Contact.tsx`** — Contact form + details
-- Contact form with name, email, subject, and message fields (validated with zod + react-hook-form)
-- Contact details section: email address, phone number
-- Form submissions stored in a new `contact_messages` database table
-- Toast confirmation on successful submission
+### Secret Required
+- `FLUTTERWAVE_SECRET_KEY` — your Flutterwave secret key from the Flutterwave dashboard (Settings → API Keys)
 
-**3. `src/pages/ShippingReturns.tsx`** — Accordion FAQ style
-- Accordion sections covering: Shipping Rates, Delivery Times, International Shipping, Return Policy, Refund Process, Exchanges
-- Uses existing Accordion UI component
+### Database Changes
+- Add `payment_reference` (text, nullable) column to `orders` table
+- Change default order status from `'confirmed'` to `'pending'`
 
-### Database Migration
-- Create `contact_messages` table: `id`, `name`, `email`, `subject`, `message`, `created_at`
-- RLS policy: allow anonymous inserts, admin-only reads
+### New Edge Functions
 
-### Routing & Footer Updates
+**1. `supabase/functions/flutterwave-init/index.ts`**
+- Accepts: order ID, amount, customer email/name/phone, redirect URL
+- Validates the authenticated user owns the order
+- Calls Flutterwave's `/v3/payments` API to initialize a payment
+- Returns the hosted payment link to the frontend
 
-**4. `src/App.tsx`** — Add 3 new routes: `/about`, `/contact`, `/shipping-returns`
+**2. `supabase/functions/flutterwave-webhook/index.ts`**
+- Receives Flutterwave webhook callbacks
+- Verifies the transaction by calling Flutterwave's `/v3/transactions/:id/verify`
+- On success: updates the order status from `pending` to `confirmed`
+- On failure: updates the order status to `failed`
+- `verify_jwt = false` in config.toml (webhooks are unauthenticated)
 
-**5. `src/components/Footer.tsx`** — Convert the static `<span>` elements to `<Link>` components pointing to the new routes
+### Frontend Changes
 
-### Files to create/edit
-- Create: `src/pages/About.tsx`, `src/pages/Contact.tsx`, `src/pages/ShippingReturns.tsx`
-- Edit: `src/App.tsx`, `src/components/Footer.tsx`
-- Database: 1 migration for `contact_messages` table
+**3. `src/pages/Checkout.tsx`**
+- On form submit: create order with status `pending`, then call `flutterwave-init` edge function
+- Redirect user to the returned Flutterwave payment link (instead of navigating to confirmation)
+- Button text changes to "Pay with Flutterwave"
+
+**4. `src/pages/OrderConfirmation.tsx`**
+- Read `tx_ref` and `status` from URL query params (Flutterwave redirects back with these)
+- Show success or failure state based on the redirect status
+- Link to order history
+
+### Technical Details
+- Flutterwave API base: `https://api.flutterwave.com`
+- Payment init endpoint: `POST /v3/payments`
+- Verify endpoint: `GET /v3/transactions/:id/verify`
+- Currency: NGN (configurable)
+- The `tx_ref` is set to the order ID for easy matching
 
