@@ -21,6 +21,7 @@ import Orders from "./pages/Orders";
 import AdminOrders from "./pages/AdminOrders";
 import AdminProducts from "./pages/AdminProducts";
 import AdminDashboard from "./pages/AdminDashboard";
+import ChangePassword from "./pages/ChangePassword";
 
 const queryClient = new QueryClient();
 
