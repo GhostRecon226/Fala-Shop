@@ -174,6 +174,14 @@ const Navbar = () => {
                   </TooltipTrigger>
                   <TooltipContent>My Orders</TooltipContent>
                 </Tooltip>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Link to="/account/change-password" className="p-2 text-foreground hover:text-primary transition-colors duration-150" aria-label="Change password">
+                      <KeyRound size={20} />
+                    </Link>
+                  </TooltipTrigger>
+                  <TooltipContent>Change Password</TooltipContent>
+                </Tooltip>
                 {isAdmin && (
                   <Tooltip>
                     <TooltipTrigger asChild>
