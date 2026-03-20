@@ -96,7 +96,7 @@ const ProductDetail = () => {
             <div>
               <p className="text-xs font-medium text-foreground mb-2">Select Size</p>
               <div className="flex flex-wrap gap-2">
-                {SIZES.map(size => (
+                {getSizesForCategory(product.category).map(size => (
                   <button
                     key={size}
                     onClick={() => setSelectedSize(size)}
