@@ -6,7 +6,7 @@ import { useWishlist } from '@/contexts/WishlistContext';
 import { ArrowLeft, Minus, Plus, Heart } from 'lucide-react';
 import { useState } from 'react';
 import ProductReviews from '@/components/ProductReviews';
-import { SIZES, requiresSize } from '@/lib/sizes';
+import { getSizesForCategory, requiresSize } from '@/lib/sizes';
 
 const ProductDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -96,7 +96,7 @@ const ProductDetail = () => {
             <div>
               <p className="text-xs font-medium text-foreground mb-2">Select Size</p>
               <div className="flex flex-wrap gap-2">
-                {SIZES.map(size => (
+                {getSizesForCategory(product.category).map(size => (
                   <button
                     key={size}
                     onClick={() => setSelectedSize(size)}
