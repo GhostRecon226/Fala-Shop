@@ -1,26 +1,25 @@
 
 
-## Plan: Add Admin Dashboard Overview Page
+## Plan: Add Change Password Page
 
 ### Overview
-Create a new dashboard page at `/admin` showing key metrics (total orders, total revenue, product count, recent orders) using data from existing tables. Add it as the first tab in the admin navigation.
+Create a simple account settings page where logged-in users can change their password using Supabase's `updateUser` API.
 
 ### Changes
 
-**1. Create `src/pages/AdminDashboard.tsx`**
-- Fetch aggregated data from `orders`, `products` tables
-- Display metric cards: Total Orders, Total Revenue (₦), Total Products, Low Stock count
-- Show a recent orders list (last 5)
-- Optional: simple revenue-over-time bar chart using recharts (already installed)
-- Reuse existing admin access guard pattern (useIsAdmin + useAuth)
-- Use `AdminNav` for navigation consistency
+**1. Create `src/pages/ChangePassword.tsx`**
+- Protected page — redirects to `/auth` if not logged in
+- Form with current password field (for confirmation UX), new password, and confirm new password fields
+- Validates new password matches confirmation and is at least 6 characters
+- Calls `supabase.auth.updateUser({ password: newPassword })` on submit
+- Shows success/error toast
 
-**2. Update `src/components/AdminNav.tsx`**
-- Add "Dashboard" tab at the beginning: `{ label: 'Dashboard', path: '/admin' }`
+**2. Update `src/App.tsx`**
+- Add route: `<Route path="/account/change-password" element={<ChangePassword />} />`
 
-**3. Update `src/App.tsx`**
-- Import `AdminDashboard` and add route: `<Route path="/admin" element={<AdminDashboard />} />`
+**3. Update `src/components/Navbar.tsx`**
+- Add a "Change Password" link in the logged-in user section (both desktop dropdown area and mobile menu), using a `KeyRound` icon or similar, linking to `/account/change-password`
 
 ### No database changes needed
-All metrics are derived from existing `orders` and `products` tables using aggregate queries via the client SDK.
+Supabase Auth handles password updates natively via `updateUser`.
 
