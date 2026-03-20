@@ -168,6 +168,14 @@ const Navbar = () => {
               <>
                 <Tooltip>
                   <TooltipTrigger asChild>
+                    <Link to="/account/settings" className="p-2 text-foreground hover:text-primary transition-colors duration-150" aria-label="Account settings">
+                      <UserCog size={20} />
+                    </Link>
+                  </TooltipTrigger>
+                  <TooltipContent>Account Settings</TooltipContent>
+                </Tooltip>
+                <Tooltip>
+                  <TooltipTrigger asChild>
                     <Link to="/orders" className="p-2 text-foreground hover:text-primary transition-colors duration-150" aria-label="My orders">
                       <Package size={20} />
                     </Link>
