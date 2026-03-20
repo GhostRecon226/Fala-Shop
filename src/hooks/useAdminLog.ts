@@ -10,6 +10,6 @@ export const logAdminAction = async (
     _action: action,
     _entity_type: entityType,
     _entity_id: entityId ?? null,
-    _details: details ?? {},
+    _details: (details ?? {}) as unknown as Record<string, never>,
   });
 };
