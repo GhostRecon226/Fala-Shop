@@ -55,7 +55,7 @@ const AdminOrders = () => {
     if (allOrders.length > 0) {
       const { data: items } = await supabase
         .from('order_items')
-        .select('id, order_id, product_id, quantity, price')
+        .select('id, order_id, product_id, quantity, price, size')
         .in('order_id', allOrders.map(o => o.id));
 
       const productIds = [...new Set((items || []).map(i => i.product_id))];
