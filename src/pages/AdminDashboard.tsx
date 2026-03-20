@@ -60,18 +60,18 @@ const AdminDashboard = () => {
 
     setRecentOrders(orders.slice(0, 5));
 
-    // Build last-7-day revenue chart
-    const last7: ChartPoint[] = [];
-    for (let i = 6; i >= 0; i--) {
+    // Build last-30-day revenue chart
+    const last30: ChartPoint[] = [];
+    for (let i = 29; i >= 0; i--) {
       const d = new Date();
       d.setDate(d.getDate() - i);
       const key = d.toISOString().slice(0, 10);
       const dayRevenue = orders
         .filter(o => o.created_at.slice(0, 10) === key)
         .reduce((s, o) => s + Number(o.total), 0);
-      last7.push({ date: d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }), revenue: dayRevenue });
+      last30.push({ date: d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }), revenue: dayRevenue });
     }
-    setChartData(last7);
+    setChartData(last30);
     setLoading(false);
   };
 
@@ -133,7 +133,7 @@ const AdminDashboard = () => {
 
           {/* Revenue chart */}
           <div className="rounded-lg border border-border bg-card p-5 mb-8">
-            <h2 className="text-sm font-medium text-muted-foreground uppercase tracking-wide mb-4">Revenue — Last 7 Days</h2>
+            <h2 className="text-sm font-medium text-muted-foreground uppercase tracking-wide mb-4">Revenue — Last 30 Days</h2>
             <div className="h-52">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={chartData}>
