@@ -3,7 +3,7 @@ import { formatPrice } from '@/lib/utils';
 import { useCart } from '@/contexts/CartContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { Minus, Plus, Trash2, ShoppingBag, Info } from 'lucide-react';
-import { Minus, Plus, Trash2, ShoppingBag } from 'lucide-react';
+
 
 const Cart = () => {
   const { items, updateQuantity, removeItem, totalPrice } = useCart();
