@@ -1,6 +1,6 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { formatPrice } from '@/lib/utils';
-import { ShoppingBag, Menu, X, Search, Heart, User, LogOut, Package, ShieldAlert, KeyRound } from 'lucide-react';
+import { ShoppingBag, Menu, X, Search, Heart, User, LogOut, Package, ShieldAlert, KeyRound, UserCog } from 'lucide-react';
 import { useCart } from '@/contexts/CartContext';
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from '@/components/ui/tooltip';
 import { useWishlist } from '@/contexts/WishlistContext';
@@ -168,6 +168,14 @@ const Navbar = () => {
               <>
                 <Tooltip>
                   <TooltipTrigger asChild>
+                    <Link to="/account/settings" className="p-2 text-foreground hover:text-primary transition-colors duration-150" aria-label="Account settings">
+                      <UserCog size={20} />
+                    </Link>
+                  </TooltipTrigger>
+                  <TooltipContent>Account Settings</TooltipContent>
+                </Tooltip>
+                <Tooltip>
+                  <TooltipTrigger asChild>
                     <Link to="/orders" className="p-2 text-foreground hover:text-primary transition-colors duration-150" aria-label="My orders">
                       <Package size={20} />
                     </Link>
@@ -241,6 +249,9 @@ const Navbar = () => {
             <div className="border-t border-border my-1" />
             {user ? (
               <>
+                <Link to="/account/settings" onClick={() => setMobileOpen(false)} className="text-sm font-medium py-2 text-foreground">
+                  Account Settings
+                </Link>
                 <Link to="/orders" onClick={() => setMobileOpen(false)} className="text-sm font-medium py-2 text-foreground">
                   My Orders
                 </Link>
