@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { formatPrice } from '@/lib/utils';
 import { Heart, Star } from 'lucide-react';
 import { Product } from '@/lib/supabase';
 import { useCart } from '@/contexts/CartContext';
