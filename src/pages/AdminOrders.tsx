@@ -6,6 +6,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useIsAdmin } from '@/hooks/useIsAdmin';
 import { ShieldAlert, Package, ChevronDown } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
+import { logAdminAction } from '@/hooks/useAdminLog';
 import AdminNav from '@/components/AdminNav';
 
 const STATUSES = ['confirmed', 'processing', 'shipped', 'delivered'] as const;
@@ -71,6 +72,7 @@ const AdminOrders = () => {
   };
 
   const updateStatus = async (orderId: string, newStatus: string) => {
+    const oldStatus = orders.find(o => o.id === orderId)?.status;
     setUpdatingId(orderId);
     const { error } = await supabase
       .from('orders')
@@ -82,6 +84,7 @@ const AdminOrders = () => {
     } else {
       setOrders(prev => prev.map(o => o.id === orderId ? { ...o, status: newStatus } : o));
       toast({ title: 'Updated', description: `Order status changed to ${newStatus}` });
+      logAdminAction('status_changed', 'order', orderId, { old_status: oldStatus, new_status: newStatus });
     }
     setUpdatingId(null);
   };

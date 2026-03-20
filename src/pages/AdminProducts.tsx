@@ -7,6 +7,7 @@ import { useIsAdmin } from '@/hooks/useIsAdmin';
 import { useQueryClient } from '@tanstack/react-query';
 import { ShieldAlert, Plus, Pencil, Trash2, Upload, X, Image as ImageIcon } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
+import { logAdminAction } from '@/hooks/useAdminLog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -157,13 +158,15 @@ const AdminProducts = () => {
         toast({ title: 'Error', description: error.message, variant: 'destructive' });
       } else {
         toast({ title: 'Updated', description: 'Product updated successfully' });
+        logAdminAction('updated', 'product', editingId, { name: payload.name, price: payload.price });
       }
     } else {
-      const { error } = await supabase.from('products').insert(payload);
+      const { data: inserted, error } = await supabase.from('products').insert(payload).select('id').single();
       if (error) {
         toast({ title: 'Error', description: error.message, variant: 'destructive' });
       } else {
         toast({ title: 'Created', description: 'Product created successfully' });
+        logAdminAction('created', 'product', inserted?.id, { name: payload.name, price: payload.price });
       }
     }
     setSaving(false);
@@ -174,11 +177,13 @@ const AdminProducts = () => {
 
   const handleDelete = async () => {
     if (!deleteId) return;
+    const deletedProduct = products.find(p => p.id === deleteId);
     const { error } = await supabase.from('products').delete().eq('id', deleteId);
     if (error) {
       toast({ title: 'Error', description: error.message, variant: 'destructive' });
     } else {
       toast({ title: 'Deleted', description: 'Product deleted' });
+      logAdminAction('deleted', 'product', deleteId, { name: deletedProduct?.name });
       queryClient.invalidateQueries({ queryKey: ['products'] });
       loadProducts();
     }

@@ -3,6 +3,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useIsAdmin } from '@/hooks/useIsAdmin';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
+import { logAdminAction } from '@/hooks/useAdminLog';
 import AdminNav from '@/components/AdminNav';
 import { ShieldAlert, Loader2, Users, Search, X, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -90,8 +91,10 @@ const AdminUsers = () => {
       if (error) {
         toast({ title: 'Error', description: error.message, variant: 'destructive' });
       } else {
+        const targetUser = users.find(u => u.user_id === targetUserId);
         toast({ title: 'Role updated', description: 'User role has been removed.' });
         setUsers(prev => prev.map(u => u.user_id === targetUserId ? { ...u, role: null } : u));
+        logAdminAction('role_removed', 'user', targetUserId, { email: targetUser?.email, old_role: targetUser?.role || 'user', new_role: 'user' });
       }
     } else {
       const { error } = await supabase.rpc('set_user_role', {
@@ -101,8 +104,10 @@ const AdminUsers = () => {
       if (error) {
         toast({ title: 'Error', description: error.message, variant: 'destructive' });
       } else {
+        const targetUser = users.find(u => u.user_id === targetUserId);
         toast({ title: 'Role updated', description: `User is now ${newRole}.` });
         setUsers(prev => prev.map(u => u.user_id === targetUserId ? { ...u, role: newRole } : u));
+        logAdminAction('role_changed', 'user', targetUserId, { email: targetUser?.email, old_role: targetUser?.role || 'user', new_role: newRole });
       }
     }
 
