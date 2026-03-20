@@ -57,7 +57,7 @@ const Navbar = () => {
       <div className="container flex h-full items-center justify-between">
         {/* Logo */}
         <Link to="/" className="flex items-center gap-2">
-          <img src={logo} alt="Fala Production Ltd." className="h-10 w-auto" />
+          <img src={logo} alt="Fala Production Ltd." className="h-14 w-auto" />
         </Link>
 
         {/* Desktop Links */}
