@@ -346,7 +346,14 @@ const AdminProducts = () => {
             </div>
 
             {/* Gallery Images */}
-            <AdminProductImages productId={editingId} />
+            <AdminProductImages
+              productId={editingId}
+              currentCoverUrl={form.image_url || null}
+              onSetCover={(url) => {
+                setForm(f => ({ ...f, image_url: url }));
+                setImagePreview(url);
+              }}
+            />
 
             <div>
               <label className="text-sm font-medium text-foreground">Description</label>
