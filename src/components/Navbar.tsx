@@ -66,7 +66,7 @@ const Navbar = () => {
           <Link to="/shop?category=Solar+Fans" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors duration-150">
             Solar Fans
           </Link>
-          <Link to="/shop?category=Shirts" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors duration-150">
+          <Link to="/shop?category=Clothing" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors duration-150">
             Clothing
           </Link>
         </div>
