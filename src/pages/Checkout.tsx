@@ -128,6 +128,7 @@ const Checkout = () => {
       const message = err?.message || 'Something went wrong. Please try again.';
       toast.error('Payment failed', { description: message });
       console.error('Failed to process order:', err);
+      setPaymentFailed(true);
       setSubmitting(false);
     }
   };
