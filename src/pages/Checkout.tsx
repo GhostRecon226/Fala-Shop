@@ -25,6 +25,7 @@ const Checkout = () => {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
   const [submitting, setSubmitting] = useState(false);
+  const [paymentFailed, setPaymentFailed] = useState(false);
   const [errors, setErrors] = useState<Partial<Record<keyof FormData, string>>>({});
   const [form, setForm] = useState<FormData>({
     firstName: '', lastName: '', email: '', phone: '',
@@ -127,6 +128,7 @@ const Checkout = () => {
       const message = err?.message || 'Something went wrong. Please try again.';
       toast.error('Payment failed', { description: message });
       console.error('Failed to process order:', err);
+      setPaymentFailed(true);
       setSubmitting(false);
     }
   };
@@ -215,12 +217,18 @@ const Checkout = () => {
                 <span className="font-semibold text-foreground">Total</span>
                 <span className="font-bold text-primary tabular-nums">{formatPrice(totalPrice)}</span>
               </div>
+              {paymentFailed && (
+                <div className="rounded-md bg-destructive/10 border border-destructive/20 p-3 text-sm text-destructive">
+                  Payment failed. Your form details have been preserved — try again when you're ready.
+                </div>
+              )}
               <button
                 type="submit"
                 disabled={submitting}
+                onClick={() => setPaymentFailed(false)}
                 className="block w-full text-center bg-primary text-primary-foreground py-3 rounded-md text-sm font-semibold hover:opacity-90 transition-all disabled:opacity-50"
               >
-                {submitting ? 'Redirecting to Payment…' : 'Pay with Flutterwave'}
+                {submitting ? 'Redirecting to Payment…' : paymentFailed ? 'Retry Payment' : 'Pay with Flutterwave'}
               </button>
             </div>
           </div>
