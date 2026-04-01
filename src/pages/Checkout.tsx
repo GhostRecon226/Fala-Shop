@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { formatPrice } from '@/lib/utils';
+import { toast } from 'sonner';
 import { useNavigate, Link, Navigate } from 'react-router-dom';
 import { useCart } from '@/contexts/CartContext';
 import { useAuth } from '@/contexts/AuthContext';
@@ -122,7 +123,9 @@ const Checkout = () => {
       clearCart();
       window.location.href = paymentData.payment_link;
       return;
-    } catch (err) {
+    } catch (err: any) {
+      const message = err?.message || 'Something went wrong. Please try again.';
+      toast.error('Payment failed', { description: message });
       console.error('Failed to process order:', err);
       setSubmitting(false);
     }
