@@ -141,7 +141,13 @@ const Checkout = () => {
     }`;
 
   return (
-    <div className="container py-10">
+    <div className="container py-10 relative">
+      {submitting && (
+        <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-background/80 backdrop-blur-sm">
+          <div className="h-10 w-10 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+          <p className="mt-4 text-sm font-medium text-foreground">Initializing payment…</p>
+        </div>
+      )}
       <h1 className="text-3xl font-bold tracking-display text-foreground mb-8">Checkout</h1>
 
       <form onSubmit={handleSubmit}>
