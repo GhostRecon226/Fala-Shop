@@ -188,18 +188,29 @@ const AdminOrders = () => {
                   </div>
 
                   {/* Status selector */}
-                  <div className="relative">
-                    <select
-                      value={order.status}
-                      onChange={e => updateStatus(order.id, e.target.value)}
-                      disabled={updatingId === order.id}
-                      className="appearance-none pl-3 pr-8 py-1.5 rounded-md border border-border bg-background text-sm font-medium text-foreground capitalize cursor-pointer focus:ring-2 focus:ring-ring outline-none disabled:opacity-50"
-                    >
-                      {STATUSES.map(s => (
-                        <option key={s} value={s}>{s}</option>
-                      ))}
-                    </select>
-                    <ChevronDown size={14} className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
+                  <div className="flex items-center gap-3">
+                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium capitalize ${
+                      order.status === 'confirmed' || order.status === 'delivered'
+                        ? 'bg-green-500/10 text-green-600'
+                        : order.status === 'failed'
+                        ? 'bg-destructive/10 text-destructive'
+                        : order.status === 'pending'
+                        ? 'bg-yellow-500/10 text-yellow-600'
+                        : 'bg-primary/10 text-primary'
+                    }`}>{order.status}</span>
+                    <div className="relative">
+                      <select
+                        value={order.status}
+                        onChange={e => updateStatus(order.id, e.target.value)}
+                        disabled={updatingId === order.id}
+                        className="appearance-none pl-3 pr-8 py-1.5 rounded-md border border-border bg-background text-sm font-medium text-foreground capitalize cursor-pointer focus:ring-2 focus:ring-ring outline-none disabled:opacity-50"
+                      >
+                        {STATUSES.map(s => (
+                          <option key={s} value={s}>{s}</option>
+                        ))}
+                      </select>
+                      <ChevronDown size={14} className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
+                    </div>
                   </div>
                 </div>
 
