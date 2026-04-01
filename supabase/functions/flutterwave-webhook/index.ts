@@ -68,6 +68,39 @@ Deno.serve(async (req) => {
           payment_reference: String(transactionId),
         })
         .eq("id", txRef);
+
+      // Send order confirmation email
+      try {
+        const { data: order } = await supabase
+          .from("orders")
+          .select("id, total, shipping_address")
+          .eq("id", txRef)
+          .single();
+
+        if (order) {
+          const address = order.shipping_address as Record<string, any>;
+          const email = address?.email;
+          const name = address?.firstName || address?.name;
+
+          if (email) {
+            await supabase.functions.invoke("send-transactional-email", {
+              body: {
+                templateName: "order-confirmation",
+                recipientEmail: email,
+                idempotencyKey: `order-confirm-${order.id}`,
+                templateData: {
+                  orderId: order.id,
+                  total: Number(order.total).toLocaleString(),
+                  customerName: name,
+                },
+              },
+            });
+          }
+        }
+      } catch (emailErr) {
+        console.error("Failed to send order confirmation email:", emailErr);
+        // Don't fail the webhook — order is already confirmed
+      }
     } else {
       await supabase
         .from("orders")
