@@ -27,6 +27,7 @@ import AccountSettings from "./pages/AccountSettings";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
 import ShippingReturns from "./pages/ShippingReturns";
+import Unsubscribe from "./pages/Unsubscribe";
 
 const queryClient = new QueryClient();
 
