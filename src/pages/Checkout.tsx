@@ -123,7 +123,9 @@ const Checkout = () => {
       clearCart();
       window.location.href = paymentData.payment_link;
       return;
-    } catch (err) {
+    } catch (err: any) {
+      const message = err?.message || 'Something went wrong. Please try again.';
+      toast.error('Payment failed', { description: message });
       console.error('Failed to process order:', err);
       setSubmitting(false);
     }
