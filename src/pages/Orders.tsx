@@ -159,7 +159,15 @@ const Orders = () => {
                   <p className="font-medium text-foreground tabular-nums">{formatPrice(Number(order.total))}</p>
                 </div>
               </div>
-              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary/10 text-primary capitalize">
+              <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium capitalize ${
+                order.status === 'confirmed' || order.status === 'delivered'
+                  ? 'bg-green-500/10 text-green-600'
+                  : order.status === 'failed'
+                  ? 'bg-destructive/10 text-destructive'
+                  : order.status === 'pending'
+                  ? 'bg-yellow-500/10 text-yellow-600'
+                  : 'bg-primary/10 text-primary'
+              }`}>
                 {order.status}
               </span>
             </div>
