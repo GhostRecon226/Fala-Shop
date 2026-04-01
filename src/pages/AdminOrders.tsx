@@ -9,7 +9,7 @@ import { toast } from '@/hooks/use-toast';
 import { logAdminAction } from '@/hooks/useAdminLog';
 import AdminNav from '@/components/AdminNav';
 
-const STATUSES = ['confirmed', 'processing', 'shipped', 'delivered'] as const;
+const STATUSES = ['pending', 'confirmed', 'processing', 'shipped', 'delivered', 'failed'] as const;
 
 type OrderRow = {
   id: string;
