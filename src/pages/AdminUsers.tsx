@@ -56,6 +56,7 @@ const AdminUsers = () => {
   const [updatingId, setUpdatingId] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [roleFilter, setRoleFilter] = useState<string>('all');
+  const [statusFilter, setStatusFilter] = useState<string>('all');
   const [page, setPage] = useState(1);
   const [deleteTarget, setDeleteTarget] = useState<UserWithRole | null>(null);
   const [deleting, setDeleting] = useState(false);
