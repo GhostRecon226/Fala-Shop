@@ -395,6 +395,14 @@ const AdminCoupons = () => {
                   </td>
                   <td className="px-4 py-3">{c.min_order_amount > 0 ? formatPrice(c.min_order_amount) : '—'}</td>
                   <td className="px-4 py-3">{c.times_used}{c.max_uses ? ` / ${c.max_uses}` : ''}</td>
+                  <td className="px-4 py-3 text-right tabular-nums text-foreground">
+                    {formatPrice(couponStats[c.code.toUpperCase()]?.total_revenue || 0)}
+                  </td>
+                  <td className="px-4 py-3 text-right tabular-nums text-destructive">
+                    {couponStats[c.code.toUpperCase()]?.total_discounts
+                      ? `−${formatPrice(couponStats[c.code.toUpperCase()].total_discounts)}`
+                      : '—'}
+                  </td>
                   <td className="px-4 py-3 text-muted-foreground">
                     {c.expires_at ? new Date(c.expires_at).toLocaleDateString() : '—'}
                   </td>
