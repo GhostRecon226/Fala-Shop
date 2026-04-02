@@ -126,6 +126,21 @@ const AdminUsers = () => {
     setUpdatingId(null);
   };
 
+  const handleDeleteUser = async () => {
+    if (!deleteTarget) return;
+    setDeleting(true);
+    const { error } = await supabase.rpc('delete_user_by_admin', { _target_user_id: deleteTarget.user_id });
+    if (error) {
+      toast({ title: 'Error', description: error.message, variant: 'destructive' });
+    } else {
+      toast({ title: 'User deleted', description: `${deleteTarget.email} has been removed.` });
+      setUsers(prev => prev.filter(u => u.user_id !== deleteTarget.user_id));
+      logAdminAction('user_deleted', 'user', deleteTarget.user_id, { email: deleteTarget.email, role: deleteTarget.role || 'user' });
+    }
+    setDeleting(false);
+    setDeleteTarget(null);
+  };
+
   if (authLoading || adminLoading) {
     return (
       <div className="container py-16 flex justify-center">
