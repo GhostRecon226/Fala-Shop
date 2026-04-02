@@ -94,9 +94,16 @@ const ProductCard = ({ product }: { product: Product }) => {
         )}
 
         <div className="flex items-center justify-between">
-          <p className="text-sm font-semibold text-primary tabular-nums">
-            {formatPrice(product.price)}
-          </p>
+          <div className="flex items-center gap-1.5">
+            {product.compare_at_price && product.compare_at_price > product.price && (
+              <span className="text-xs text-muted-foreground line-through tabular-nums">
+                {formatPrice(product.compare_at_price)}
+              </span>
+            )}
+            <p className="text-sm font-semibold text-primary tabular-nums">
+              {formatPrice(product.price)}
+            </p>
+          </div>
           <button
             onClick={() => addItem(product)}
             className="text-xs font-medium text-primary hover:text-accent transition-colors duration-150"

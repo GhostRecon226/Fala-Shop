@@ -38,6 +38,7 @@ type Product = {
   image_url: string | null;
   available_sizes: string[];
   available_colors: string[];
+  compare_at_price: number | null;
 };
 
 const emptyForm = {
@@ -50,6 +51,7 @@ const emptyForm = {
   is_featured: false,
   available_sizes: [] as string[],
   available_colors: [] as string[],
+  compare_at_price: '',
 };
 
 const AdminProducts = () => {
@@ -100,6 +102,7 @@ const AdminProducts = () => {
       is_featured: !!p.is_featured,
       available_sizes: p.available_sizes || [],
       available_colors: p.available_colors || [],
+      compare_at_price: p.compare_at_price ? String(p.compare_at_price) : '',
     });
     setImagePreview(p.image_url || null);
     setColorInput('');
@@ -162,6 +165,7 @@ const AdminProducts = () => {
       is_featured: form.is_featured,
       available_sizes: form.available_sizes,
       available_colors: form.available_colors,
+      compare_at_price: form.compare_at_price ? parseFloat(form.compare_at_price) : null,
     };
 
     if (editingId) {
@@ -320,9 +324,13 @@ const AdminProducts = () => {
                 <Input type="number" step="0.01" value={form.price} onChange={e => setForm(f => ({ ...f, price: e.target.value }))} />
               </div>
               <div>
-                <label className="text-sm font-medium text-foreground">Stock</label>
-                <Input type="number" value={form.stock_quantity} onChange={e => setForm(f => ({ ...f, stock_quantity: e.target.value }))} />
+                <label className="text-sm font-medium text-foreground">Compare at Price</label>
+                <Input type="number" step="0.01" placeholder="Original price" value={form.compare_at_price} onChange={e => setForm(f => ({ ...f, compare_at_price: e.target.value }))} />
               </div>
+            </div>
+            <div>
+              <label className="text-sm font-medium text-foreground">Stock</label>
+              <Input type="number" value={form.stock_quantity} onChange={e => setForm(f => ({ ...f, stock_quantity: e.target.value }))} />
             </div>
 
             {/* Image Upload */}

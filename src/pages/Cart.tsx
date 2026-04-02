@@ -46,9 +46,16 @@ const Cart = () => {
                 <p className="text-xs text-muted-foreground">
                   {product.category}{size ? ` · Size ${size}` : ''}{color ? ` · ${color}` : ''}
                 </p>
-                <p className="text-sm font-semibold text-primary tabular-nums mt-1">
-                  {formatPrice(product.price)}
-                </p>
+                <div className="flex items-center gap-1.5 mt-1">
+                  {(product as any).compare_at_price && (product as any).compare_at_price > product.price && (
+                    <span className="text-xs text-muted-foreground line-through tabular-nums">
+                      {formatPrice((product as any).compare_at_price)}
+                    </span>
+                  )}
+                  <p className="text-sm font-semibold text-primary tabular-nums">
+                    {formatPrice(product.price)}
+                  </p>
+                </div>
               </div>
               <div className="flex flex-col items-end justify-between">
                 <button onClick={() => removeItem(product.id, size, color)} className="text-muted-foreground hover:text-destructive transition-colors">

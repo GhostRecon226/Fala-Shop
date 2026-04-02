@@ -362,6 +362,7 @@ export type Database = {
           available_colors: string[]
           available_sizes: string[]
           category: string
+          compare_at_price: number | null
           created_at: string
           description: string | null
           id: string
@@ -375,6 +376,7 @@ export type Database = {
           available_colors?: string[]
           available_sizes?: string[]
           category: string
+          compare_at_price?: number | null
           created_at?: string
           description?: string | null
           id?: string
@@ -388,6 +390,7 @@ export type Database = {
           available_colors?: string[]
           available_sizes?: string[]
           category?: string
+          compare_at_price?: number | null
           created_at?: string
           description?: string | null
           id?: string

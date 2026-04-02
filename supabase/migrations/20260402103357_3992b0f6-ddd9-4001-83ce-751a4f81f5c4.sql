@@ -1,0 +1,1 @@
+ALTER TABLE public.products ADD COLUMN compare_at_price numeric DEFAULT NULL;
