@@ -5,7 +5,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useIsAdmin } from '@/hooks/useIsAdmin';
 import { useQueryClient } from '@tanstack/react-query';
-import { ShieldAlert, Plus, Pencil, Trash2, Upload, X, Image as ImageIcon } from 'lucide-react';
+import { ShieldAlert, Plus, Pencil, Trash2, Upload, X, Image as ImageIcon, Tag } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { logAdminAction } from '@/hooks/useAdminLog';
 import { Button } from '@/components/ui/button';
