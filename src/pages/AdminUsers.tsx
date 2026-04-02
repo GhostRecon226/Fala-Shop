@@ -69,7 +69,8 @@ const AdminUsers = () => {
       u.email.toLowerCase().includes(searchQuery.toLowerCase());
     const effectiveRole = u.role || 'user';
     const matchesRole = roleFilter === 'all' || effectiveRole === roleFilter;
-    return matchesSearch && matchesRole;
+    const matchesStatus = statusFilter === 'all' || (statusFilter === 'suspended' ? u.is_banned : !u.is_banned);
+    return matchesSearch && matchesRole && matchesStatus;
   });
 
   const totalPages = Math.max(1, Math.ceil(filteredUsers.length / perPage));
