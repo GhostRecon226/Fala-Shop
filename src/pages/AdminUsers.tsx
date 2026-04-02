@@ -59,6 +59,8 @@ const AdminUsers = () => {
   const [page, setPage] = useState(1);
   const [deleteTarget, setDeleteTarget] = useState<UserWithRole | null>(null);
   const [deleting, setDeleting] = useState(false);
+  const [banTarget, setBanTarget] = useState<UserWithRole | null>(null);
+  const [banning, setBanning] = useState(false);
   const perPage = 10;
 
   const filteredUsers = users.filter(u => {
