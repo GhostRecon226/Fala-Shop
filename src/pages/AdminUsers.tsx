@@ -368,6 +368,30 @@ const AdminUsers = () => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <AlertDialog open={!!banTarget} onOpenChange={(open) => !open && setBanTarget(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{banTarget?.is_banned ? 'Reactivate user?' : 'Suspend user?'}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {banTarget?.is_banned
+                ? <>This will reactivate <span className="font-medium text-foreground">{banTarget?.email}</span>, allowing them to sign in again.</>
+                : <>This will suspend <span className="font-medium text-foreground">{banTarget?.email}</span>, preventing them from signing in. Their data will be preserved and you can reactivate them later.</>
+              }
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={banning}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleBanToggle}
+              disabled={banning}
+              className={banTarget?.is_banned ? '' : 'bg-orange-500 text-white hover:bg-orange-600'}
+            >
+              {banning ? 'Processing…' : banTarget?.is_banned ? 'Reactivate' : 'Suspend'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
