@@ -65,7 +65,16 @@ const Checkout = () => {
     if (!code) return;
     setCouponLoading(true);
     setCouponError('');
-    const { data, error } = await supabase.rpc('validate_coupon', { _code: code, _order_total: totalPrice });
+    const cartItems = items.map(({ product, quantity }) => ({
+      product_id: product.id,
+      category: product.category,
+      line_total: product.price * quantity,
+    }));
+    const { data, error } = await supabase.rpc('validate_coupon', {
+      _code: code,
+      _order_total: totalPrice,
+      _cart_items: cartItems as unknown as undefined,
+    });
     setCouponLoading(false);
     if (error) { setCouponError('Failed to validate coupon'); return; }
     const result = data as unknown as { valid: boolean; error?: string; discount_amount?: number; discount_type?: string; discount_value?: number };

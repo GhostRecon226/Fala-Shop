@@ -14,6 +14,8 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Badge } from '@/components/ui/badge';
 import { formatPrice } from '@/lib/utils';
 
 interface Coupon {
@@ -27,7 +29,12 @@ interface Coupon {
   is_active: boolean;
   expires_at: string | null;
   created_at: string;
+  applies_to: string;
+  product_ids: string[];
+  categories: string[];
 }
+
+interface Product { id: string; name: string; category: string; }
 
 const emptyForm = {
   code: '',
@@ -36,26 +43,36 @@ const emptyForm = {
   min_order_amount: '',
   max_uses: '',
   expires_at: '',
+  applies_to: 'all' as string,
+  product_ids: [] as string[],
+  categories: [] as string[],
 };
 
 const AdminCoupons = () => {
   const { data: isAdmin, isLoading: adminLoading } = useIsAdmin();
   const [coupons, setCoupons] = useState<Coupon[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [allCategories, setAllCategories] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState(emptyForm);
   const [submitting, setSubmitting] = useState(false);
 
-  const fetchCoupons = async () => {
-    const { data, error } = await supabase
-      .from('coupons')
-      .select('*')
-      .order('created_at', { ascending: false });
-    if (!error && data) setCoupons(data);
+  const fetchData = async () => {
+    const [couponsRes, productsRes] = await Promise.all([
+      supabase.from('coupons').select('*').order('created_at', { ascending: false }),
+      supabase.from('products').select('id, name, category').order('name'),
+    ]);
+    if (couponsRes.data) setCoupons(couponsRes.data as unknown as Coupon[]);
+    if (productsRes.data) {
+      setProducts(productsRes.data);
+      const cats = [...new Set(productsRes.data.map(p => p.category))].sort();
+      setAllCategories(cats);
+    }
     setLoading(false);
   };
 
-  useEffect(() => { if (isAdmin) fetchCoupons(); }, [isAdmin]);
+  useEffect(() => { if (isAdmin) fetchData(); }, [isAdmin]);
 
   if (adminLoading || loading) {
     return (
@@ -78,6 +95,8 @@ const AdminCoupons = () => {
     const discountValue = parseFloat(form.discount_value);
     if (isNaN(discountValue) || discountValue <= 0) { toast.error('Invalid discount value'); return; }
     if (form.discount_type === 'percentage' && discountValue > 100) { toast.error('Percentage cannot exceed 100'); return; }
+    if (form.applies_to === 'product' && form.product_ids.length === 0) { toast.error('Select at least one product'); return; }
+    if (form.applies_to === 'category' && form.categories.length === 0) { toast.error('Select at least one category'); return; }
 
     setSubmitting(true);
     const { error } = await supabase.from('coupons').insert({
@@ -87,16 +106,19 @@ const AdminCoupons = () => {
       min_order_amount: form.min_order_amount ? parseFloat(form.min_order_amount) : 0,
       max_uses: form.max_uses ? parseInt(form.max_uses) : null,
       expires_at: form.expires_at || null,
+      applies_to: form.applies_to,
+      product_ids: form.applies_to === 'product' ? form.product_ids : [],
+      categories: form.applies_to === 'category' ? form.categories : [],
     });
 
     if (error) {
       toast.error(error.message.includes('unique') ? 'Code already exists' : error.message);
     } else {
       toast.success('Coupon created');
-      logAdminAction('create', 'coupon', code, { discount_type: form.discount_type, discount_value: discountValue });
+      logAdminAction('create', 'coupon', code, { discount_type: form.discount_type, discount_value: discountValue, applies_to: form.applies_to });
       setForm(emptyForm);
       setOpen(false);
-      fetchCoupons();
+      fetchData();
     }
     setSubmitting(false);
   };
@@ -122,6 +144,26 @@ const AdminCoupons = () => {
     }
   };
 
+  const toggleProductId = (id: string) => {
+    setForm(f => ({
+      ...f,
+      product_ids: f.product_ids.includes(id) ? f.product_ids.filter(p => p !== id) : [...f.product_ids, id],
+    }));
+  };
+
+  const toggleCategory = (cat: string) => {
+    setForm(f => ({
+      ...f,
+      categories: f.categories.includes(cat) ? f.categories.filter(c => c !== cat) : [...f.categories, cat],
+    }));
+  };
+
+  const scopeLabel = (c: Coupon) => {
+    if (c.applies_to === 'product') return `${c.product_ids.length} product(s)`;
+    if (c.applies_to === 'category') return c.categories.join(', ');
+    return 'All';
+  };
+
   return (
     <div className="container py-10">
       <AdminNav />
@@ -131,7 +173,7 @@ const AdminCoupons = () => {
           <DialogTrigger asChild>
             <Button size="sm"><Plus className="h-4 w-4 mr-1" /> New Coupon</Button>
           </DialogTrigger>
-          <DialogContent>
+          <DialogContent className="max-h-[85vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>Create Coupon</DialogTitle>
             </DialogHeader>
@@ -156,6 +198,43 @@ const AdminCoupons = () => {
                   <Input type="number" value={form.discount_value} onChange={e => setForm(f => ({ ...f, discount_value: e.target.value }))} placeholder={form.discount_type === 'percentage' ? '10' : '500'} />
                 </div>
               </div>
+
+              {/* Scope */}
+              <div>
+                <label className="text-xs font-medium text-muted-foreground mb-1 block">Applies To</label>
+                <Select value={form.applies_to} onValueChange={v => setForm(f => ({ ...f, applies_to: v, product_ids: [], categories: [] }))}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Products</SelectItem>
+                    <SelectItem value="product">Specific Products</SelectItem>
+                    <SelectItem value="category">Specific Categories</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {form.applies_to === 'product' && (
+                <div className="max-h-40 overflow-y-auto border border-border rounded-md p-2 space-y-1">
+                  {products.map(p => (
+                    <label key={p.id} className="flex items-center gap-2 text-sm cursor-pointer hover:bg-muted/50 rounded px-1 py-0.5">
+                      <Checkbox checked={form.product_ids.includes(p.id)} onCheckedChange={() => toggleProductId(p.id)} />
+                      <span className="truncate">{p.name}</span>
+                      <span className="text-xs text-muted-foreground ml-auto">{p.category}</span>
+                    </label>
+                  ))}
+                </div>
+              )}
+
+              {form.applies_to === 'category' && (
+                <div className="flex flex-wrap gap-2">
+                  {allCategories.map(cat => (
+                    <label key={cat} className="flex items-center gap-1.5 text-sm cursor-pointer border border-border rounded-md px-3 py-1.5 hover:bg-muted/50">
+                      <Checkbox checked={form.categories.includes(cat)} onCheckedChange={() => toggleCategory(cat)} />
+                      {cat}
+                    </label>
+                  ))}
+                </div>
+              )}
+
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="text-xs font-medium text-muted-foreground mb-1 block">Min Order Amount</label>
@@ -190,6 +269,7 @@ const AdminCoupons = () => {
               <tr>
                 <th className="text-left px-4 py-3 font-medium">Code</th>
                 <th className="text-left px-4 py-3 font-medium">Discount</th>
+                <th className="text-left px-4 py-3 font-medium">Scope</th>
                 <th className="text-left px-4 py-3 font-medium">Min Order</th>
                 <th className="text-left px-4 py-3 font-medium">Usage</th>
                 <th className="text-left px-4 py-3 font-medium">Expires</th>
@@ -203,6 +283,11 @@ const AdminCoupons = () => {
                   <td className="px-4 py-3 font-mono font-semibold">{c.code}</td>
                   <td className="px-4 py-3">
                     {c.discount_type === 'percentage' ? `${c.discount_value}%` : formatPrice(c.discount_value)}
+                  </td>
+                  <td className="px-4 py-3">
+                    <Badge variant={c.applies_to === 'all' ? 'secondary' : 'outline'} className="text-xs">
+                      {scopeLabel(c)}
+                    </Badge>
                   </td>
                   <td className="px-4 py-3">{c.min_order_amount > 0 ? formatPrice(c.min_order_amount) : '—'}</td>
                   <td className="px-4 py-3">{c.times_used}{c.max_uses ? ` / ${c.max_uses}` : ''}</td>
