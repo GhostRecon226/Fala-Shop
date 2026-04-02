@@ -6,7 +6,7 @@ import AdminNav from '@/components/AdminNav';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
-import { Trash2, Plus } from 'lucide-react';
+import { Trash2, Plus, Pencil } from 'lucide-react';
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogClose,
 } from '@/components/ui/dialog';
@@ -56,6 +56,7 @@ const AdminCoupons = () => {
   const [loading, setLoading] = useState(true);
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState(emptyForm);
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
   const fetchData = async () => {
@@ -89,17 +90,15 @@ const AdminCoupons = () => {
     return <div className="container py-20 text-center text-muted-foreground">Access Denied</div>;
   }
 
-  const handleCreate = async () => {
+  const validateForm = () => {
     const code = form.code.trim().toUpperCase();
-    if (!code) { toast.error('Code is required'); return; }
+    if (!code) { toast.error('Code is required'); return null; }
     const discountValue = parseFloat(form.discount_value);
-    if (isNaN(discountValue) || discountValue <= 0) { toast.error('Invalid discount value'); return; }
-    if (form.discount_type === 'percentage' && discountValue > 100) { toast.error('Percentage cannot exceed 100'); return; }
-    if (form.applies_to === 'product' && form.product_ids.length === 0) { toast.error('Select at least one product'); return; }
-    if (form.applies_to === 'category' && form.categories.length === 0) { toast.error('Select at least one category'); return; }
-
-    setSubmitting(true);
-    const { error } = await supabase.from('coupons').insert({
+    if (isNaN(discountValue) || discountValue <= 0) { toast.error('Invalid discount value'); return null; }
+    if (form.discount_type === 'percentage' && discountValue > 100) { toast.error('Percentage cannot exceed 100'); return null; }
+    if (form.applies_to === 'product' && form.product_ids.length === 0) { toast.error('Select at least one product'); return null; }
+    if (form.applies_to === 'category' && form.categories.length === 0) { toast.error('Select at least one category'); return null; }
+    return {
       code,
       discount_type: form.discount_type,
       discount_value: discountValue,
@@ -109,18 +108,64 @@ const AdminCoupons = () => {
       applies_to: form.applies_to,
       product_ids: form.applies_to === 'product' ? form.product_ids : [],
       categories: form.applies_to === 'category' ? form.categories : [],
-    });
+    };
+  };
 
-    if (error) {
-      toast.error(error.message.includes('unique') ? 'Code already exists' : error.message);
+  const handleSave = async () => {
+    const data = validateForm();
+    if (!data) return;
+    setSubmitting(true);
+
+    if (editingId) {
+      const { error } = await supabase.from('coupons').update(data).eq('id', editingId);
+      if (error) {
+        toast.error(error.message.includes('unique') ? 'Code already exists' : error.message);
+      } else {
+        toast.success('Coupon updated');
+        logAdminAction('update', 'coupon', data.code, { discount_type: data.discount_type, discount_value: data.discount_value, applies_to: data.applies_to });
+        closeDialog();
+        fetchData();
+      }
     } else {
-      toast.success('Coupon created');
-      logAdminAction('create', 'coupon', code, { discount_type: form.discount_type, discount_value: discountValue, applies_to: form.applies_to });
-      setForm(emptyForm);
-      setOpen(false);
-      fetchData();
+      const { error } = await supabase.from('coupons').insert(data);
+      if (error) {
+        toast.error(error.message.includes('unique') ? 'Code already exists' : error.message);
+      } else {
+        toast.success('Coupon created');
+        logAdminAction('create', 'coupon', data.code, { discount_type: data.discount_type, discount_value: data.discount_value, applies_to: data.applies_to });
+        closeDialog();
+        fetchData();
+      }
     }
     setSubmitting(false);
+  };
+
+  const closeDialog = () => {
+    setOpen(false);
+    setEditingId(null);
+    setForm(emptyForm);
+  };
+
+  const openEdit = (c: Coupon) => {
+    setEditingId(c.id);
+    setForm({
+      code: c.code,
+      discount_type: c.discount_type,
+      discount_value: String(c.discount_value),
+      min_order_amount: c.min_order_amount ? String(c.min_order_amount) : '',
+      max_uses: c.max_uses ? String(c.max_uses) : '',
+      expires_at: c.expires_at ? c.expires_at.slice(0, 16) : '',
+      applies_to: c.applies_to,
+      product_ids: c.product_ids || [],
+      categories: c.categories || [],
+    });
+    setOpen(true);
+  };
+
+  const openCreate = () => {
+    setEditingId(null);
+    setForm(emptyForm);
+    setOpen(true);
   };
 
   const toggleActive = async (coupon: Coupon) => {
@@ -169,13 +214,13 @@ const AdminCoupons = () => {
       <AdminNav />
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold text-foreground">Coupons</h1>
-        <Dialog open={open} onOpenChange={setOpen}>
+        <Dialog open={open} onOpenChange={v => { if (!v) closeDialog(); else setOpen(true); }}>
           <DialogTrigger asChild>
-            <Button size="sm"><Plus className="h-4 w-4 mr-1" /> New Coupon</Button>
+            <Button size="sm" onClick={openCreate}><Plus className="h-4 w-4 mr-1" /> New Coupon</Button>
           </DialogTrigger>
           <DialogContent className="max-h-[85vh] overflow-y-auto">
             <DialogHeader>
-              <DialogTitle>Create Coupon</DialogTitle>
+              <DialogTitle>{editingId ? 'Edit Coupon' : 'Create Coupon'}</DialogTitle>
             </DialogHeader>
             <div className="space-y-4">
               <div>
@@ -251,8 +296,8 @@ const AdminCoupons = () => {
               </div>
               <div className="flex justify-end gap-2 pt-2">
                 <DialogClose asChild><Button variant="outline" size="sm">Cancel</Button></DialogClose>
-                <Button size="sm" onClick={handleCreate} disabled={submitting}>
-                  {submitting ? 'Creating…' : 'Create'}
+                <Button size="sm" onClick={handleSave} disabled={submitting}>
+                  {submitting ? (editingId ? 'Saving…' : 'Creating…') : (editingId ? 'Save Changes' : 'Create')}
                 </Button>
               </div>
             </div>
@@ -297,7 +342,10 @@ const AdminCoupons = () => {
                   <td className="px-4 py-3">
                     <Switch checked={c.is_active} onCheckedChange={() => toggleActive(c)} />
                   </td>
-                  <td className="px-4 py-3 text-right">
+                  <td className="px-4 py-3 text-right space-x-1">
+                    <Button variant="ghost" size="icon" onClick={() => openEdit(c)}>
+                      <Pencil className="h-4 w-4 text-muted-foreground" />
+                    </Button>
                     <Button variant="ghost" size="icon" onClick={() => deleteCoupon(c)}>
                       <Trash2 className="h-4 w-4 text-destructive" />
                     </Button>
