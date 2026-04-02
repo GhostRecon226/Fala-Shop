@@ -37,6 +37,8 @@ const AdminDashboard = () => {
   const [chartData, setChartData] = useState<ChartPoint[]>([]);
   const [lowStockProducts, setLowStockProducts] = useState<LowStockProduct[]>([]);
   const [loading, setLoading] = useState(true);
+  const [saleEndsAt, setSaleEndsAt] = useState('');
+  const [savingSale, setSavingSale] = useState(false);
 
   useEffect(() => {
     if (isAdmin) loadData();
