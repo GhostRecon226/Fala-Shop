@@ -90,6 +90,41 @@ const Index = () => {
         </div>
       </section>
 
+      {/* Sale Banner */}
+      {saleProducts.length > 0 && (
+        <section className="relative overflow-hidden bg-gradient-to-r from-destructive/90 via-destructive to-primary mb-0">
+          <div className="absolute inset-0 opacity-[0.07]">
+            <div className="absolute top-2 left-6 text-[100px] font-black text-white select-none rotate-[-6deg]">%</div>
+            <div className="absolute bottom-0 right-8 text-[60px] font-black text-white select-none rotate-[10deg]">SALE</div>
+          </div>
+          <div className="container relative py-10 md:py-14">
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
+              <div>
+                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/20 text-white/90 text-xs font-medium mb-3">
+                  <Tag size={12} />
+                  Limited Time
+                </div>
+                <h2 className="text-2xl md:text-3xl font-bold text-white tracking-tight">
+                  Up to {maxDiscount}% Off
+                </h2>
+                <p className="text-sm text-white/70 mt-1">Don't miss out on these deals</p>
+              </div>
+              <Link
+                to="/sale"
+                className="inline-flex items-center gap-2 bg-white text-destructive px-5 py-2.5 rounded-md text-sm font-semibold hover:bg-white/90 transition-colors self-start"
+              >
+                View All Deals <ArrowRight size={14} />
+              </Link>
+            </div>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+              {saleProducts.map(product => (
+                <ProductCard key={product.id} product={product} />
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* Featured Products */}
       <section className="container pb-16">
         <div className="flex items-center justify-between mb-8">
