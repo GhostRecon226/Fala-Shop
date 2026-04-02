@@ -31,6 +31,10 @@ const Checkout = () => {
     firstName: '', lastName: '', email: '', phone: '',
     address: '', city: '', state: '', zip: '',
   });
+  const [couponCode, setCouponCode] = useState('');
+  const [appliedCoupon, setAppliedCoupon] = useState<{ code: string; discount_amount: number; discount_type: string; discount_value: number } | null>(null);
+  const [couponLoading, setCouponLoading] = useState(false);
+  const [couponError, setCouponError] = useState('');
 
   if (loading) {
     return (
@@ -52,6 +56,28 @@ const Checkout = () => {
       </div>
     );
   }
+
+  const discountAmount = appliedCoupon?.discount_amount ?? 0;
+  const finalTotal = Math.max(0, totalPrice - discountAmount);
+
+  const handleApplyCoupon = async () => {
+    const code = couponCode.trim().toUpperCase();
+    if (!code) return;
+    setCouponLoading(true);
+    setCouponError('');
+    const { data, error } = await supabase.rpc('validate_coupon', { _code: code, _order_total: totalPrice });
+    setCouponLoading(false);
+    if (error) { setCouponError('Failed to validate coupon'); return; }
+    const result = data as unknown as { valid: boolean; error?: string; discount_amount?: number; discount_type?: string; discount_value?: number };
+    if (!result.valid) { setCouponError(result.error || 'Invalid coupon'); return; }
+    setAppliedCoupon({ code, discount_amount: result.discount_amount!, discount_type: result.discount_type!, discount_value: result.discount_value! });
+  };
+
+  const handleRemoveCoupon = () => {
+    setAppliedCoupon(null);
+    setCouponCode('');
+    setCouponError('');
+  };
 
   const handleChange = (field: keyof FormData, value: string) => {
     setForm(prev => ({ ...prev, [field]: value }));
@@ -80,9 +106,11 @@ const Checkout = () => {
         .from('orders')
         .insert({
           user_id: user.id,
-          total: totalPrice,
+          total: finalTotal,
           shipping_address: result.data,
           status: 'pending',
+          coupon_code: appliedCoupon?.code ?? null,
+          discount_amount: discountAmount,
         })
         .select('id')
         .single();
@@ -108,7 +136,7 @@ const Checkout = () => {
       const { data: paymentData, error: paymentError } = await supabase.functions.invoke('flutterwave-init', {
         body: {
           order_id: order.id,
-          amount: totalPrice,
+          amount: finalTotal,
           email: result.data.email,
           name: `${result.data.firstName} ${result.data.lastName}`,
           phone: result.data.phone,
@@ -219,9 +247,52 @@ const Checkout = () => {
                   </div>
                 ))}
               </div>
-              <div className="border-t border-border pt-4 flex justify-between">
-                <span className="font-semibold text-foreground">Total</span>
-                <span className="font-bold text-primary tabular-nums">{formatPrice(totalPrice)}</span>
+              {/* Coupon input */}
+              <div className="border-t border-border pt-4">
+                {appliedCoupon ? (
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-muted-foreground">
+                      Coupon <span className="font-mono font-semibold text-foreground">{appliedCoupon.code}</span>
+                      {' '}({appliedCoupon.discount_type === 'percentage' ? `${appliedCoupon.discount_value}%` : formatPrice(appliedCoupon.discount_value)})
+                    </span>
+                    <button type="button" onClick={handleRemoveCoupon} className="text-xs text-destructive hover:underline">Remove</button>
+                  </div>
+                ) : (
+                  <div className="flex gap-2">
+                    <input
+                      className="flex-1 px-3 py-2 rounded-md border border-input text-sm bg-background text-foreground uppercase placeholder:normal-case"
+                      placeholder="Coupon code"
+                      value={couponCode}
+                      onChange={e => { setCouponCode(e.target.value.toUpperCase()); setCouponError(''); }}
+                    />
+                    <button
+                      type="button"
+                      onClick={handleApplyCoupon}
+                      disabled={couponLoading || !couponCode.trim()}
+                      className="px-3 py-2 rounded-md border border-input text-sm font-medium hover:bg-accent transition-colors disabled:opacity-50"
+                    >
+                      {couponLoading ? '…' : 'Apply'}
+                    </button>
+                  </div>
+                )}
+                {couponError && <p className="text-xs text-destructive mt-1">{couponError}</p>}
+              </div>
+              {/* Totals */}
+              <div className="border-t border-border pt-4 space-y-2">
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Subtotal</span>
+                  <span className="tabular-nums">{formatPrice(totalPrice)}</span>
+                </div>
+                {discountAmount > 0 && (
+                  <div className="flex justify-between text-sm text-green-600">
+                    <span>Discount</span>
+                    <span className="tabular-nums">−{formatPrice(discountAmount)}</span>
+                  </div>
+                )}
+                <div className="flex justify-between">
+                  <span className="font-semibold text-foreground">Total</span>
+                  <span className="font-bold text-primary tabular-nums">{formatPrice(finalTotal)}</span>
+                </div>
               </div>
               {paymentFailed && (
                 <div className="rounded-md bg-destructive/10 border border-destructive/20 p-3 text-sm text-destructive">

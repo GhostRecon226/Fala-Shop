@@ -23,6 +23,7 @@ import AdminProducts from "./pages/AdminProducts";
 import AdminDashboard from "./pages/AdminDashboard";
 import AdminUsers from "./pages/AdminUsers";
 import AdminActivityLog from "./pages/AdminActivityLog";
+import AdminCoupons from "./pages/AdminCoupons";
 import AccountSettings from "./pages/AccountSettings";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
@@ -58,6 +59,7 @@ const App = () => (
                 <Route path="/admin/products" element={<AdminProducts />} />
                 <Route path="/admin/users" element={<AdminUsers />} />
                 <Route path="/admin/activity" element={<AdminActivityLog />} />
+                <Route path="/admin/coupons" element={<AdminCoupons />} />
                 <Route path="/account/settings" element={<AccountSettings />} />
                 <Route path="/wishlist" element={<Wishlist />} />
                 <Route path="/about" element={<About />} />

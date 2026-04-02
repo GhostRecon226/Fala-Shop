@@ -112,6 +112,45 @@ export type Database = {
         }
         Relationships: []
       }
+      coupons: {
+        Row: {
+          code: string
+          created_at: string
+          discount_type: string
+          discount_value: number
+          expires_at: string | null
+          id: string
+          is_active: boolean
+          max_uses: number | null
+          min_order_amount: number
+          times_used: number
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          discount_type?: string
+          discount_value: number
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean
+          max_uses?: number | null
+          min_order_amount?: number
+          times_used?: number
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          discount_type?: string
+          discount_value?: number
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean
+          max_uses?: number | null
+          min_order_amount?: number
+          times_used?: number
+        }
+        Relationships: []
+      }
       email_send_log: {
         Row: {
           created_at: string
@@ -243,7 +282,9 @@ export type Database = {
       }
       orders: {
         Row: {
+          coupon_code: string | null
           created_at: string
+          discount_amount: number
           id: string
           payment_reference: string | null
           shipping_address: Json
@@ -252,7 +293,9 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          coupon_code?: string | null
           created_at?: string
+          discount_amount?: number
           id?: string
           payment_reference?: string | null
           shipping_address?: Json
@@ -261,7 +304,9 @@ export type Database = {
           user_id: string
         }
         Update: {
+          coupon_code?: string | null
           created_at?: string
+          discount_amount?: number
           id?: string
           payment_reference?: string | null
           shipping_address?: Json
@@ -516,6 +561,10 @@ export type Database = {
           _target_user_id: string
         }
         Returns: undefined
+      }
+      validate_coupon: {
+        Args: { _code: string; _order_total: number }
+        Returns: Json
       }
     }
     Enums: {
