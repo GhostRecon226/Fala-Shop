@@ -51,6 +51,7 @@ const emptyForm = {
   is_featured: false,
   available_sizes: [] as string[],
   available_colors: [] as string[],
+  compare_at_price: '',
 };
 
 const AdminProducts = () => {
