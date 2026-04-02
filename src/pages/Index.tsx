@@ -1,7 +1,8 @@
 import { Link } from 'react-router-dom';
-import { ArrowRight, Tag } from 'lucide-react';
+import { ArrowRight, Tag, Clock } from 'lucide-react';
 import { useMemo } from 'react';
 import { useFeaturedProducts, useProducts } from '@/hooks/useProducts';
+import { useSaleCountdown } from '@/hooks/useSaleCountdown';
 import ProductCard from '@/components/ProductCard';
 import heroImage from '@/assets/hero-image.jpg';
 
