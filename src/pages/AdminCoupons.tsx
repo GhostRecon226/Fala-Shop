@@ -6,7 +6,7 @@ import AdminNav from '@/components/AdminNav';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
-import { Trash2, Plus, Pencil } from 'lucide-react';
+import { Trash2, Plus, Pencil, TrendingUp, Tag, BarChart3 } from 'lucide-react';
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogClose,
 } from '@/components/ui/dialog';
@@ -36,6 +36,12 @@ interface Coupon {
 
 interface Product { id: string; name: string; category: string; }
 
+interface CouponStats {
+  order_count: number;
+  total_revenue: number;
+  total_discounts: number;
+}
+
 const emptyForm = {
   code: '',
   discount_type: 'percentage' as string,
@@ -53,6 +59,7 @@ const AdminCoupons = () => {
   const [coupons, setCoupons] = useState<Coupon[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
   const [allCategories, setAllCategories] = useState<string[]>([]);
+  const [couponStats, setCouponStats] = useState<Record<string, CouponStats>>({});
   const [loading, setLoading] = useState(true);
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState(emptyForm);
@@ -60,9 +67,10 @@ const AdminCoupons = () => {
   const [submitting, setSubmitting] = useState(false);
 
   const fetchData = async () => {
-    const [couponsRes, productsRes] = await Promise.all([
+    const [couponsRes, productsRes, ordersRes] = await Promise.all([
       supabase.from('coupons').select('*').order('created_at', { ascending: false }),
       supabase.from('products').select('id, name, category').order('name'),
+      supabase.from('orders').select('coupon_code, total, discount_amount').not('coupon_code', 'is', null),
     ]);
     if (couponsRes.data) setCoupons(couponsRes.data as unknown as Coupon[]);
     if (productsRes.data) {
@@ -70,6 +78,16 @@ const AdminCoupons = () => {
       const cats = [...new Set(productsRes.data.map(p => p.category))].sort();
       setAllCategories(cats);
     }
+    // Build stats map
+    const stats: Record<string, CouponStats> = {};
+    (ordersRes.data || []).forEach(o => {
+      const code = (o.coupon_code as string).toUpperCase();
+      if (!stats[code]) stats[code] = { order_count: 0, total_revenue: 0, total_discounts: 0 };
+      stats[code].order_count += 1;
+      stats[code].total_revenue += Number(o.total);
+      stats[code].total_discounts += Number(o.discount_amount);
+    });
+    setCouponStats(stats);
     setLoading(false);
   };
 
@@ -212,6 +230,45 @@ const AdminCoupons = () => {
   return (
     <div className="container py-10">
       <AdminNav />
+      {/* Analytics summary cards */}
+      {(() => {
+        const totalOrders = Object.values(couponStats).reduce((s, v) => s + v.order_count, 0);
+        const totalRevenue = Object.values(couponStats).reduce((s, v) => s + v.total_revenue, 0);
+        const totalDiscounts = Object.values(couponStats).reduce((s, v) => s + v.total_discounts, 0);
+        return (
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+            <div className="rounded-lg border border-border p-4">
+              <div className="flex items-center gap-2 text-muted-foreground mb-1">
+                <Tag className="h-4 w-4" />
+                <span className="text-xs font-medium">Total Coupons</span>
+              </div>
+              <p className="text-2xl font-bold text-foreground tabular-nums">{coupons.length}</p>
+            </div>
+            <div className="rounded-lg border border-border p-4">
+              <div className="flex items-center gap-2 text-muted-foreground mb-1">
+                <BarChart3 className="h-4 w-4" />
+                <span className="text-xs font-medium">Orders with Coupons</span>
+              </div>
+              <p className="text-2xl font-bold text-foreground tabular-nums">{totalOrders}</p>
+            </div>
+            <div className="rounded-lg border border-border p-4">
+              <div className="flex items-center gap-2 text-muted-foreground mb-1">
+                <TrendingUp className="h-4 w-4" />
+                <span className="text-xs font-medium">Revenue (w/ Coupons)</span>
+              </div>
+              <p className="text-2xl font-bold text-foreground tabular-nums">{formatPrice(totalRevenue)}</p>
+            </div>
+            <div className="rounded-lg border border-border p-4">
+              <div className="flex items-center gap-2 text-destructive/70 mb-1">
+                <TrendingUp className="h-4 w-4" />
+                <span className="text-xs font-medium">Total Discounts Given</span>
+              </div>
+              <p className="text-2xl font-bold text-destructive tabular-nums">−{formatPrice(totalDiscounts)}</p>
+            </div>
+          </div>
+        );
+      })()}
+
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold text-foreground">Coupons</h1>
         <Dialog open={open} onOpenChange={v => { if (!v) closeDialog(); else setOpen(true); }}>
@@ -317,6 +374,8 @@ const AdminCoupons = () => {
                 <th className="text-left px-4 py-3 font-medium">Scope</th>
                 <th className="text-left px-4 py-3 font-medium">Min Order</th>
                 <th className="text-left px-4 py-3 font-medium">Usage</th>
+                <th className="text-right px-4 py-3 font-medium">Revenue</th>
+                <th className="text-right px-4 py-3 font-medium">Discounts</th>
                 <th className="text-left px-4 py-3 font-medium">Expires</th>
                 <th className="text-left px-4 py-3 font-medium">Active</th>
                 <th className="text-right px-4 py-3 font-medium">Actions</th>
@@ -336,6 +395,14 @@ const AdminCoupons = () => {
                   </td>
                   <td className="px-4 py-3">{c.min_order_amount > 0 ? formatPrice(c.min_order_amount) : '—'}</td>
                   <td className="px-4 py-3">{c.times_used}{c.max_uses ? ` / ${c.max_uses}` : ''}</td>
+                  <td className="px-4 py-3 text-right tabular-nums text-foreground">
+                    {formatPrice(couponStats[c.code.toUpperCase()]?.total_revenue || 0)}
+                  </td>
+                  <td className="px-4 py-3 text-right tabular-nums text-destructive">
+                    {couponStats[c.code.toUpperCase()]?.total_discounts
+                      ? `−${formatPrice(couponStats[c.code.toUpperCase()].total_discounts)}`
+                      : '—'}
+                  </td>
                   <td className="px-4 py-3 text-muted-foreground">
                     {c.expires_at ? new Date(c.expires_at).toLocaleDateString() : '—'}
                   </td>
