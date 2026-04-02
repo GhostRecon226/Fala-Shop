@@ -50,7 +50,7 @@ const AdminDashboard = () => {
     const [ordersRes, productsRes, settingsRes] = await Promise.all([
       supabase.from('orders').select('id, total, status, created_at, shipping_address').order('created_at', { ascending: false }),
       supabase.from('products').select('id, name, stock_quantity'),
-      supabase.from('site_settings' as any).select('sale_ends_at').eq('id', 1).single(),
+      supabase.from('site_settings').select('sale_ends_at').eq('id', 1).single(),
     ]);
 
     const orders = (ordersRes.data || []) as RecentOrder[];
