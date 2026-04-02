@@ -235,6 +235,9 @@ const Navbar = () => {
             <Link to="/shop" onClick={() => setMobileOpen(false)} className="text-sm font-medium py-2 text-foreground">
               Shop
             </Link>
+            <Link to="/sale" onClick={() => setMobileOpen(false)} className="text-sm font-medium py-2 text-destructive">
+              Sale
+            </Link>
             <Link to="/shop?category=Solar+Fans" onClick={() => setMobileOpen(false)} className="text-sm font-medium py-2 text-foreground">
               Solar Fans
             </Link>
