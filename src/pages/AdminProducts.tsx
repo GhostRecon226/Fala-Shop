@@ -671,7 +671,7 @@ const AdminProducts = () => {
             </Button>
           </DialogFooter>
         </DialogContent>
-      </Dialog>}
+      </Dialog>
     </div>
   );
 };
