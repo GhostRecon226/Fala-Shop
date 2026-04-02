@@ -1,40 +1,30 @@
 
 
-## Plan: Add Order Email Notifications on Payment Confirmation
+## Plan: Add Forgot Password / Reset Password Flow
 
 ### Overview
-Send an order confirmation email to the customer when the Flutterwave webhook confirms a successful payment. This uses Lovable's built-in email system — no third-party service needed.
+Add a "Forgot password?" link on the login form, a forgot-password view to request a reset email, and a `/reset-password` page where users set a new password after clicking the email link.
 
-### Prerequisites (not yet done)
-No email domain is configured yet. Before we can send emails, you'll need to set up a sender domain. This is a one-time step where you point a subdomain (e.g., `notify.yourdomain.com`) to Lovable's email infrastructure. It takes a few minutes to configure and up to 72 hours for DNS to fully verify.
+### Changes
 
-### Steps
+**1. Update `src/pages/Auth.tsx`**
+- Add a third view state: `'login' | 'signup' | 'forgot'`
+- In the `forgot` view, show an email-only form that calls `supabase.auth.resetPasswordForEmail(email, { redirectTo: window.location.origin + '/reset-password' })`
+- Show a success message after submission
+- Add a "Forgot password?" link below the password field on the login view
 
-**1. Set up email domain**
-- Open the email setup dialog to configure your sender domain
+**2. Create `src/pages/ResetPassword.tsx`**
+- New page that renders a "Set new password" form (password + confirm password)
+- On mount, listen for `PASSWORD_RECOVERY` event via `supabase.auth.onAuthStateChange`
+- On submit, call `supabase.auth.updateUser({ password })`
+- Show success toast and redirect to `/auth` on completion
+- Show error state if no recovery session is detected
 
-**2. Set up email infrastructure**
-- Automatically provisions the email queue, processing pipeline, and supporting database tables
+**3. Update `src/App.tsx`**
+- Add route: `<Route path="/reset-password" element={<ResetPassword />} />`
 
-**3. Scaffold transactional email system**
-- Creates the `send-transactional-email` Edge Function and supporting infrastructure (unsubscribe handling, suppression list)
-
-**4. Create order confirmation email template**
-- React Email template in `_shared/transactional-email-templates/order-confirmation.tsx`
-- Includes order ID, total amount, and a thank-you message
-- Styled to match the app's brand (dark plum primary, Inter font, white background)
-
-**5. Create unsubscribe page**
-- A simple branded page at the path determined by the scaffold tool
-
-**6. Update the Flutterwave webhook to send the email**
-- After updating order status to "confirmed", fetch the order's shipping address (which contains the customer email/name)
-- Call `send-transactional-email` with the order confirmation template, passing order details as template data
-- Use `order-confirm-{orderId}` as the idempotency key to prevent duplicate sends
-
-**7. Deploy edge functions**
-- Deploy `flutterwave-webhook`, `send-transactional-email`, and related functions
-
-### Technical detail
-The webhook will add roughly 10 lines: after the successful status update, it queries the order's `shipping_address` JSON for the email/name, then invokes `send-transactional-email` via `supabase.functions.invoke()`. Emails are queued and retried automatically.
+### Technical notes
+- The reset email is sent by the built-in auth system (no custom email template needed unless requested separately)
+- The `/reset-password` route must be public (not behind auth guard) since the user arrives via email link
+- Password confirmation validation happens client-side before calling `updateUser`
 
