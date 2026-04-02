@@ -65,6 +65,9 @@ const Navbar = () => {
           <Link to="/shop" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors duration-150">
             Shop
           </Link>
+          <Link to="/sale" className="text-sm font-medium text-destructive hover:text-destructive/80 transition-colors duration-150">
+            Sale
+          </Link>
           <Link to="/shop?category=Solar+Fans" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors duration-150">
             Solar Fans
           </Link>
@@ -231,6 +234,9 @@ const Navbar = () => {
           <div className="container flex flex-col py-4 gap-3">
             <Link to="/shop" onClick={() => setMobileOpen(false)} className="text-sm font-medium py-2 text-foreground">
               Shop
+            </Link>
+            <Link to="/sale" onClick={() => setMobileOpen(false)} className="text-sm font-medium py-2 text-destructive">
+              Sale
             </Link>
             <Link to="/shop?category=Solar+Fans" onClick={() => setMobileOpen(false)} className="text-sm font-medium py-2 text-foreground">
               Solar Fans
