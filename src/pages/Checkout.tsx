@@ -247,9 +247,52 @@ const Checkout = () => {
                   </div>
                 ))}
               </div>
-              <div className="border-t border-border pt-4 flex justify-between">
-                <span className="font-semibold text-foreground">Total</span>
-                <span className="font-bold text-primary tabular-nums">{formatPrice(totalPrice)}</span>
+              {/* Coupon input */}
+              <div className="border-t border-border pt-4">
+                {appliedCoupon ? (
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-muted-foreground">
+                      Coupon <span className="font-mono font-semibold text-foreground">{appliedCoupon.code}</span>
+                      {' '}({appliedCoupon.discount_type === 'percentage' ? `${appliedCoupon.discount_value}%` : formatPrice(appliedCoupon.discount_value)})
+                    </span>
+                    <button type="button" onClick={handleRemoveCoupon} className="text-xs text-destructive hover:underline">Remove</button>
+                  </div>
+                ) : (
+                  <div className="flex gap-2">
+                    <input
+                      className="flex-1 px-3 py-2 rounded-md border border-input text-sm bg-background text-foreground uppercase placeholder:normal-case"
+                      placeholder="Coupon code"
+                      value={couponCode}
+                      onChange={e => { setCouponCode(e.target.value.toUpperCase()); setCouponError(''); }}
+                    />
+                    <button
+                      type="button"
+                      onClick={handleApplyCoupon}
+                      disabled={couponLoading || !couponCode.trim()}
+                      className="px-3 py-2 rounded-md border border-input text-sm font-medium hover:bg-accent transition-colors disabled:opacity-50"
+                    >
+                      {couponLoading ? '…' : 'Apply'}
+                    </button>
+                  </div>
+                )}
+                {couponError && <p className="text-xs text-destructive mt-1">{couponError}</p>}
+              </div>
+              {/* Totals */}
+              <div className="border-t border-border pt-4 space-y-2">
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Subtotal</span>
+                  <span className="tabular-nums">{formatPrice(totalPrice)}</span>
+                </div>
+                {discountAmount > 0 && (
+                  <div className="flex justify-between text-sm text-green-600">
+                    <span>Discount</span>
+                    <span className="tabular-nums">−{formatPrice(discountAmount)}</span>
+                  </div>
+                )}
+                <div className="flex justify-between">
+                  <span className="font-semibold text-foreground">Total</span>
+                  <span className="font-bold text-primary tabular-nums">{formatPrice(finalTotal)}</span>
+                </div>
               </div>
               {paymentFailed && (
                 <div className="rounded-md bg-destructive/10 border border-destructive/20 p-3 text-sm text-destructive">
