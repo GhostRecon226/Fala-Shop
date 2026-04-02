@@ -57,7 +57,7 @@ const AdminDashboard = () => {
     const products = productsRes.data || [];
 
     // Sale end date
-    const saleEnd = (settingsRes.data as any)?.sale_ends_at;
+    const saleEnd = settingsRes.data?.sale_ends_at;
     if (saleEnd) {
       // Format to datetime-local input value
       setSaleEndsAt(new Date(saleEnd).toISOString().slice(0, 16));
