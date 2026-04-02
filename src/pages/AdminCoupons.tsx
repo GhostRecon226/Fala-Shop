@@ -89,9 +89,11 @@ const AdminCoupons = () => {
       setAllCategories(cats);
     }
     // Build stats map
+    const allOrders = (ordersRes.data || []) as CouponOrder[];
+    setCouponOrders(allOrders);
     const stats: Record<string, CouponStats> = {};
-    (ordersRes.data || []).forEach(o => {
-      const code = (o.coupon_code as string).toUpperCase();
+    allOrders.forEach(o => {
+      const code = o.coupon_code.toUpperCase();
       if (!stats[code]) stats[code] = { order_count: 0, total_revenue: 0, total_discounts: 0 };
       stats[code].order_count += 1;
       stats[code].total_revenue += Number(o.total);
