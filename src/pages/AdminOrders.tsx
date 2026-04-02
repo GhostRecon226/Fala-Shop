@@ -18,6 +18,8 @@ type OrderRow = {
   status: string;
   created_at: string;
   shipping_address: Record<string, string>;
+  coupon_code: string | null;
+  discount_amount: number;
 };
 
 type OrderItemRow = {
