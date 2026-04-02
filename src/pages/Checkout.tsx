@@ -136,7 +136,7 @@ const Checkout = () => {
       const { data: paymentData, error: paymentError } = await supabase.functions.invoke('flutterwave-init', {
         body: {
           order_id: order.id,
-          amount: totalPrice,
+          amount: finalTotal,
           email: result.data.email,
           name: `${result.data.firstName} ${result.data.lastName}`,
           phone: result.data.phone,
