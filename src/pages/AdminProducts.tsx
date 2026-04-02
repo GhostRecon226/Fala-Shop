@@ -102,6 +102,7 @@ const AdminProducts = () => {
       is_featured: !!p.is_featured,
       available_sizes: p.available_sizes || [],
       available_colors: p.available_colors || [],
+      compare_at_price: p.compare_at_price ? String(p.compare_at_price) : '',
     });
     setImagePreview(p.image_url || null);
     setColorInput('');
