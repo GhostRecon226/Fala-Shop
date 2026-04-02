@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Tag } from 'lucide-react';
+import { useMemo } from 'react';
 import { useFeaturedProducts, useProducts } from '@/hooks/useProducts';
 import ProductCard from '@/components/ProductCard';
 import heroImage from '@/assets/hero-image.jpg';
