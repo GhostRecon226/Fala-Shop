@@ -88,7 +88,7 @@ const Orders = () => {
     const fetch = async () => {
       const { data: ordersData } = await supabase
         .from('orders')
-        .select('id, total, status, created_at')
+        .select('id, total, status, created_at, coupon_code, discount_amount')
         .order('created_at', { ascending: false });
 
       if (!ordersData || ordersData.length === 0) {
