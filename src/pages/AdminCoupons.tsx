@@ -69,6 +69,7 @@ const AdminCoupons = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [allCategories, setAllCategories] = useState<string[]>([]);
   const [couponStats, setCouponStats] = useState<Record<string, CouponStats>>({});
+  const [couponOrders, setCouponOrders] = useState<CouponOrder[]>([]);
   const [loading, setLoading] = useState(true);
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState(emptyForm);
