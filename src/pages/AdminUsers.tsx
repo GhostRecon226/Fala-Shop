@@ -149,7 +149,7 @@ const AdminUsers = () => {
     setBanning(true);
     const willBan = !banTarget.is_banned;
     const rpc = willBan ? 'ban_user_by_admin' : 'unban_user_by_admin';
-    const { error } = await supabase.rpc(rpc, { _target_user_id: banTarget.user_id } as any);
+    const { error } = await (supabase.rpc as any)(rpc, { _target_user_id: banTarget.user_id });
     if (error) {
       toast({ title: 'Error', description: error.message, variant: 'destructive' });
     } else {
