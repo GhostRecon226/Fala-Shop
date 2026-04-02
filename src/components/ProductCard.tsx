@@ -17,6 +17,9 @@ const ProductCard = ({ product }: { product: Product }) => {
   const colors = product.available_colors || [];
   const sizes = product.available_sizes || [];
 
+  const hasDiscount = product.compare_at_price && product.compare_at_price > product.price;
+  const discountPct = hasDiscount ? Math.round((1 - product.price / product.compare_at_price!) * 100) : 0;
+
   return (
     <div className="group relative">
       <Link to={`/product/${product.id}`}>
@@ -27,6 +30,12 @@ const ProductCard = ({ product }: { product: Product }) => {
             className="h-full w-full object-cover transition-transform duration-150 ease-[cubic-bezier(0.4,0,0.2,1)] group-hover:scale-[1.02]"
             loading="lazy"
           />
+          {/* Sale badge */}
+          {hasDiscount && (
+            <span className="absolute top-2 left-2 z-10 px-2 py-0.5 rounded-full bg-destructive text-destructive-foreground text-[10px] font-semibold">
+              -{discountPct}%
+            </span>
+          )}
           {/* Stock overlay on hover */}
           <div className="absolute bottom-0 left-0 right-0 bg-accent/90 px-3 py-1.5 translate-y-full transition-transform duration-150 ease-[cubic-bezier(0.4,0,0.2,1)] group-hover:translate-y-0">
             <span className="text-xs font-medium tabular-nums text-accent-foreground">

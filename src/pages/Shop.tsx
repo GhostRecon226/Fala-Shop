@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useProducts } from '@/hooks/useProducts';
 import ProductCard from '@/components/ProductCard';
-import { ArrowUpDown } from 'lucide-react';
+import { ArrowUpDown, Tag } from 'lucide-react';
 
 const categories = ['All', 'Solar Fans', 'Clothing', 'Sneakers', 'Bags'];
 
@@ -18,15 +18,24 @@ const Shop = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const activeCategory = searchParams.get('category') || 'All';
   const [sort, setSort] = useState<SortOption>('newest');
+  const [saleOnly, setSaleOnly] = useState(false);
   const { data: products, isLoading } = useProducts(activeCategory === 'All' ? undefined : activeCategory);
 
   const sortedProducts = useMemo(() => {
     if (!products) return [];
-    const sorted = [...products];
-    if (sort === 'price-asc') sorted.sort((a, b) => a.price - b.price);
-    else if (sort === 'price-desc') sorted.sort((a, b) => b.price - a.price);
-    return sorted;
-  }, [products, sort]);
+    let filtered = [...products];
+    if (saleOnly) {
+      filtered = filtered.filter(p => (p as any).compare_at_price && (p as any).compare_at_price > p.price);
+    }
+    if (sort === 'price-asc') filtered.sort((a, b) => a.price - b.price);
+    else if (sort === 'price-desc') filtered.sort((a, b) => b.price - a.price);
+    return filtered;
+  }, [products, sort, saleOnly]);
+
+  const saleCount = useMemo(() => {
+    if (!products) return 0;
+    return products.filter(p => (p as any).compare_at_price && (p as any).compare_at_price > p.price).length;
+  }, [products]);
 
   const handleCategoryChange = (cat: string) => {
     if (cat === 'All') {
@@ -57,6 +66,19 @@ const Shop = () => {
               {cat}
             </button>
           ))}
+          {saleCount > 0 && (
+            <button
+              onClick={() => setSaleOnly(!saleOnly)}
+              className={`inline-flex items-center gap-1.5 px-4 py-2 rounded-md text-sm font-medium transition-all duration-150 ${
+                saleOnly
+                  ? 'bg-destructive text-destructive-foreground'
+                  : 'bg-secondary text-secondary-foreground hover:bg-muted'
+              }`}
+            >
+              <Tag size={14} />
+              On Sale ({saleCount})
+            </button>
+          )}
         </div>
 
         <div className="relative">
@@ -92,7 +114,9 @@ const Shop = () => {
         </div>
       ) : (
         <div className="text-center py-20">
-          <p className="text-muted-foreground">No products found in this category.</p>
+          <p className="text-muted-foreground">
+            {saleOnly ? 'No products on sale right now.' : 'No products found in this category.'}
+          </p>
         </div>
       )}
     </div>
