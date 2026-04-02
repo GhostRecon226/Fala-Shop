@@ -1,7 +1,8 @@
 import { Link } from 'react-router-dom';
-import { ArrowRight, Tag } from 'lucide-react';
+import { ArrowRight, Tag, Clock } from 'lucide-react';
 import { useMemo } from 'react';
 import { useFeaturedProducts, useProducts } from '@/hooks/useProducts';
+import { useSaleCountdown } from '@/hooks/useSaleCountdown';
 import ProductCard from '@/components/ProductCard';
 import heroImage from '@/assets/hero-image.jpg';
 
@@ -15,6 +16,7 @@ const categories = [
 const Index = () => {
   const { data: featured, isLoading: loadingFeatured } = useFeaturedProducts();
   const { data: allProducts, isLoading: loadingAll } = useProducts();
+  const { timeLeft } = useSaleCountdown();
 
   const displayProducts = featured && featured.length > 0 ? featured : allProducts?.slice(0, 4);
 
@@ -108,6 +110,28 @@ const Index = () => {
                   Up to {maxDiscount}% Off
                 </h2>
                 <p className="text-sm text-white/70 mt-1">Don't miss out on these deals</p>
+                {timeLeft && (
+                  <div className="flex items-center gap-1.5 mt-3">
+                    <Clock size={14} className="text-white/70" />
+                    <span className="text-xs text-white/70">Ends in</span>
+                    <div className="flex gap-1.5">
+                      {timeLeft.days > 0 && (
+                        <span className="inline-flex items-center justify-center min-w-[2rem] px-1.5 py-0.5 rounded bg-white/20 text-white text-xs font-bold tabular-nums">
+                          {timeLeft.days}d
+                        </span>
+                      )}
+                      <span className="inline-flex items-center justify-center min-w-[2rem] px-1.5 py-0.5 rounded bg-white/20 text-white text-xs font-bold tabular-nums">
+                        {String(timeLeft.hours).padStart(2, '0')}h
+                      </span>
+                      <span className="inline-flex items-center justify-center min-w-[2rem] px-1.5 py-0.5 rounded bg-white/20 text-white text-xs font-bold tabular-nums">
+                        {String(timeLeft.minutes).padStart(2, '0')}m
+                      </span>
+                      <span className="inline-flex items-center justify-center min-w-[2rem] px-1.5 py-0.5 rounded bg-white/20 text-white text-xs font-bold tabular-nums">
+                        {String(timeLeft.seconds).padStart(2, '0')}s
+                      </span>
+                    </div>
+                  </div>
+                )}
               </div>
               <Link
                 to="/sale"

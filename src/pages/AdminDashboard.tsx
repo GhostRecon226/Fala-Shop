@@ -5,8 +5,11 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useIsAdmin } from '@/hooks/useIsAdmin';
 import { formatPrice } from '@/lib/utils';
 import AdminNav from '@/components/AdminNav';
-import { ShieldAlert, DollarSign, Package, ShoppingCart, AlertTriangle } from 'lucide-react';
+import { ShieldAlert, DollarSign, Package, ShoppingCart, AlertTriangle, Clock } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { toast } from '@/hooks/use-toast';
 
 type Metrics = {
   totalOrders: number;
@@ -34,6 +37,8 @@ const AdminDashboard = () => {
   const [chartData, setChartData] = useState<ChartPoint[]>([]);
   const [lowStockProducts, setLowStockProducts] = useState<LowStockProduct[]>([]);
   const [loading, setLoading] = useState(true);
+  const [saleEndsAt, setSaleEndsAt] = useState('');
+  const [savingSale, setSavingSale] = useState(false);
 
   useEffect(() => {
     if (isAdmin) loadData();
@@ -42,13 +47,21 @@ const AdminDashboard = () => {
   const loadData = async () => {
     setLoading(true);
 
-    const [ordersRes, productsRes] = await Promise.all([
+    const [ordersRes, productsRes, settingsRes] = await Promise.all([
       supabase.from('orders').select('id, total, status, created_at, shipping_address').order('created_at', { ascending: false }),
       supabase.from('products').select('id, name, stock_quantity'),
+      supabase.from('site_settings' as any).select('sale_ends_at').eq('id', 1).single(),
     ]);
 
     const orders = (ordersRes.data || []) as RecentOrder[];
     const products = productsRes.data || [];
+
+    // Sale end date
+    const saleEnd = (settingsRes.data as any)?.sale_ends_at;
+    if (saleEnd) {
+      // Format to datetime-local input value
+      setSaleEndsAt(new Date(saleEnd).toISOString().slice(0, 16));
+    }
 
     const totalRevenue = orders.reduce((sum, o) => sum + Number(o.total), 0);
     const lowItems = products
@@ -78,6 +91,21 @@ const AdminDashboard = () => {
     }
     setChartData(last30);
     setLoading(false);
+  };
+
+  const handleSaveSaleEnd = async () => {
+    setSavingSale(true);
+    const value = saleEndsAt ? new Date(saleEndsAt).toISOString() : null;
+    const { error } = await supabase
+      .from('site_settings' as any)
+      .update({ sale_ends_at: value, updated_at: new Date().toISOString() } as any)
+      .eq('id', 1);
+    if (error) {
+      toast({ title: 'Error', description: error.message, variant: 'destructive' });
+    } else {
+      toast({ title: 'Saved', description: value ? 'Sale end date updated' : 'Sale timer cleared' });
+    }
+    setSavingSale(false);
   };
 
   if (authLoading || adminLoading) {
@@ -134,6 +162,33 @@ const AdminDashboard = () => {
                 <p className="text-2xl font-bold text-foreground tabular-nums">{card.value}</p>
               </div>
             ))}
+          </div>
+
+          {/* Sale Timer Setting */}
+          <div className="rounded-lg border border-border bg-card p-5 mb-8">
+            <div className="flex items-center gap-2 mb-4">
+              <Clock size={16} className="text-primary" />
+              <h2 className="text-sm font-medium text-muted-foreground uppercase tracking-wide">Sale Countdown Timer</h2>
+            </div>
+            <p className="text-xs text-muted-foreground mb-3">Set when the current sale ends. A countdown timer will appear on the homepage sale banner.</p>
+            <div className="flex flex-col sm:flex-row gap-3">
+              <Input
+                type="datetime-local"
+                value={saleEndsAt}
+                onChange={e => setSaleEndsAt(e.target.value)}
+                className="max-w-xs"
+              />
+              <div className="flex gap-2">
+                <Button size="sm" onClick={handleSaveSaleEnd} disabled={savingSale}>
+                  {savingSale ? 'Saving...' : 'Save'}
+                </Button>
+                {saleEndsAt && (
+                  <Button size="sm" variant="outline" onClick={() => { setSaleEndsAt(''); handleSaveSaleEnd(); }}>
+                    Clear Timer
+                  </Button>
+                )}
+              </div>
+            </div>
           </div>
 
           {/* Revenue chart */}
