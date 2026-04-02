@@ -57,6 +57,28 @@ const Checkout = () => {
     );
   }
 
+  const discountAmount = appliedCoupon?.discount_amount ?? 0;
+  const finalTotal = Math.max(0, totalPrice - discountAmount);
+
+  const handleApplyCoupon = async () => {
+    const code = couponCode.trim().toUpperCase();
+    if (!code) return;
+    setCouponLoading(true);
+    setCouponError('');
+    const { data, error } = await supabase.rpc('validate_coupon', { _code: code, _order_total: totalPrice });
+    setCouponLoading(false);
+    if (error) { setCouponError('Failed to validate coupon'); return; }
+    const result = data as unknown as { valid: boolean; error?: string; discount_amount?: number; discount_type?: string; discount_value?: number };
+    if (!result.valid) { setCouponError(result.error || 'Invalid coupon'); return; }
+    setAppliedCoupon({ code, discount_amount: result.discount_amount!, discount_type: result.discount_type!, discount_value: result.discount_value! });
+  };
+
+  const handleRemoveCoupon = () => {
+    setAppliedCoupon(null);
+    setCouponCode('');
+    setCouponError('');
+  };
+
   const handleChange = (field: keyof FormData, value: string) => {
     setForm(prev => ({ ...prev, [field]: value }));
     if (errors[field]) {
