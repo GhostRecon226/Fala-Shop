@@ -10,6 +10,7 @@ export type Product = {
   image_url: string | null;
   stock_quantity: number;
   is_featured: boolean;
+  compare_at_price: number | null;
   available_colors: string[];
   available_sizes: string[];
 };

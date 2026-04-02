@@ -88,9 +88,21 @@ const ProductDetail = () => {
             <h1 className="text-3xl font-bold tracking-display text-foreground">{product.name}</h1>
           </div>
 
-          <p className="text-2xl font-bold text-primary tabular-nums">
-            {formatPrice(product.price)}
-          </p>
+          <div className="flex items-center gap-3">
+            {(product as any).compare_at_price && (product as any).compare_at_price > product.price && (
+              <span className="text-lg text-muted-foreground line-through tabular-nums">
+                {formatPrice((product as any).compare_at_price)}
+              </span>
+            )}
+            <p className="text-2xl font-bold text-primary tabular-nums">
+              {formatPrice(product.price)}
+            </p>
+            {(product as any).compare_at_price && (product as any).compare_at_price > product.price && (
+              <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-destructive/10 text-destructive">
+                -{Math.round((1 - product.price / (product as any).compare_at_price) * 100)}%
+              </span>
+            )}
+          </div>
 
           {product.description && (
             <p className="text-base text-muted-foreground leading-relaxed text-pretty">

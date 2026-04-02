@@ -324,9 +324,13 @@ const AdminProducts = () => {
                 <Input type="number" step="0.01" value={form.price} onChange={e => setForm(f => ({ ...f, price: e.target.value }))} />
               </div>
               <div>
-                <label className="text-sm font-medium text-foreground">Stock</label>
-                <Input type="number" value={form.stock_quantity} onChange={e => setForm(f => ({ ...f, stock_quantity: e.target.value }))} />
+                <label className="text-sm font-medium text-foreground">Compare at Price</label>
+                <Input type="number" step="0.01" placeholder="Original price" value={form.compare_at_price} onChange={e => setForm(f => ({ ...f, compare_at_price: e.target.value }))} />
               </div>
+            </div>
+            <div>
+              <label className="text-sm font-medium text-foreground">Stock</label>
+              <Input type="number" value={form.stock_quantity} onChange={e => setForm(f => ({ ...f, stock_quantity: e.target.value }))} />
             </div>
 
             {/* Image Upload */}
