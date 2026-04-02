@@ -1,66 +1,20 @@
 
-## Plan: Add Coupon / Discount Code Feature
 
-### Overview
-Create a coupon system where admins can create discount codes, and customers can apply them at checkout to get a percentage or fixed-amount discount on their order total.
+## Problem: 404 on Page Refresh (Published Site)
 
-### Database Changes
+The published site returns a 404 when refreshing any route other than `/` (e.g. `/cart`, `/order-confirmation`). This is a standard single-page application (SPA) issue: the hosting server tries to find a file matching the URL path, fails, and returns 404. The app needs a fallback rewrite rule so all paths serve `index.html`, letting React Router handle routing client-side.
 
-**1. New `coupons` table**
-```sql
-create table public.coupons (
-  id uuid primary key default gen_random_uuid(),
-  code text not null unique,
-  discount_type text not null default 'percentage', -- 'percentage' or 'fixed'
-  discount_value numeric not null,
-  min_order_amount numeric default 0,
-  max_uses integer default null,         -- null = unlimited
-  times_used integer not null default 0,
-  is_active boolean not null default true,
-  expires_at timestamp with time zone default null,
-  created_at timestamp with time zone not null default now()
-);
+## Fix
+
+**1. Create `public/_redirects` file**
+
+Add a Netlify-compatible catch-all rewrite (Lovable's hosting uses this):
+
+```
+/*    /index.html   200
 ```
 
-- RLS: Admins can CRUD; authenticated users can SELECT active, non-expired coupons (for validation).
+This single line ensures every route falls back to the SPA entry point, so refreshing `/cart`, `/order-confirmation?status=success&tx_ref=...`, or any other route works correctly.
 
-**2. New `validate_coupon` RPC function**
-- Takes a coupon code and order total
-- Checks: exists, active, not expired, not exceeded max uses, meets minimum order amount
-- Returns discount type, value, and calculated discount amount
-- `SECURITY DEFINER` to bypass RLS for accurate `times_used` checks
+This is a one-file, one-line fix.
 
-**3. Add `coupon_code` and `discount_amount` columns to `orders` table**
-- Track which coupon was used and the discount applied per order
-
-**4. New `increment_coupon_usage` trigger**
-- On order insert with a `coupon_code`, increment `times_used` on the coupon
-
-### Frontend Changes
-
-**5. Update `src/pages/Checkout.tsx`**
-- Add a coupon input field with "Apply" button in the Order Summary section
-- On apply: call `validate_coupon` RPC, display discount line item and updated total
-- On remove: clear the applied coupon
-- Pass `coupon_code` and `discount_amount` when creating the order
-- Send discounted total to Flutterwave payment initialization
-
-**6. Update `src/pages/Cart.tsx`**
-- Optionally show a "Have a coupon?" teaser linking to checkout
-
-**7. Add admin coupon management page (`src/pages/AdminCoupons.tsx`)**
-- List all coupons with code, type, value, usage count, status, expiry
-- Create new coupon form (code, discount type, value, min order, max uses, expiry)
-- Toggle active/inactive
-- Delete coupon
-
-**8. Update `src/App.tsx`**
-- Add `/admin/coupons` route
-- Update `AdminNav.tsx` to include Coupons link
-
-### Technical Notes
-- Coupon codes stored uppercase, validated case-insensitively
-- Discount capped so order total never goes below zero
-- For percentage discounts, value is 1-100 (representing %)
-- The `validate_coupon` function prevents race conditions on usage limits
-- Order history will show the coupon code and discount amount applied
