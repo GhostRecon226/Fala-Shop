@@ -56,6 +56,7 @@ const AdminUsers = () => {
   const [updatingId, setUpdatingId] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [roleFilter, setRoleFilter] = useState<string>('all');
+  const [statusFilter, setStatusFilter] = useState<string>('all');
   const [page, setPage] = useState(1);
   const [deleteTarget, setDeleteTarget] = useState<UserWithRole | null>(null);
   const [deleting, setDeleting] = useState(false);
@@ -68,14 +69,15 @@ const AdminUsers = () => {
       u.email.toLowerCase().includes(searchQuery.toLowerCase());
     const effectiveRole = u.role || 'user';
     const matchesRole = roleFilter === 'all' || effectiveRole === roleFilter;
-    return matchesSearch && matchesRole;
+    const matchesStatus = statusFilter === 'all' || (statusFilter === 'suspended' ? u.is_banned : !u.is_banned);
+    return matchesSearch && matchesRole && matchesStatus;
   });
 
   const totalPages = Math.max(1, Math.ceil(filteredUsers.length / perPage));
   const paginatedUsers = filteredUsers.slice((page - 1) * perPage, page * perPage);
 
   // Reset to page 1 when filters change
-  useEffect(() => { setPage(1); }, [searchQuery, roleFilter]);
+  useEffect(() => { setPage(1); }, [searchQuery, roleFilter, statusFilter]);
 
   useEffect(() => {
     if (authLoading || adminLoading || !isAdmin) return;
@@ -221,6 +223,16 @@ const AdminUsers = () => {
               {ROLES.map(r => (
                 <SelectItem key={r} value={r} className="capitalize">{r}</SelectItem>
               ))}
+            </SelectContent>
+          </Select>
+          <Select value={statusFilter} onValueChange={setStatusFilter}>
+            <SelectTrigger className="w-full sm:w-36 h-9 text-sm">
+              <SelectValue placeholder="Filter by status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Status</SelectItem>
+              <SelectItem value="active">Active</SelectItem>
+              <SelectItem value="suspended">Suspended</SelectItem>
             </SelectContent>
           </Select>
         </div>
