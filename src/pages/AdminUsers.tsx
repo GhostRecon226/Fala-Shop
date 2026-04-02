@@ -5,7 +5,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 import { logAdminAction } from '@/hooks/useAdminLog';
 import AdminNav from '@/components/AdminNav';
-import { ShieldAlert, Loader2, Users, Search, X, ChevronLeft, ChevronRight, Trash2 } from 'lucide-react';
+import { ShieldAlert, Loader2, Users, Search, X, ChevronLeft, ChevronRight, Trash2, Ban, ShieldCheck } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -32,6 +32,7 @@ type UserWithRole = {
   email: string;
   created_at: string;
   role: string | null;
+  is_banned: boolean;
 };
 
 const ROLES = ['user', 'moderator', 'admin'] as const;
@@ -58,6 +59,8 @@ const AdminUsers = () => {
   const [page, setPage] = useState(1);
   const [deleteTarget, setDeleteTarget] = useState<UserWithRole | null>(null);
   const [deleting, setDeleting] = useState(false);
+  const [banTarget, setBanTarget] = useState<UserWithRole | null>(null);
+  const [banning, setBanning] = useState(false);
   const perPage = 10;
 
   const filteredUsers = users.filter(u => {
@@ -139,6 +142,23 @@ const AdminUsers = () => {
     }
     setDeleting(false);
     setDeleteTarget(null);
+  };
+
+  const handleBanToggle = async () => {
+    if (!banTarget) return;
+    setBanning(true);
+    const willBan = !banTarget.is_banned;
+    const rpc = willBan ? 'ban_user_by_admin' : 'unban_user_by_admin';
+    const { error } = await (supabase.rpc as any)(rpc, { _target_user_id: banTarget.user_id });
+    if (error) {
+      toast({ title: 'Error', description: error.message, variant: 'destructive' });
+    } else {
+      toast({ title: willBan ? 'User suspended' : 'User reactivated', description: `${banTarget.email} has been ${willBan ? 'suspended' : 'reactivated'}.` });
+      setUsers(prev => prev.map(u => u.user_id === banTarget.user_id ? { ...u, is_banned: willBan } : u));
+      logAdminAction(willBan ? 'user_banned' : 'user_unbanned', 'user', banTarget.user_id, { email: banTarget.email });
+    }
+    setBanning(false);
+    setBanTarget(null);
   };
 
   if (authLoading || adminLoading) {
@@ -233,8 +253,11 @@ const AdminUsers = () => {
                   const isSelf = u.user_id === user?.id;
 
                   return (
-                    <tr key={u.user_id} className="border-b border-border last:border-0 hover:bg-muted/30 transition-colors">
-                      <td className="px-4 py-3 font-medium">{u.email}</td>
+                    <tr key={u.user_id} className={`border-b border-border last:border-0 hover:bg-muted/30 transition-colors ${u.is_banned ? 'opacity-60' : ''}`}>
+                      <td className="px-4 py-3 font-medium">
+                        {u.email}
+                        {u.is_banned && <Badge variant="destructive" className="ml-2 text-[10px] py-0">Suspended</Badge>}
+                      </td>
                       <td className="px-4 py-3 text-muted-foreground">
                         {new Date(u.created_at).toLocaleDateString()}
                       </td>
@@ -267,14 +290,25 @@ const AdminUsers = () => {
                       </td>
                       <td className="px-4 py-3">
                         {!isSelf && (
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="h-8 w-8 p-0 text-muted-foreground hover:text-destructive"
-                            onClick={() => setDeleteTarget(u)}
-                          >
-                            <Trash2 size={14} />
-                          </Button>
+                          <div className="flex gap-1">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className={`h-8 w-8 p-0 ${u.is_banned ? 'text-green-600 hover:text-green-700' : 'text-muted-foreground hover:text-orange-500'}`}
+                              onClick={() => setBanTarget(u)}
+                              title={u.is_banned ? 'Reactivate user' : 'Suspend user'}
+                            >
+                              {u.is_banned ? <ShieldCheck size={14} /> : <Ban size={14} />}
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="h-8 w-8 p-0 text-muted-foreground hover:text-destructive"
+                              onClick={() => setDeleteTarget(u)}
+                            >
+                              <Trash2 size={14} />
+                            </Button>
+                          </div>
                         )}
                       </td>
                     </tr>
@@ -330,6 +364,30 @@ const AdminUsers = () => {
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
               {deleting ? 'Deleting…' : 'Delete'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog open={!!banTarget} onOpenChange={(open) => !open && setBanTarget(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{banTarget?.is_banned ? 'Reactivate user?' : 'Suspend user?'}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {banTarget?.is_banned
+                ? <>This will reactivate <span className="font-medium text-foreground">{banTarget?.email}</span>, allowing them to sign in again.</>
+                : <>This will suspend <span className="font-medium text-foreground">{banTarget?.email}</span>, preventing them from signing in. Their data will be preserved and you can reactivate them later.</>
+              }
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={banning}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleBanToggle}
+              disabled={banning}
+              className={banTarget?.is_banned ? '' : 'bg-orange-500 text-white hover:bg-orange-600'}
+            >
+              {banning ? 'Processing…' : banTarget?.is_banned ? 'Reactivate' : 'Suspend'}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
