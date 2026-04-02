@@ -597,10 +597,10 @@ const AdminProducts = () => {
             <Button variant="destructive" onClick={handleDelete}>Delete</Button>
           </DialogFooter>
         </DialogContent>
-      </Dialog>
+      </Dialog>}
 
       {/* Bulk Compare-at-Price Dialog */}
-      <Dialog open={bulkDialogOpen} onOpenChange={setBulkDialogOpen}>
+      {bulkDialogOpen && <Dialog open={bulkDialogOpen} onOpenChange={setBulkDialogOpen}>
         <DialogContent className="max-w-sm">
           <DialogHeader>
             <DialogTitle>Bulk Set Compare-at-Price</DialogTitle>
