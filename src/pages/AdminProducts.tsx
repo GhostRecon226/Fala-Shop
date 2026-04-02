@@ -583,10 +583,10 @@ const AdminProducts = () => {
             <Button onClick={handleSave} disabled={saving || uploading}>{saving ? 'Saving...' : 'Save'}</Button>
           </DialogFooter>
         </DialogContent>
-      </Dialog>
+      </Dialog>}
 
       {/* Delete Confirmation */}
-      <Dialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
+      {!!deleteId && <Dialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
         <DialogContent className="max-w-sm">
           <DialogHeader>
             <DialogTitle>Delete Product</DialogTitle>
