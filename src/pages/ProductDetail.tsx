@@ -89,17 +89,17 @@ const ProductDetail = () => {
           </div>
 
           <div className="flex items-center gap-3">
-            {(product as any).compare_at_price && (product as any).compare_at_price > product.price && (
+            {product.compare_at_price && product.compare_at_price > product.price && (
               <span className="text-lg text-muted-foreground line-through tabular-nums">
-                {formatPrice((product as any).compare_at_price)}
+                {formatPrice(product.compare_at_price)}
               </span>
             )}
             <p className="text-2xl font-bold text-primary tabular-nums">
               {formatPrice(product.price)}
             </p>
-            {(product as any).compare_at_price && (product as any).compare_at_price > product.price && (
+            {product.compare_at_price && product.compare_at_price > product.price && (
               <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-destructive/10 text-destructive">
-                -{Math.round((1 - product.price / (product as any).compare_at_price) * 100)}%
+                -{Math.round((1 - product.price / product.compare_at_price) * 100)}%
               </span>
             )}
           </div>

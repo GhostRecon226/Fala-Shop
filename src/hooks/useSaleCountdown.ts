@@ -9,11 +9,11 @@ export function useSaleCountdown() {
     queryKey: ['site-settings-sale'],
     queryFn: async () => {
       const { data } = await supabase
-        .from('site_settings' as any)
+        .from('site_settings')
         .select('sale_ends_at')
         .eq('id', 1)
         .single();
-      return (data as any)?.sale_ends_at as string | null;
+      return data?.sale_ends_at as string | null;
     },
     staleTime: 60_000,
   });

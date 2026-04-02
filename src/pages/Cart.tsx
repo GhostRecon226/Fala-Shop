@@ -47,9 +47,9 @@ const Cart = () => {
                   {product.category}{size ? ` · Size ${size}` : ''}{color ? ` · ${color}` : ''}
                 </p>
                 <div className="flex items-center gap-1.5 mt-1">
-                  {(product as any).compare_at_price && (product as any).compare_at_price > product.price && (
+                  {product.compare_at_price && product.compare_at_price > product.price && (
                     <span className="text-xs text-muted-foreground line-through tabular-nums">
-                      {formatPrice((product as any).compare_at_price)}
+                      {formatPrice(product.compare_at_price)}
                     </span>
                   )}
                   <p className="text-sm font-semibold text-primary tabular-nums">

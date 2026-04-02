@@ -50,14 +50,14 @@ const AdminDashboard = () => {
     const [ordersRes, productsRes, settingsRes] = await Promise.all([
       supabase.from('orders').select('id, total, status, created_at, shipping_address').order('created_at', { ascending: false }),
       supabase.from('products').select('id, name, stock_quantity'),
-      supabase.from('site_settings' as any).select('sale_ends_at').eq('id', 1).single(),
+      supabase.from('site_settings').select('sale_ends_at').eq('id', 1).single(),
     ]);
 
     const orders = (ordersRes.data || []) as RecentOrder[];
     const products = productsRes.data || [];
 
     // Sale end date
-    const saleEnd = (settingsRes.data as any)?.sale_ends_at;
+    const saleEnd = settingsRes.data?.sale_ends_at;
     if (saleEnd) {
       // Format to datetime-local input value
       setSaleEndsAt(new Date(saleEnd).toISOString().slice(0, 16));
@@ -97,8 +97,8 @@ const AdminDashboard = () => {
     setSavingSale(true);
     const value = saleEndsAt ? new Date(saleEndsAt).toISOString() : null;
     const { error } = await supabase
-      .from('site_settings' as any)
-      .update({ sale_ends_at: value, updated_at: new Date().toISOString() } as any)
+      .from('site_settings')
+      .update({ sale_ends_at: value, updated_at: new Date().toISOString() })
       .eq('id', 1);
     if (error) {
       toast({ title: 'Error', description: error.message, variant: 'destructive' });

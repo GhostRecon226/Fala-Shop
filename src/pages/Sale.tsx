@@ -20,15 +20,15 @@ const Sale = () => {
   const saleProducts = useMemo(() => {
     if (!products) return [];
     const onSale = products.filter(
-      (p) => (p as any).compare_at_price && (p as any).compare_at_price > p.price
+      (p) => p.compare_at_price && p.compare_at_price > p.price
     );
 
     const sorted = [...onSale];
     switch (sort) {
       case 'biggest-discount':
         sorted.sort((a, b) => {
-          const discA = 1 - a.price / ((a as any).compare_at_price || a.price);
-          const discB = 1 - b.price / ((b as any).compare_at_price || b.price);
+          const discA = 1 - a.price / (a.compare_at_price || a.price);
+          const discB = 1 - b.price / (b.compare_at_price || b.price);
           return discB - discA;
         });
         break;
@@ -48,7 +48,7 @@ const Sale = () => {
     if (saleProducts.length === 0) return 0;
     return Math.max(
       ...saleProducts.map((p) =>
-        Math.round((1 - p.price / ((p as any).compare_at_price || p.price)) * 100)
+        Math.round((1 - p.price / (p.compare_at_price || p.price)) * 100)
       )
     );
   }, [saleProducts]);
