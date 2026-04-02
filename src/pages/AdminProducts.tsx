@@ -385,7 +385,7 @@ const AdminProducts = () => {
       )}
 
       {/* Add / Edit Dialog */}
-      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+      {dialogOpen && <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent className="max-w-md">
           <DialogHeader>
             <DialogTitle>{editingId ? 'Edit Product' : 'Add Product'}</DialogTitle>
