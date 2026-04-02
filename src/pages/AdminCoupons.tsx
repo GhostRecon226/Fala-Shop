@@ -296,8 +296,8 @@ const AdminCoupons = () => {
               </div>
               <div className="flex justify-end gap-2 pt-2">
                 <DialogClose asChild><Button variant="outline" size="sm">Cancel</Button></DialogClose>
-                <Button size="sm" onClick={handleCreate} disabled={submitting}>
-                  {submitting ? 'Creating…' : 'Create'}
+                <Button size="sm" onClick={handleSave} disabled={submitting}>
+                  {submitting ? (editingId ? 'Saving…' : 'Creating…') : (editingId ? 'Save Changes' : 'Create')}
                 </Button>
               </div>
             </div>
