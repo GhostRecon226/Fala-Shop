@@ -56,6 +56,8 @@ const AdminUsers = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [roleFilter, setRoleFilter] = useState<string>('all');
   const [page, setPage] = useState(1);
+  const [deleteTarget, setDeleteTarget] = useState<UserWithRole | null>(null);
+  const [deleting, setDeleting] = useState(false);
   const perPage = 10;
 
   const filteredUsers = users.filter(u => {
