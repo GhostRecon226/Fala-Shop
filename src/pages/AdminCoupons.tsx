@@ -63,6 +63,57 @@ const emptyForm = {
   categories: [] as string[],
 };
 
+const chartConfig: ChartConfig = {
+  orders: { label: 'Orders', color: 'hsl(var(--primary))' },
+  discounts: { label: 'Discounts', color: 'hsl(var(--destructive))' },
+};
+
+const CouponUsageChart = ({ orders }: { orders: CouponOrder[] }) => {
+  const chartData = useMemo(() => {
+    const now = new Date();
+    const weeks: { label: string; start: Date; end: Date }[] = [];
+    for (let i = 11; i >= 0; i--) {
+      const start = new Date(now);
+      start.setDate(start.getDate() - i * 7);
+      start.setHours(0, 0, 0, 0);
+      const day = start.getDay();
+      start.setDate(start.getDate() - day);
+      const end = new Date(start);
+      end.setDate(end.getDate() + 7);
+      const label = `${start.getDate()}/${start.getMonth() + 1}`;
+      if (weeks.length === 0 || weeks[weeks.length - 1].label !== label) {
+        weeks.push({ label, start, end });
+      }
+    }
+    return weeks.map(w => {
+      const weekOrders = orders.filter(o => {
+        const d = new Date(o.created_at);
+        return d >= w.start && d < w.end;
+      });
+      return {
+        week: w.label,
+        orders: weekOrders.length,
+        discounts: weekOrders.reduce((s, o) => s + Number(o.discount_amount), 0),
+      };
+    });
+  }, [orders]);
+
+  return (
+    <div className="rounded-lg border border-border p-4 mb-6">
+      <h3 className="text-sm font-medium text-foreground mb-3">Coupon Usage — Last 12 Weeks</h3>
+      <ChartContainer config={chartConfig} className="h-[200px] w-full">
+        <BarChart data={chartData}>
+          <CartesianGrid strokeDasharray="3 3" vertical={false} className="stroke-border" />
+          <XAxis dataKey="week" tickLine={false} axisLine={false} className="text-xs fill-muted-foreground" />
+          <YAxis tickLine={false} axisLine={false} className="text-xs fill-muted-foreground" width={40} />
+          <ChartTooltip content={<ChartTooltipContent />} />
+          <Bar dataKey="orders" fill="var(--color-orders)" radius={[4, 4, 0, 0]} />
+        </BarChart>
+      </ChartContainer>
+    </div>
+  );
+};
+
 const AdminCoupons = () => {
   const { data: isAdmin, isLoading: adminLoading } = useIsAdmin();
   const [coupons, setCoupons] = useState<Coupon[]>([]);
