@@ -44,6 +44,13 @@ interface CouponStats {
   total_discounts: number;
 }
 
+interface CouponOrder {
+  coupon_code: string;
+  total: number;
+  discount_amount: number;
+  created_at: string;
+}
+
 const emptyForm = {
   code: '',
   discount_type: 'percentage' as string,
