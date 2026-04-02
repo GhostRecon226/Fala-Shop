@@ -598,6 +598,80 @@ const AdminProducts = () => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Bulk Compare-at-Price Dialog */}
+      <Dialog open={bulkDialogOpen} onOpenChange={setBulkDialogOpen}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle>Bulk Set Compare-at-Price</DialogTitle>
+            <DialogDescription>
+              Update compare-at-price for {selectedIds.size} selected product(s).
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="flex gap-2">
+              {(['set', 'markup', 'clear'] as const).map(mode => (
+                <button
+                  key={mode}
+                  onClick={() => setBulkMode(mode)}
+                  className={`flex-1 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                    bulkMode === mode
+                      ? 'bg-primary text-primary-foreground'
+                      : 'bg-secondary text-secondary-foreground hover:bg-muted'
+                  }`}
+                >
+                  {mode === 'set' ? 'Fixed Price' : mode === 'markup' ? '% Markup' : 'Clear'}
+                </button>
+              ))}
+            </div>
+
+            {bulkMode === 'set' && (
+              <div>
+                <label className="text-sm font-medium text-foreground">Compare-at-Price</label>
+                <Input
+                  type="number"
+                  step="0.01"
+                  placeholder="e.g. 15000"
+                  value={bulkComparePrice}
+                  onChange={e => setBulkComparePrice(e.target.value)}
+                />
+                <p className="text-xs text-muted-foreground mt-1">All selected products will get this same compare-at-price.</p>
+              </div>
+            )}
+
+            {bulkMode === 'markup' && (
+              <div>
+                <label className="text-sm font-medium text-foreground">Markup Percentage (%)</label>
+                <Input
+                  type="number"
+                  step="1"
+                  placeholder="e.g. 20"
+                  value={bulkMarkup}
+                  onChange={e => setBulkMarkup(e.target.value)}
+                />
+                <p className="text-xs text-muted-foreground mt-1">
+                  Compare-at-price = current price + {bulkMarkup || '0'}%. Each product's price is used individually.
+                </p>
+              </div>
+            )}
+
+            {bulkMode === 'clear' && (
+              <p className="text-sm text-muted-foreground">
+                This will remove the compare-at-price from all {selectedIds.size} selected product(s), removing sale badges.
+              </p>
+            )}
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setBulkDialogOpen(false)}>Cancel</Button>
+            <Button
+              onClick={handleBulkSave}
+              disabled={bulkSaving || (bulkMode === 'set' && !bulkComparePrice) || (bulkMode === 'markup' && !bulkMarkup)}
+            >
+              {bulkSaving ? 'Updating...' : `Update ${selectedIds.size} Product(s)`}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
