@@ -1,50 +1,49 @@
 
 
-## Plan: Add Compare-at-Price (Strikethrough Pricing)
+## Identified Issues and Fixes
 
-### Overview
-Add a `compare_at_price` column to the products table so admins can set an original/old price. When set (and higher than the current price), the old price displays with a strikethrough and the current price shows as the discounted price — across product cards, product detail page, and cart.
+### Issue 1: Console Warning — "Function components cannot be given refs" in AdminProducts
+The `AdminProducts` page renders three `Dialog` components simultaneously (Add/Edit, Delete Confirmation, Bulk Edit). The warning occurs because the Radix `Dialog` component receives a ref it cannot handle. This is a cosmetic React warning, not a crash, but should be cleaned up.
 
-### Database Changes
+**Fix**: Wrap each `Dialog` in a conditional render so only the active dialog mounts, rather than rendering all three with `open` prop toggling.
 
-**1. Add `compare_at_price` column to `products` table**
-```sql
-ALTER TABLE public.products 
-ADD COLUMN compare_at_price numeric DEFAULT NULL;
-```
+**File**: `src/pages/AdminProducts.tsx`
 
-### Code Changes
+---
 
-**2. Update `Product` type** (`src/lib/supabase.ts`)
-- Add `compare_at_price: number | null`
+### Issue 2: Excessive `as any` type casts for `compare_at_price`
+Multiple files (Sale.tsx, Shop.tsx, Index.tsx, ProductDetail.tsx, Cart.tsx) cast products to `any` to access `compare_at_price`, even though the `Product` type in `src/lib/supabase.ts` already includes this field. This happens because the `useProducts` hook returns the correct type but consuming components cast unnecessarily.
 
-**3. Update `AdminProducts.tsx`**
-- Add `compare_at_price` field to the product form (labeled "Original Price" or "Compare at Price")
-- Include it in create/update queries
-- Show in the products table
+**Fix**: Remove all `(p as any).compare_at_price` casts and use `p.compare_at_price` directly, since the `Product` type already has this field.
 
-**4. Update `ProductCard.tsx`**
-- When `compare_at_price` exists and is greater than `price`, show:
-  - Old price with strikethrough styling (`line-through text-muted-foreground`)
-  - Current price in bold/primary color
-  - Optional discount badge (e.g. "-20%")
+**Files**: `src/pages/Sale.tsx`, `src/pages/Shop.tsx`, `src/pages/Index.tsx`, `src/pages/ProductDetail.tsx`, `src/pages/Cart.tsx`
 
-**5. Update `ProductDetail.tsx`**
-- Same strikethrough treatment in the price section
-- Show percentage saved
+---
 
-**6. Update `Cart.tsx`**
-- Show strikethrough original price next to discounted price per item
+### Issue 3: `site_settings` table accessed with `as any` cast
+The `useSaleCountdown` hook and `AdminDashboard` use `supabase.from('site_settings' as any)` because the auto-generated types file may not include this table yet. The types file does include it (it was added via migration), so the cast is unnecessary noise, but the real fix depends on whether the generated types are current.
 
-### Visual Example
-```text
-  ₦15,000  ←  muted, line-through
-  ₦12,000  ←  primary, bold
-  Save 20%
-```
+**Fix**: Remove `as any` casts from `site_settings` queries in `useSaleCountdown.ts` and `AdminDashboard.tsx` if the types file includes the table. If not, leave them but note this is expected until types regenerate.
 
-### Technical Notes
-- `compare_at_price` is optional — when null or equal to price, only the regular price shows
-- No changes to checkout logic needed; the actual `price` field remains the selling price
-- Admin can clear the field to remove the strikethrough display
+**Files**: `src/hooks/useSaleCountdown.ts`, `src/pages/AdminDashboard.tsx`
+
+---
+
+### Issue 4: No functional errors or data issues detected
+- All API requests return 200 with valid data
+- No runtime crashes or exceptions
+- Authentication and RLS policies are working correctly
+- Cart, orders, products, and admin features all function properly
+
+---
+
+### Summary of Changes
+
+| # | Issue | Severity | Files |
+|---|-------|----------|-------|
+| 1 | Dialog ref warning in AdminProducts | Low (warning) | AdminProducts.tsx |
+| 2 | Unnecessary `as any` casts | Low (code quality) | 5 page files |
+| 3 | `site_settings` type casts | Low (code quality) | 2 files |
+
+All issues are code quality improvements — no critical bugs or broken functionality found.
 
