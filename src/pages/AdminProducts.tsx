@@ -304,9 +304,16 @@ const AdminProducts = () => {
 
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-xl font-semibold text-foreground">Products ({products.length})</h2>
-        <Button onClick={openAdd} size="sm">
-          <Plus size={16} className="mr-1" /> Add Product
-        </Button>
+        <div className="flex items-center gap-2">
+          {selectedIds.size > 0 && (
+            <Button variant="outline" size="sm" onClick={() => { setBulkMode('set'); setBulkDialogOpen(true); }}>
+              <Tag size={14} className="mr-1" /> Set Sale Price ({selectedIds.size})
+            </Button>
+          )}
+          <Button onClick={openAdd} size="sm">
+            <Plus size={16} className="mr-1" /> Add Product
+          </Button>
+        </div>
       </div>
 
       {loading ? (
