@@ -47,13 +47,21 @@ const AdminDashboard = () => {
   const loadData = async () => {
     setLoading(true);
 
-    const [ordersRes, productsRes] = await Promise.all([
+    const [ordersRes, productsRes, settingsRes] = await Promise.all([
       supabase.from('orders').select('id, total, status, created_at, shipping_address').order('created_at', { ascending: false }),
       supabase.from('products').select('id, name, stock_quantity'),
+      supabase.from('site_settings' as any).select('sale_ends_at').eq('id', 1).single(),
     ]);
 
     const orders = (ordersRes.data || []) as RecentOrder[];
     const products = productsRes.data || [];
+
+    // Sale end date
+    const saleEnd = (settingsRes.data as any)?.sale_ends_at;
+    if (saleEnd) {
+      // Format to datetime-local input value
+      setSaleEndsAt(new Date(saleEnd).toISOString().slice(0, 16));
+    }
 
     const totalRevenue = orders.reduce((sum, o) => sum + Number(o.total), 0);
     const lowItems = products
@@ -83,6 +91,21 @@ const AdminDashboard = () => {
     }
     setChartData(last30);
     setLoading(false);
+  };
+
+  const handleSaveSaleEnd = async () => {
+    setSavingSale(true);
+    const value = saleEndsAt ? new Date(saleEndsAt).toISOString() : null;
+    const { error } = await supabase
+      .from('site_settings' as any)
+      .update({ sale_ends_at: value, updated_at: new Date().toISOString() } as any)
+      .eq('id', 1);
+    if (error) {
+      toast({ title: 'Error', description: error.message, variant: 'destructive' });
+    } else {
+      toast({ title: 'Saved', description: value ? 'Sale end date updated' : 'Sale timer cleared' });
+    }
+    setSavingSale(false);
   };
 
   if (authLoading || adminLoading) {
