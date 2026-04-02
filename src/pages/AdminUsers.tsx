@@ -5,7 +5,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 import { logAdminAction } from '@/hooks/useAdminLog';
 import AdminNav from '@/components/AdminNav';
-import { ShieldAlert, Loader2, Users, Search, X, ChevronLeft, ChevronRight } from 'lucide-react';
+import { ShieldAlert, Loader2, Users, Search, X, ChevronLeft, ChevronRight, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -16,6 +16,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 
 type UserWithRole = {
   user_id: string;
@@ -46,6 +56,8 @@ const AdminUsers = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [roleFilter, setRoleFilter] = useState<string>('all');
   const [page, setPage] = useState(1);
+  const [deleteTarget, setDeleteTarget] = useState<UserWithRole | null>(null);
+  const [deleting, setDeleting] = useState(false);
   const perPage = 10;
 
   const filteredUsers = users.filter(u => {
@@ -112,6 +124,21 @@ const AdminUsers = () => {
     }
 
     setUpdatingId(null);
+  };
+
+  const handleDeleteUser = async () => {
+    if (!deleteTarget) return;
+    setDeleting(true);
+    const { error } = await supabase.rpc('delete_user_by_admin', { _target_user_id: deleteTarget.user_id });
+    if (error) {
+      toast({ title: 'Error', description: error.message, variant: 'destructive' });
+    } else {
+      toast({ title: 'User deleted', description: `${deleteTarget.email} has been removed.` });
+      setUsers(prev => prev.filter(u => u.user_id !== deleteTarget.user_id));
+      logAdminAction('user_deleted', 'user', deleteTarget.user_id, { email: deleteTarget.email, role: deleteTarget.role || 'user' });
+    }
+    setDeleting(false);
+    setDeleteTarget(null);
   };
 
   if (authLoading || adminLoading) {
@@ -197,6 +224,7 @@ const AdminUsers = () => {
                   <th className="text-left px-4 py-3 font-medium text-muted-foreground">Joined</th>
                   <th className="text-left px-4 py-3 font-medium text-muted-foreground">Current Role</th>
                   <th className="text-left px-4 py-3 font-medium text-muted-foreground">Change Role</th>
+                  <th className="px-4 py-3 w-10"></th>
                 </tr>
               </thead>
               <tbody>
@@ -237,6 +265,18 @@ const AdminUsers = () => {
                           </Select>
                         )}
                       </td>
+                      <td className="px-4 py-3">
+                        {!isSelf && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-8 w-8 p-0 text-muted-foreground hover:text-destructive"
+                            onClick={() => setDeleteTarget(u)}
+                          >
+                            <Trash2 size={14} />
+                          </Button>
+                        )}
+                      </td>
                     </tr>
                   );
                 })}
@@ -273,6 +313,27 @@ const AdminUsers = () => {
           )}
         </div>
       )}
+
+      <AlertDialog open={!!deleteTarget} onOpenChange={(open) => !open && setDeleteTarget(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete user?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will permanently delete <span className="font-medium text-foreground">{deleteTarget?.email}</span> and their profile data. Orders and reviews will be preserved. This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={deleting}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeleteUser}
+              disabled={deleting}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {deleting ? 'Deleting…' : 'Delete'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
