@@ -80,7 +80,7 @@ const AdminCoupons = () => {
     const [couponsRes, productsRes, ordersRes] = await Promise.all([
       supabase.from('coupons').select('*').order('created_at', { ascending: false }),
       supabase.from('products').select('id, name, category').order('name'),
-      supabase.from('orders').select('coupon_code, total, discount_amount').not('coupon_code', 'is', null),
+      supabase.from('orders').select('coupon_code, total, discount_amount, created_at').not('coupon_code', 'is', null),
     ]);
     if (couponsRes.data) setCoupons(couponsRes.data as unknown as Coupon[]);
     if (productsRes.data) {
