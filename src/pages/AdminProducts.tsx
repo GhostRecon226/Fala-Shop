@@ -38,6 +38,7 @@ type Product = {
   image_url: string | null;
   available_sizes: string[];
   available_colors: string[];
+  compare_at_price: number | null;
 };
 
 const emptyForm = {
