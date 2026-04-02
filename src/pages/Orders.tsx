@@ -158,6 +158,14 @@ const Orders = () => {
                   <span className="text-muted-foreground">Total</span>
                   <p className="font-medium text-foreground tabular-nums">{formatPrice(Number(order.total))}</p>
                 </div>
+                {order.coupon_code && (
+                  <div>
+                    <span className="text-muted-foreground">Coupon</span>
+                    <p className="font-medium text-green-600 text-xs">
+                      {order.coupon_code} (−{formatPrice(Number(order.discount_amount))})
+                    </p>
+                  </div>
+                )}
               </div>
               <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium capitalize ${
                 order.status === 'confirmed' || order.status === 'delivered'
