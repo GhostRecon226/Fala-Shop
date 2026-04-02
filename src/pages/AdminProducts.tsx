@@ -5,7 +5,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useIsAdmin } from '@/hooks/useIsAdmin';
 import { useQueryClient } from '@tanstack/react-query';
-import { ShieldAlert, Plus, Pencil, Trash2, Upload, X, Image as ImageIcon } from 'lucide-react';
+import { ShieldAlert, Plus, Pencil, Trash2, Upload, X, Image as ImageIcon, Tag } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { logAdminAction } from '@/hooks/useAdminLog';
 import { Button } from '@/components/ui/button';
@@ -70,6 +70,70 @@ const AdminProducts = () => {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [colorInput, setColorInput] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Bulk edit state
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [bulkDialogOpen, setBulkDialogOpen] = useState(false);
+  const [bulkComparePrice, setBulkComparePrice] = useState('');
+  const [bulkMode, setBulkMode] = useState<'set' | 'clear' | 'markup'>('set');
+  const [bulkMarkup, setBulkMarkup] = useState('');
+  const [bulkSaving, setBulkSaving] = useState(false);
+
+  const toggleSelect = (id: string) => {
+    setSelectedIds(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id); else next.add(id);
+      return next;
+    });
+  };
+
+  const toggleSelectAll = () => {
+    if (selectedIds.size === products.length) {
+      setSelectedIds(new Set());
+    } else {
+      setSelectedIds(new Set(products.map(p => p.id)));
+    }
+  };
+
+  const handleBulkSave = async () => {
+    if (selectedIds.size === 0) return;
+    setBulkSaving(true);
+
+    let errorCount = 0;
+    for (const id of selectedIds) {
+      let newComparePrice: number | null = null;
+
+      if (bulkMode === 'set') {
+        newComparePrice = bulkComparePrice ? parseFloat(bulkComparePrice) : null;
+      } else if (bulkMode === 'clear') {
+        newComparePrice = null;
+      } else if (bulkMode === 'markup') {
+        const product = products.find(p => p.id === id);
+        if (product && bulkMarkup) {
+          const pct = parseFloat(bulkMarkup);
+          newComparePrice = Math.round(product.price * (1 + pct / 100) * 100) / 100;
+        }
+      }
+
+      const { error } = await supabase.from('products').update({ compare_at_price: newComparePrice }).eq('id', id);
+      if (error) errorCount++;
+    }
+
+    if (errorCount > 0) {
+      toast({ title: 'Partial error', description: `${errorCount} product(s) failed to update`, variant: 'destructive' });
+    } else {
+      toast({ title: 'Updated', description: `Compare-at-price updated for ${selectedIds.size} product(s)` });
+      logAdminAction('bulk_updated_compare_price', 'product', null, { count: selectedIds.size, mode: bulkMode });
+    }
+
+    setBulkSaving(false);
+    setBulkDialogOpen(false);
+    setSelectedIds(new Set());
+    setBulkComparePrice('');
+    setBulkMarkup('');
+    queryClient.invalidateQueries({ queryKey: ['products'] });
+    loadProducts();
+  };
 
   useEffect(() => {
     if (isAdmin) loadProducts();
@@ -240,9 +304,16 @@ const AdminProducts = () => {
 
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-xl font-semibold text-foreground">Products ({products.length})</h2>
-        <Button onClick={openAdd} size="sm">
-          <Plus size={16} className="mr-1" /> Add Product
-        </Button>
+        <div className="flex items-center gap-2">
+          {selectedIds.size > 0 && (
+            <Button variant="outline" size="sm" onClick={() => { setBulkMode('set'); setBulkDialogOpen(true); }}>
+              <Tag size={14} className="mr-1" /> Set Sale Price ({selectedIds.size})
+            </Button>
+          )}
+          <Button onClick={openAdd} size="sm">
+            <Plus size={16} className="mr-1" /> Add Product
+          </Button>
+        </div>
       </div>
 
       {loading ? (
@@ -252,10 +323,17 @@ const AdminProducts = () => {
           <Table>
             <TableHeader>
               <TableRow>
+                <TableHead className="w-10">
+                  <Checkbox
+                    checked={products.length > 0 && selectedIds.size === products.length}
+                    onCheckedChange={toggleSelectAll}
+                  />
+                </TableHead>
                 <TableHead className="w-12">Image</TableHead>
                 <TableHead>Name</TableHead>
                 <TableHead>Category</TableHead>
                 <TableHead className="text-right">Price</TableHead>
+                <TableHead className="text-right">Compare</TableHead>
                 <TableHead className="text-right">Stock</TableHead>
                 <TableHead>Featured</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
@@ -263,7 +341,13 @@ const AdminProducts = () => {
             </TableHeader>
             <TableBody>
               {products.map(p => (
-                <TableRow key={p.id}>
+                <TableRow key={p.id} className={selectedIds.has(p.id) ? 'bg-primary/5' : ''}>
+                  <TableCell>
+                    <Checkbox
+                      checked={selectedIds.has(p.id)}
+                      onCheckedChange={() => toggleSelect(p.id)}
+                    />
+                  </TableCell>
                   <TableCell>
                     {p.image_url ? (
                       <img src={p.image_url} alt={p.name} className="w-10 h-10 rounded object-cover" />
@@ -276,6 +360,11 @@ const AdminProducts = () => {
                   <TableCell className="font-medium">{p.name}</TableCell>
                   <TableCell>{p.category}</TableCell>
                   <TableCell className="text-right tabular-nums">{formatPrice(Number(p.price))}</TableCell>
+                  <TableCell className="text-right tabular-nums">
+                    {p.compare_at_price ? (
+                      <span className="text-muted-foreground line-through">{formatPrice(Number(p.compare_at_price))}</span>
+                    ) : '—'}
+                  </TableCell>
                   <TableCell className="text-right tabular-nums">{p.stock_quantity ?? 0}</TableCell>
                   <TableCell>{p.is_featured ? '✓' : '—'}</TableCell>
                   <TableCell className="text-right">
@@ -506,6 +595,80 @@ const AdminProducts = () => {
           <DialogFooter>
             <Button variant="outline" onClick={() => setDeleteId(null)}>Cancel</Button>
             <Button variant="destructive" onClick={handleDelete}>Delete</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Bulk Compare-at-Price Dialog */}
+      <Dialog open={bulkDialogOpen} onOpenChange={setBulkDialogOpen}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle>Bulk Set Compare-at-Price</DialogTitle>
+            <DialogDescription>
+              Update compare-at-price for {selectedIds.size} selected product(s).
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="flex gap-2">
+              {(['set', 'markup', 'clear'] as const).map(mode => (
+                <button
+                  key={mode}
+                  onClick={() => setBulkMode(mode)}
+                  className={`flex-1 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                    bulkMode === mode
+                      ? 'bg-primary text-primary-foreground'
+                      : 'bg-secondary text-secondary-foreground hover:bg-muted'
+                  }`}
+                >
+                  {mode === 'set' ? 'Fixed Price' : mode === 'markup' ? '% Markup' : 'Clear'}
+                </button>
+              ))}
+            </div>
+
+            {bulkMode === 'set' && (
+              <div>
+                <label className="text-sm font-medium text-foreground">Compare-at-Price</label>
+                <Input
+                  type="number"
+                  step="0.01"
+                  placeholder="e.g. 15000"
+                  value={bulkComparePrice}
+                  onChange={e => setBulkComparePrice(e.target.value)}
+                />
+                <p className="text-xs text-muted-foreground mt-1">All selected products will get this same compare-at-price.</p>
+              </div>
+            )}
+
+            {bulkMode === 'markup' && (
+              <div>
+                <label className="text-sm font-medium text-foreground">Markup Percentage (%)</label>
+                <Input
+                  type="number"
+                  step="1"
+                  placeholder="e.g. 20"
+                  value={bulkMarkup}
+                  onChange={e => setBulkMarkup(e.target.value)}
+                />
+                <p className="text-xs text-muted-foreground mt-1">
+                  Compare-at-price = current price + {bulkMarkup || '0'}%. Each product's price is used individually.
+                </p>
+              </div>
+            )}
+
+            {bulkMode === 'clear' && (
+              <p className="text-sm text-muted-foreground">
+                This will remove the compare-at-price from all {selectedIds.size} selected product(s), removing sale badges.
+              </p>
+            )}
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setBulkDialogOpen(false)}>Cancel</Button>
+            <Button
+              onClick={handleBulkSave}
+              disabled={bulkSaving || (bulkMode === 'set' && !bulkComparePrice) || (bulkMode === 'markup' && !bulkMarkup)}
+            >
+              {bulkSaving ? 'Updating...' : `Update ${selectedIds.size} Product(s)`}
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
