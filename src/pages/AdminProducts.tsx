@@ -323,10 +323,17 @@ const AdminProducts = () => {
           <Table>
             <TableHeader>
               <TableRow>
+                <TableHead className="w-10">
+                  <Checkbox
+                    checked={products.length > 0 && selectedIds.size === products.length}
+                    onCheckedChange={toggleSelectAll}
+                  />
+                </TableHead>
                 <TableHead className="w-12">Image</TableHead>
                 <TableHead>Name</TableHead>
                 <TableHead>Category</TableHead>
                 <TableHead className="text-right">Price</TableHead>
+                <TableHead className="text-right">Compare</TableHead>
                 <TableHead className="text-right">Stock</TableHead>
                 <TableHead>Featured</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
@@ -334,7 +341,13 @@ const AdminProducts = () => {
             </TableHeader>
             <TableBody>
               {products.map(p => (
-                <TableRow key={p.id}>
+                <TableRow key={p.id} className={selectedIds.has(p.id) ? 'bg-primary/5' : ''}>
+                  <TableCell>
+                    <Checkbox
+                      checked={selectedIds.has(p.id)}
+                      onCheckedChange={() => toggleSelect(p.id)}
+                    />
+                  </TableCell>
                   <TableCell>
                     {p.image_url ? (
                       <img src={p.image_url} alt={p.name} className="w-10 h-10 rounded object-cover" />
@@ -347,6 +360,11 @@ const AdminProducts = () => {
                   <TableCell className="font-medium">{p.name}</TableCell>
                   <TableCell>{p.category}</TableCell>
                   <TableCell className="text-right tabular-nums">{formatPrice(Number(p.price))}</TableCell>
+                  <TableCell className="text-right tabular-nums">
+                    {p.compare_at_price ? (
+                      <span className="text-muted-foreground line-through">{formatPrice(Number(p.compare_at_price))}</span>
+                    ) : '—'}
+                  </TableCell>
                   <TableCell className="text-right tabular-nums">{p.stock_quantity ?? 0}</TableCell>
                   <TableCell>{p.is_featured ? '✓' : '—'}</TableCell>
                   <TableCell className="text-right">
