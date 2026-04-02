@@ -165,6 +165,7 @@ const AdminProducts = () => {
       is_featured: form.is_featured,
       available_sizes: form.available_sizes,
       available_colors: form.available_colors,
+      compare_at_price: form.compare_at_price ? parseFloat(form.compare_at_price) : null,
     };
 
     if (editingId) {
