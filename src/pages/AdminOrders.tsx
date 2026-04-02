@@ -18,6 +18,8 @@ type OrderRow = {
   status: string;
   created_at: string;
   shipping_address: Record<string, string>;
+  coupon_code: string | null;
+  discount_amount: number;
 };
 
 type OrderItemRow = {
@@ -173,6 +175,14 @@ const AdminOrders = () => {
                       <span className="text-muted-foreground">Total</span>
                       <p className="font-medium text-foreground tabular-nums">{formatPrice(Number(order.total))}</p>
                     </div>
+                    {order.coupon_code && (
+                      <div>
+                        <span className="text-muted-foreground">Coupon</span>
+                        <p className="font-medium text-green-600 text-xs">
+                          {order.coupon_code} (−{formatPrice(Number(order.discount_amount))})
+                        </p>
+                      </div>
+                    )}
                     <div>
                       <span className="text-muted-foreground">Customer</span>
                       <p className="font-medium text-foreground text-xs truncate max-w-[180px]">

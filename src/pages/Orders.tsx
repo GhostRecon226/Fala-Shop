@@ -18,6 +18,8 @@ type Order = {
   total: number;
   status: string;
   created_at: string;
+  coupon_code: string | null;
+  discount_amount: number;
   items: OrderItem[];
 };
 
@@ -86,7 +88,7 @@ const Orders = () => {
     const fetch = async () => {
       const { data: ordersData } = await supabase
         .from('orders')
-        .select('id, total, status, created_at')
+        .select('id, total, status, created_at, coupon_code, discount_amount')
         .order('created_at', { ascending: false });
 
       if (!ordersData || ordersData.length === 0) {
@@ -158,6 +160,14 @@ const Orders = () => {
                   <span className="text-muted-foreground">Total</span>
                   <p className="font-medium text-foreground tabular-nums">{formatPrice(Number(order.total))}</p>
                 </div>
+                {order.coupon_code && (
+                  <div>
+                    <span className="text-muted-foreground">Coupon</span>
+                    <p className="font-medium text-green-600 text-xs">
+                      {order.coupon_code} (−{formatPrice(Number(order.discount_amount))})
+                    </p>
+                  </div>
+                )}
               </div>
               <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium capitalize ${
                 order.status === 'confirmed' || order.status === 'delivered'
