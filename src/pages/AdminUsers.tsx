@@ -265,6 +265,18 @@ const AdminUsers = () => {
                           </Select>
                         )}
                       </td>
+                      <td className="px-4 py-3">
+                        {!isSelf && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-8 w-8 p-0 text-muted-foreground hover:text-destructive"
+                            onClick={() => setDeleteTarget(u)}
+                          >
+                            <Trash2 size={14} />
+                          </Button>
+                        )}
+                      </td>
                     </tr>
                   );
                 })}
