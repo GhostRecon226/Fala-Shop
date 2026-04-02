@@ -224,6 +224,7 @@ const AdminUsers = () => {
                   <th className="text-left px-4 py-3 font-medium text-muted-foreground">Joined</th>
                   <th className="text-left px-4 py-3 font-medium text-muted-foreground">Current Role</th>
                   <th className="text-left px-4 py-3 font-medium text-muted-foreground">Change Role</th>
+                  <th className="px-4 py-3 w-10"></th>
                 </tr>
               </thead>
               <tbody>
