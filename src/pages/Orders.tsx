@@ -18,6 +18,8 @@ type Order = {
   total: number;
   status: string;
   created_at: string;
+  coupon_code: string | null;
+  discount_amount: number;
   items: OrderItem[];
 };
 
