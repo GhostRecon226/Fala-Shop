@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useIsAdmin } from '@/hooks/useIsAdmin';
 import { logAdminAction } from '@/hooks/useAdminLog';
@@ -17,6 +17,8 @@ import { Switch } from '@/components/ui/switch';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Badge } from '@/components/ui/badge';
 import { formatPrice } from '@/lib/utils';
+import { ChartContainer, ChartTooltip, ChartTooltipContent, type ChartConfig } from '@/components/ui/chart';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid } from 'recharts';
 
 interface Coupon {
   id: string;
@@ -42,6 +44,13 @@ interface CouponStats {
   total_discounts: number;
 }
 
+interface CouponOrder {
+  coupon_code: string;
+  total: number;
+  discount_amount: number;
+  created_at: string;
+}
+
 const emptyForm = {
   code: '',
   discount_type: 'percentage' as string,
@@ -54,12 +63,64 @@ const emptyForm = {
   categories: [] as string[],
 };
 
+const chartConfig: ChartConfig = {
+  orders: { label: 'Orders', color: 'hsl(var(--primary))' },
+  discounts: { label: 'Discounts', color: 'hsl(var(--destructive))' },
+};
+
+const CouponUsageChart = ({ orders }: { orders: CouponOrder[] }) => {
+  const chartData = useMemo(() => {
+    const now = new Date();
+    const weeks: { label: string; start: Date; end: Date }[] = [];
+    for (let i = 11; i >= 0; i--) {
+      const start = new Date(now);
+      start.setDate(start.getDate() - i * 7);
+      start.setHours(0, 0, 0, 0);
+      const day = start.getDay();
+      start.setDate(start.getDate() - day);
+      const end = new Date(start);
+      end.setDate(end.getDate() + 7);
+      const label = `${start.getDate()}/${start.getMonth() + 1}`;
+      if (weeks.length === 0 || weeks[weeks.length - 1].label !== label) {
+        weeks.push({ label, start, end });
+      }
+    }
+    return weeks.map(w => {
+      const weekOrders = orders.filter(o => {
+        const d = new Date(o.created_at);
+        return d >= w.start && d < w.end;
+      });
+      return {
+        week: w.label,
+        orders: weekOrders.length,
+        discounts: weekOrders.reduce((s, o) => s + Number(o.discount_amount), 0),
+      };
+    });
+  }, [orders]);
+
+  return (
+    <div className="rounded-lg border border-border p-4 mb-6">
+      <h3 className="text-sm font-medium text-foreground mb-3">Coupon Usage — Last 12 Weeks</h3>
+      <ChartContainer config={chartConfig} className="h-[200px] w-full">
+        <BarChart data={chartData}>
+          <CartesianGrid strokeDasharray="3 3" vertical={false} className="stroke-border" />
+          <XAxis dataKey="week" tickLine={false} axisLine={false} className="text-xs fill-muted-foreground" />
+          <YAxis tickLine={false} axisLine={false} className="text-xs fill-muted-foreground" width={40} />
+          <ChartTooltip content={<ChartTooltipContent />} />
+          <Bar dataKey="orders" fill="var(--color-orders)" radius={[4, 4, 0, 0]} />
+        </BarChart>
+      </ChartContainer>
+    </div>
+  );
+};
+
 const AdminCoupons = () => {
   const { data: isAdmin, isLoading: adminLoading } = useIsAdmin();
   const [coupons, setCoupons] = useState<Coupon[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
   const [allCategories, setAllCategories] = useState<string[]>([]);
   const [couponStats, setCouponStats] = useState<Record<string, CouponStats>>({});
+  const [couponOrders, setCouponOrders] = useState<CouponOrder[]>([]);
   const [loading, setLoading] = useState(true);
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState(emptyForm);
@@ -70,7 +131,7 @@ const AdminCoupons = () => {
     const [couponsRes, productsRes, ordersRes] = await Promise.all([
       supabase.from('coupons').select('*').order('created_at', { ascending: false }),
       supabase.from('products').select('id, name, category').order('name'),
-      supabase.from('orders').select('coupon_code, total, discount_amount').not('coupon_code', 'is', null),
+      supabase.from('orders').select('coupon_code, total, discount_amount, created_at').not('coupon_code', 'is', null),
     ]);
     if (couponsRes.data) setCoupons(couponsRes.data as unknown as Coupon[]);
     if (productsRes.data) {
@@ -79,9 +140,11 @@ const AdminCoupons = () => {
       setAllCategories(cats);
     }
     // Build stats map
+    const allOrders = (ordersRes.data || []) as CouponOrder[];
+    setCouponOrders(allOrders);
     const stats: Record<string, CouponStats> = {};
-    (ordersRes.data || []).forEach(o => {
-      const code = (o.coupon_code as string).toUpperCase();
+    allOrders.forEach(o => {
+      const code = o.coupon_code.toUpperCase();
       if (!stats[code]) stats[code] = { order_count: 0, total_revenue: 0, total_discounts: 0 };
       stats[code].order_count += 1;
       stats[code].total_revenue += Number(o.total);
@@ -268,6 +331,9 @@ const AdminCoupons = () => {
           </div>
         );
       })()}
+
+      {/* Usage trend chart */}
+      {couponOrders.length > 0 && <CouponUsageChart orders={couponOrders} />}
 
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold text-foreground">Coupons</h1>
