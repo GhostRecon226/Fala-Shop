@@ -1,20 +1,50 @@
 
 
-## Problem: 404 on Page Refresh (Published Site)
+## Plan: Add Compare-at-Price (Strikethrough Pricing)
 
-The published site returns a 404 when refreshing any route other than `/` (e.g. `/cart`, `/order-confirmation`). This is a standard single-page application (SPA) issue: the hosting server tries to find a file matching the URL path, fails, and returns 404. The app needs a fallback rewrite rule so all paths serve `index.html`, letting React Router handle routing client-side.
+### Overview
+Add a `compare_at_price` column to the products table so admins can set an original/old price. When set (and higher than the current price), the old price displays with a strikethrough and the current price shows as the discounted price — across product cards, product detail page, and cart.
 
-## Fix
+### Database Changes
 
-**1. Create `public/_redirects` file**
-
-Add a Netlify-compatible catch-all rewrite (Lovable's hosting uses this):
-
+**1. Add `compare_at_price` column to `products` table**
+```sql
+ALTER TABLE public.products 
+ADD COLUMN compare_at_price numeric DEFAULT NULL;
 ```
-/*    /index.html   200
+
+### Code Changes
+
+**2. Update `Product` type** (`src/lib/supabase.ts`)
+- Add `compare_at_price: number | null`
+
+**3. Update `AdminProducts.tsx`**
+- Add `compare_at_price` field to the product form (labeled "Original Price" or "Compare at Price")
+- Include it in create/update queries
+- Show in the products table
+
+**4. Update `ProductCard.tsx`**
+- When `compare_at_price` exists and is greater than `price`, show:
+  - Old price with strikethrough styling (`line-through text-muted-foreground`)
+  - Current price in bold/primary color
+  - Optional discount badge (e.g. "-20%")
+
+**5. Update `ProductDetail.tsx`**
+- Same strikethrough treatment in the price section
+- Show percentage saved
+
+**6. Update `Cart.tsx`**
+- Show strikethrough original price next to discounted price per item
+
+### Visual Example
+```text
+  ₦15,000  ←  muted, line-through
+  ₦12,000  ←  primary, bold
+  Save 20%
 ```
 
-This single line ensures every route falls back to the SPA entry point, so refreshing `/cart`, `/order-confirmation?status=success&tx_ref=...`, or any other route works correctly.
-
-This is a one-file, one-line fix.
+### Technical Notes
+- `compare_at_price` is optional — when null or equal to price, only the regular price shows
+- No changes to checkout logic needed; the actual `price` field remains the selling price
+- Admin can clear the field to remove the strikethrough display
 
