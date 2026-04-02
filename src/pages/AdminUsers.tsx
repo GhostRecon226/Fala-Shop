@@ -290,14 +290,25 @@ const AdminUsers = () => {
                       </td>
                       <td className="px-4 py-3">
                         {!isSelf && (
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="h-8 w-8 p-0 text-muted-foreground hover:text-destructive"
-                            onClick={() => setDeleteTarget(u)}
-                          >
-                            <Trash2 size={14} />
-                          </Button>
+                          <div className="flex gap-1">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className={`h-8 w-8 p-0 ${u.is_banned ? 'text-green-600 hover:text-green-700' : 'text-muted-foreground hover:text-orange-500'}`}
+                              onClick={() => setBanTarget(u)}
+                              title={u.is_banned ? 'Reactivate user' : 'Suspend user'}
+                            >
+                              {u.is_banned ? <ShieldCheck size={14} /> : <Ban size={14} />}
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="h-8 w-8 p-0 text-muted-foreground hover:text-destructive"
+                              onClick={() => setDeleteTarget(u)}
+                            >
+                              <Trash2 size={14} />
+                            </Button>
+                          </div>
                         )}
                       </td>
                     </tr>
