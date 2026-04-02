@@ -281,6 +281,9 @@ const AdminCoupons = () => {
         );
       })()}
 
+      {/* Usage trend chart */}
+      {couponOrders.length > 0 && <CouponUsageChart orders={couponOrders} />}
+
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold text-foreground">Coupons</h1>
         <Dialog open={open} onOpenChange={v => { if (!v) closeDialog(); else setOpen(true); }}>
