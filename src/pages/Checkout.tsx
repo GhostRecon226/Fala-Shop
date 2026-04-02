@@ -106,9 +106,11 @@ const Checkout = () => {
         .from('orders')
         .insert({
           user_id: user.id,
-          total: totalPrice,
+          total: finalTotal,
           shipping_address: result.data,
           status: 'pending',
+          coupon_code: appliedCoupon?.code ?? null,
+          discount_amount: discountAmount,
         })
         .select('id')
         .single();
