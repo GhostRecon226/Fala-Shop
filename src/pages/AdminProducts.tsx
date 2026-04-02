@@ -71,6 +71,70 @@ const AdminProducts = () => {
   const [colorInput, setColorInput] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  // Bulk edit state
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [bulkDialogOpen, setBulkDialogOpen] = useState(false);
+  const [bulkComparePrice, setBulkComparePrice] = useState('');
+  const [bulkMode, setBulkMode] = useState<'set' | 'clear' | 'markup'>('set');
+  const [bulkMarkup, setBulkMarkup] = useState('');
+  const [bulkSaving, setBulkSaving] = useState(false);
+
+  const toggleSelect = (id: string) => {
+    setSelectedIds(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id); else next.add(id);
+      return next;
+    });
+  };
+
+  const toggleSelectAll = () => {
+    if (selectedIds.size === products.length) {
+      setSelectedIds(new Set());
+    } else {
+      setSelectedIds(new Set(products.map(p => p.id)));
+    }
+  };
+
+  const handleBulkSave = async () => {
+    if (selectedIds.size === 0) return;
+    setBulkSaving(true);
+
+    let errorCount = 0;
+    for (const id of selectedIds) {
+      let newComparePrice: number | null = null;
+
+      if (bulkMode === 'set') {
+        newComparePrice = bulkComparePrice ? parseFloat(bulkComparePrice) : null;
+      } else if (bulkMode === 'clear') {
+        newComparePrice = null;
+      } else if (bulkMode === 'markup') {
+        const product = products.find(p => p.id === id);
+        if (product && bulkMarkup) {
+          const pct = parseFloat(bulkMarkup);
+          newComparePrice = Math.round(product.price * (1 + pct / 100) * 100) / 100;
+        }
+      }
+
+      const { error } = await supabase.from('products').update({ compare_at_price: newComparePrice }).eq('id', id);
+      if (error) errorCount++;
+    }
+
+    if (errorCount > 0) {
+      toast({ title: 'Partial error', description: `${errorCount} product(s) failed to update`, variant: 'destructive' });
+    } else {
+      toast({ title: 'Updated', description: `Compare-at-price updated for ${selectedIds.size} product(s)` });
+      logAdminAction('bulk_updated_compare_price', 'product', null, { count: selectedIds.size, mode: bulkMode });
+    }
+
+    setBulkSaving(false);
+    setBulkDialogOpen(false);
+    setSelectedIds(new Set());
+    setBulkComparePrice('');
+    setBulkMarkup('');
+    queryClient.invalidateQueries({ queryKey: ['products'] });
+    loadProducts();
+  };
+
   useEffect(() => {
     if (isAdmin) loadProducts();
   }, [isAdmin]);
