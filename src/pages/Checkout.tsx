@@ -31,6 +31,10 @@ const Checkout = () => {
     firstName: '', lastName: '', email: '', phone: '',
     address: '', city: '', state: '', zip: '',
   });
+  const [couponCode, setCouponCode] = useState('');
+  const [appliedCoupon, setAppliedCoupon] = useState<{ code: string; discount_amount: number; discount_type: string; discount_value: number } | null>(null);
+  const [couponLoading, setCouponLoading] = useState(false);
+  const [couponError, setCouponError] = useState('');
 
   if (loading) {
     return (
