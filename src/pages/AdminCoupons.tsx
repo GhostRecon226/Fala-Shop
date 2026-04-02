@@ -374,6 +374,8 @@ const AdminCoupons = () => {
                 <th className="text-left px-4 py-3 font-medium">Scope</th>
                 <th className="text-left px-4 py-3 font-medium">Min Order</th>
                 <th className="text-left px-4 py-3 font-medium">Usage</th>
+                <th className="text-right px-4 py-3 font-medium">Revenue</th>
+                <th className="text-right px-4 py-3 font-medium">Discounts</th>
                 <th className="text-left px-4 py-3 font-medium">Expires</th>
                 <th className="text-left px-4 py-3 font-medium">Active</th>
                 <th className="text-right px-4 py-3 font-medium">Actions</th>
