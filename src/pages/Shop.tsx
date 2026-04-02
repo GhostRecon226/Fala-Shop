@@ -25,7 +25,7 @@ const Shop = () => {
     if (!products) return [];
     let filtered = [...products];
     if (saleOnly) {
-      filtered = filtered.filter(p => (p as any).compare_at_price && (p as any).compare_at_price > p.price);
+      filtered = filtered.filter(p => p.compare_at_price && p.compare_at_price > p.price);
     }
     if (sort === 'price-asc') filtered.sort((a, b) => a.price - b.price);
     else if (sort === 'price-desc') filtered.sort((a, b) => b.price - a.price);
