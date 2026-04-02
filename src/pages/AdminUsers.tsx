@@ -253,8 +253,11 @@ const AdminUsers = () => {
                   const isSelf = u.user_id === user?.id;
 
                   return (
-                    <tr key={u.user_id} className="border-b border-border last:border-0 hover:bg-muted/30 transition-colors">
-                      <td className="px-4 py-3 font-medium">{u.email}</td>
+                    <tr key={u.user_id} className={`border-b border-border last:border-0 hover:bg-muted/30 transition-colors ${u.is_banned ? 'opacity-60' : ''}`}>
+                      <td className="px-4 py-3 font-medium">
+                        {u.email}
+                        {u.is_banned && <Badge variant="destructive" className="ml-2 text-[10px] py-0">Suspended</Badge>}
+                      </td>
                       <td className="px-4 py-3 text-muted-foreground">
                         {new Date(u.created_at).toLocaleDateString()}
                       </td>
