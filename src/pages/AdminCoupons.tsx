@@ -230,6 +230,45 @@ const AdminCoupons = () => {
   return (
     <div className="container py-10">
       <AdminNav />
+      {/* Analytics summary cards */}
+      {(() => {
+        const totalOrders = Object.values(couponStats).reduce((s, v) => s + v.order_count, 0);
+        const totalRevenue = Object.values(couponStats).reduce((s, v) => s + v.total_revenue, 0);
+        const totalDiscounts = Object.values(couponStats).reduce((s, v) => s + v.total_discounts, 0);
+        return (
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+            <div className="rounded-lg border border-border p-4">
+              <div className="flex items-center gap-2 text-muted-foreground mb-1">
+                <Tag className="h-4 w-4" />
+                <span className="text-xs font-medium">Total Coupons</span>
+              </div>
+              <p className="text-2xl font-bold text-foreground tabular-nums">{coupons.length}</p>
+            </div>
+            <div className="rounded-lg border border-border p-4">
+              <div className="flex items-center gap-2 text-muted-foreground mb-1">
+                <BarChart3 className="h-4 w-4" />
+                <span className="text-xs font-medium">Orders with Coupons</span>
+              </div>
+              <p className="text-2xl font-bold text-foreground tabular-nums">{totalOrders}</p>
+            </div>
+            <div className="rounded-lg border border-border p-4">
+              <div className="flex items-center gap-2 text-muted-foreground mb-1">
+                <TrendingUp className="h-4 w-4" />
+                <span className="text-xs font-medium">Revenue (w/ Coupons)</span>
+              </div>
+              <p className="text-2xl font-bold text-foreground tabular-nums">{formatPrice(totalRevenue)}</p>
+            </div>
+            <div className="rounded-lg border border-border p-4">
+              <div className="flex items-center gap-2 text-destructive/70 mb-1">
+                <TrendingUp className="h-4 w-4" />
+                <span className="text-xs font-medium">Total Discounts Given</span>
+              </div>
+              <p className="text-2xl font-bold text-destructive tabular-nums">−{formatPrice(totalDiscounts)}</p>
+            </div>
+          </div>
+        );
+      })()}
+
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold text-foreground">Coupons</h1>
         <Dialog open={open} onOpenChange={v => { if (!v) closeDialog(); else setOpen(true); }}>
