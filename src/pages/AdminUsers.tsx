@@ -32,6 +32,7 @@ type UserWithRole = {
   email: string;
   created_at: string;
   role: string | null;
+  is_banned: boolean;
 };
 
 const ROLES = ['user', 'moderator', 'admin'] as const;
