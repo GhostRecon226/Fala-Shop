@@ -16,6 +16,7 @@ const categories = [
 const Index = () => {
   const { data: featured, isLoading: loadingFeatured } = useFeaturedProducts();
   const { data: allProducts, isLoading: loadingAll } = useProducts();
+  const { timeLeft } = useSaleCountdown();
 
   const displayProducts = featured && featured.length > 0 ? featured : allProducts?.slice(0, 4);
 
