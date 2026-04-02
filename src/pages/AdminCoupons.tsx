@@ -39,7 +39,7 @@ const emptyForm = {
 };
 
 const AdminCoupons = () => {
-  const { isAdmin, loading: adminLoading } = useIsAdmin();
+  const { data: isAdmin, isLoading: adminLoading } = useIsAdmin();
   const [coupons, setCoupons] = useState<Coupon[]>([]);
   const [loading, setLoading] = useState(true);
   const [open, setOpen] = useState(false);
