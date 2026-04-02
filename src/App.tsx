@@ -64,6 +64,7 @@ const App = () => (
                 <Route path="/contact" element={<Contact />} />
                 <Route path="/shipping-returns" element={<ShippingReturns />} />
                 <Route path="/unsubscribe" element={<Unsubscribe />} />
+                <Route path="/reset-password" element={<ResetPassword />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </main>
