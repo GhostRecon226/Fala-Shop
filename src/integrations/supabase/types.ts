@@ -114,6 +114,8 @@ export type Database = {
       }
       coupons: {
         Row: {
+          applies_to: string
+          categories: string[]
           code: string
           created_at: string
           discount_type: string
@@ -123,9 +125,12 @@ export type Database = {
           is_active: boolean
           max_uses: number | null
           min_order_amount: number
+          product_ids: string[]
           times_used: number
         }
         Insert: {
+          applies_to?: string
+          categories?: string[]
           code: string
           created_at?: string
           discount_type?: string
@@ -135,9 +140,12 @@ export type Database = {
           is_active?: boolean
           max_uses?: number | null
           min_order_amount?: number
+          product_ids?: string[]
           times_used?: number
         }
         Update: {
+          applies_to?: string
+          categories?: string[]
           code?: string
           created_at?: string
           discount_type?: string
@@ -147,6 +155,7 @@ export type Database = {
           is_active?: boolean
           max_uses?: number | null
           min_order_amount?: number
+          product_ids?: string[]
           times_used?: number
         }
         Relationships: []
@@ -562,10 +571,12 @@ export type Database = {
         }
         Returns: undefined
       }
-      validate_coupon: {
-        Args: { _code: string; _order_total: number }
-        Returns: Json
-      }
+      validate_coupon:
+        | { Args: { _code: string; _order_total: number }; Returns: Json }
+        | {
+            Args: { _cart_items?: Json; _code: string; _order_total: number }
+            Returns: Json
+          }
     }
     Enums: {
       app_role: "admin" | "moderator" | "user"
