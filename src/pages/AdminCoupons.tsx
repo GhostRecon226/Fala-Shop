@@ -342,7 +342,10 @@ const AdminCoupons = () => {
                   <td className="px-4 py-3">
                     <Switch checked={c.is_active} onCheckedChange={() => toggleActive(c)} />
                   </td>
-                  <td className="px-4 py-3 text-right">
+                  <td className="px-4 py-3 text-right space-x-1">
+                    <Button variant="ghost" size="icon" onClick={() => openEdit(c)}>
+                      <Pencil className="h-4 w-4 text-muted-foreground" />
+                    </Button>
                     <Button variant="ghost" size="icon" onClick={() => deleteCoupon(c)}>
                       <Trash2 className="h-4 w-4 text-destructive" />
                     </Button>
