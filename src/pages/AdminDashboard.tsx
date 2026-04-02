@@ -164,6 +164,33 @@ const AdminDashboard = () => {
             ))}
           </div>
 
+          {/* Sale Timer Setting */}
+          <div className="rounded-lg border border-border bg-card p-5 mb-8">
+            <div className="flex items-center gap-2 mb-4">
+              <Clock size={16} className="text-primary" />
+              <h2 className="text-sm font-medium text-muted-foreground uppercase tracking-wide">Sale Countdown Timer</h2>
+            </div>
+            <p className="text-xs text-muted-foreground mb-3">Set when the current sale ends. A countdown timer will appear on the homepage sale banner.</p>
+            <div className="flex flex-col sm:flex-row gap-3">
+              <Input
+                type="datetime-local"
+                value={saleEndsAt}
+                onChange={e => setSaleEndsAt(e.target.value)}
+                className="max-w-xs"
+              />
+              <div className="flex gap-2">
+                <Button size="sm" onClick={handleSaveSaleEnd} disabled={savingSale}>
+                  {savingSale ? 'Saving...' : 'Save'}
+                </Button>
+                {saleEndsAt && (
+                  <Button size="sm" variant="outline" onClick={() => { setSaleEndsAt(''); handleSaveSaleEnd(); }}>
+                    Clear Timer
+                  </Button>
+                )}
+              </div>
+            </div>
+          </div>
+
           {/* Revenue chart */}
           <div className="rounded-lg border border-border bg-card p-5 mb-8">
             <h2 className="text-sm font-medium text-muted-foreground uppercase tracking-wide mb-4">Revenue — Last 30 Days</h2>
