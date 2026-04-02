@@ -1,49 +1,31 @@
 
 
-## Identified Issues and Fixes
+## Plan: Clear All Dummy Data (Full Clean Slate)
 
-### Issue 1: Console Warning — "Function components cannot be given refs" in AdminProducts
-The `AdminProducts` page renders three `Dialog` components simultaneously (Add/Edit, Delete Confirmation, Bulk Edit). The warning occurs because the Radix `Dialog` component receives a ref it cannot handle. This is a cosmetic React warning, not a crash, but should be cleaned up.
+### What will be deleted
+| Table | Records | Action |
+|-------|---------|--------|
+| cart_items | 3 | Delete all |
+| order_items | (linked to 13 orders) | Delete all |
+| orders | 13 | Delete all |
+| reviews | 0 | Delete all (safety) |
+| product_images | 0 | Delete all (safety) |
+| products | 18 | Delete all |
 
-**Fix**: Wrap each `Dialog` in a conditional render so only the active dialog mounts, rather than rendering all three with `open` prop toggling.
+### Execution order
+Deletions must happen in dependency order to avoid referential issues:
 
-**File**: `src/pages/AdminProducts.tsx`
+1. **Delete cart_items** — references products
+2. **Delete order_items** — references orders and products
+3. **Delete orders** — references users
+4. **Delete reviews** — references products
+5. **Delete product_images** — references products
+6. **Delete products** — the main target
 
----
+All six DELETE statements will be executed via the database insert tool (data operations, not schema changes).
 
-### Issue 2: Excessive `as any` type casts for `compare_at_price`
-Multiple files (Sale.tsx, Shop.tsx, Index.tsx, ProductDetail.tsx, Cart.tsx) cast products to `any` to access `compare_at_price`, even though the `Product` type in `src/lib/supabase.ts` already includes this field. This happens because the `useProducts` hook returns the correct type but consuming components cast unnecessarily.
-
-**Fix**: Remove all `(p as any).compare_at_price` casts and use `p.compare_at_price` directly, since the `Product` type already has this field.
-
-**Files**: `src/pages/Sale.tsx`, `src/pages/Shop.tsx`, `src/pages/Index.tsx`, `src/pages/ProductDetail.tsx`, `src/pages/Cart.tsx`
-
----
-
-### Issue 3: `site_settings` table accessed with `as any` cast
-The `useSaleCountdown` hook and `AdminDashboard` use `supabase.from('site_settings' as any)` because the auto-generated types file may not include this table yet. The types file does include it (it was added via migration), so the cast is unnecessary noise, but the real fix depends on whether the generated types are current.
-
-**Fix**: Remove `as any` casts from `site_settings` queries in `useSaleCountdown.ts` and `AdminDashboard.tsx` if the types file includes the table. If not, leave them but note this is expected until types regenerate.
-
-**Files**: `src/hooks/useSaleCountdown.ts`, `src/pages/AdminDashboard.tsx`
-
----
-
-### Issue 4: No functional errors or data issues detected
-- All API requests return 200 with valid data
-- No runtime crashes or exceptions
-- Authentication and RLS policies are working correctly
-- Cart, orders, products, and admin features all function properly
-
----
-
-### Summary of Changes
-
-| # | Issue | Severity | Files |
-|---|-------|----------|-------|
-| 1 | Dialog ref warning in AdminProducts | Low (warning) | AdminProducts.tsx |
-| 2 | Unnecessary `as any` casts | Low (code quality) | 5 page files |
-| 3 | `site_settings` type casts | Low (code quality) | 2 files |
-
-All issues are code quality improvements — no critical bugs or broken functionality found.
+### Notes
+- No schema changes needed — tables stay intact, just emptied
+- Storage bucket `product-images` files (if any) are not auto-deleted by row deletion, but the query showed 0 image records so nothing to clean
+- The site will show empty product grids until new products are added
 
