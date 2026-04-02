@@ -225,6 +225,16 @@ const AdminUsers = () => {
               ))}
             </SelectContent>
           </Select>
+          <Select value={statusFilter} onValueChange={setStatusFilter}>
+            <SelectTrigger className="w-full sm:w-36 h-9 text-sm">
+              <SelectValue placeholder="Filter by status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Status</SelectItem>
+              <SelectItem value="active">Active</SelectItem>
+              <SelectItem value="suspended">Suspended</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
       )}
 
