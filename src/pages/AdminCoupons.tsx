@@ -214,13 +214,13 @@ const AdminCoupons = () => {
       <AdminNav />
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold text-foreground">Coupons</h1>
-        <Dialog open={open} onOpenChange={setOpen}>
+        <Dialog open={open} onOpenChange={v => { if (!v) closeDialog(); else setOpen(true); }}>
           <DialogTrigger asChild>
-            <Button size="sm"><Plus className="h-4 w-4 mr-1" /> New Coupon</Button>
+            <Button size="sm" onClick={openCreate}><Plus className="h-4 w-4 mr-1" /> New Coupon</Button>
           </DialogTrigger>
           <DialogContent className="max-h-[85vh] overflow-y-auto">
             <DialogHeader>
-              <DialogTitle>Create Coupon</DialogTitle>
+              <DialogTitle>{editingId ? 'Edit Coupon' : 'Create Coupon'}</DialogTitle>
             </DialogHeader>
             <div className="space-y-4">
               <div>
