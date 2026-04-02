@@ -36,6 +36,12 @@ interface Coupon {
 
 interface Product { id: string; name: string; category: string; }
 
+interface CouponStats {
+  order_count: number;
+  total_revenue: number;
+  total_discounts: number;
+}
+
 const emptyForm = {
   code: '',
   discount_type: 'percentage' as string,
