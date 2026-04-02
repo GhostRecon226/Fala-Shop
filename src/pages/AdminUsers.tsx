@@ -77,7 +77,7 @@ const AdminUsers = () => {
   const paginatedUsers = filteredUsers.slice((page - 1) * perPage, page * perPage);
 
   // Reset to page 1 when filters change
-  useEffect(() => { setPage(1); }, [searchQuery, roleFilter]);
+  useEffect(() => { setPage(1); }, [searchQuery, roleFilter, statusFilter]);
 
   useEffect(() => {
     if (authLoading || adminLoading || !isAdmin) return;
