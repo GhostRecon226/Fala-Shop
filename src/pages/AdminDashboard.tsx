@@ -5,8 +5,11 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useIsAdmin } from '@/hooks/useIsAdmin';
 import { formatPrice } from '@/lib/utils';
 import AdminNav from '@/components/AdminNav';
-import { ShieldAlert, DollarSign, Package, ShoppingCart, AlertTriangle } from 'lucide-react';
+import { ShieldAlert, DollarSign, Package, ShoppingCart, AlertTriangle, Clock } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { toast } from '@/hooks/use-toast';
 
 type Metrics = {
   totalOrders: number;
