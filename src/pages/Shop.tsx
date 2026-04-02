@@ -34,7 +34,7 @@ const Shop = () => {
 
   const saleCount = useMemo(() => {
     if (!products) return 0;
-    return products.filter(p => (p as any).compare_at_price && (p as any).compare_at_price > p.price).length;
+    return products.filter(p => p.compare_at_price && p.compare_at_price > p.price).length;
   }, [products]);
 
   const handleCategoryChange = (cat: string) => {

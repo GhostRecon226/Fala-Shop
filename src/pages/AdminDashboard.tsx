@@ -97,8 +97,8 @@ const AdminDashboard = () => {
     setSavingSale(true);
     const value = saleEndsAt ? new Date(saleEndsAt).toISOString() : null;
     const { error } = await supabase
-      .from('site_settings' as any)
-      .update({ sale_ends_at: value, updated_at: new Date().toISOString() } as any)
+      .from('site_settings')
+      .update({ sale_ends_at: value, updated_at: new Date().toISOString() })
       .eq('id', 1);
     if (error) {
       toast({ title: 'Error', description: error.message, variant: 'destructive' });

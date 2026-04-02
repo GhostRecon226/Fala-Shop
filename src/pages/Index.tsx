@@ -34,7 +34,7 @@ const Index = () => {
 
   const maxDiscount = useMemo(() => {
     if (saleProducts.length === 0) return 0;
-    return Math.max(...saleProducts.map(p => Math.round((1 - p.price / ((p as any).compare_at_price || p.price)) * 100)));
+    return Math.max(...saleProducts.map(p => Math.round((1 - p.price / (p.compare_at_price || p.price)) * 100)));
   }, [saleProducts]);
 
   return (
