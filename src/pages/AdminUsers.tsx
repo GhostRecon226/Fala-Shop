@@ -144,6 +144,23 @@ const AdminUsers = () => {
     setDeleteTarget(null);
   };
 
+  const handleBanToggle = async () => {
+    if (!banTarget) return;
+    setBanning(true);
+    const willBan = !banTarget.is_banned;
+    const rpc = willBan ? 'ban_user_by_admin' : 'unban_user_by_admin';
+    const { error } = await supabase.rpc(rpc, { _target_user_id: banTarget.user_id } as any);
+    if (error) {
+      toast({ title: 'Error', description: error.message, variant: 'destructive' });
+    } else {
+      toast({ title: willBan ? 'User suspended' : 'User reactivated', description: `${banTarget.email} has been ${willBan ? 'suspended' : 'reactivated'}.` });
+      setUsers(prev => prev.map(u => u.user_id === banTarget.user_id ? { ...u, is_banned: willBan } : u));
+      logAdminAction(willBan ? 'user_banned' : 'user_unbanned', 'user', banTarget.user_id, { email: banTarget.email });
+    }
+    setBanning(false);
+    setBanTarget(null);
+  };
+
   if (authLoading || adminLoading) {
     return (
       <div className="container py-16 flex justify-center">
