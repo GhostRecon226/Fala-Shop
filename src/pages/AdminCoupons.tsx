@@ -67,9 +67,10 @@ const AdminCoupons = () => {
   const [submitting, setSubmitting] = useState(false);
 
   const fetchData = async () => {
-    const [couponsRes, productsRes] = await Promise.all([
+    const [couponsRes, productsRes, ordersRes] = await Promise.all([
       supabase.from('coupons').select('*').order('created_at', { ascending: false }),
       supabase.from('products').select('id, name, category').order('name'),
+      supabase.from('orders').select('coupon_code, total, discount_amount').not('coupon_code', 'is', null),
     ]);
     if (couponsRes.data) setCoupons(couponsRes.data as unknown as Coupon[]);
     if (productsRes.data) {
@@ -77,6 +78,16 @@ const AdminCoupons = () => {
       const cats = [...new Set(productsRes.data.map(p => p.category))].sort();
       setAllCategories(cats);
     }
+    // Build stats map
+    const stats: Record<string, CouponStats> = {};
+    (ordersRes.data || []).forEach(o => {
+      const code = (o.coupon_code as string).toUpperCase();
+      if (!stats[code]) stats[code] = { order_count: 0, total_revenue: 0, total_discounts: 0 };
+      stats[code].order_count += 1;
+      stats[code].total_revenue += Number(o.total);
+      stats[code].total_discounts += Number(o.discount_amount);
+    });
+    setCouponStats(stats);
     setLoading(false);
   };
 
