@@ -1,31 +1,16 @@
 
 
-## Plan: Clear All Dummy Data (Full Clean Slate)
+## Plan: Replace Favicon with Company Logo
 
-### What will be deleted
-| Table | Records | Action |
-|-------|---------|--------|
-| cart_items | 3 | Delete all |
-| order_items | (linked to 13 orders) | Delete all |
-| orders | 13 | Delete all |
-| reviews | 0 | Delete all (safety) |
-| product_images | 0 | Delete all (safety) |
-| products | 18 | Delete all |
+The user has uploaded their company's `.ico` file to replace the default Lovable favicon.
 
-### Execution order
-Deletions must happen in dependency order to avoid referential issues:
+### Steps
 
-1. **Delete cart_items** — references products
-2. **Delete order_items** — references orders and products
-3. **Delete orders** — references users
-4. **Delete reviews** — references products
-5. **Delete product_images** — references products
-6. **Delete products** — the main target
+1. **Copy the uploaded `.ico` file** to `public/favicon.ico`, replacing the existing Lovable favicon
+2. **Update `index.html`** to add an explicit `<link rel="icon">` tag pointing to `/favicon.ico`
 
-All six DELETE statements will be executed via the database insert tool (data operations, not schema changes).
+### Technical Details
 
-### Notes
-- No schema changes needed — tables stay intact, just emptied
-- Storage bucket `product-images` files (if any) are not auto-deleted by row deletion, but the query showed 0 image records so nothing to clean
-- The site will show empty product grids until new products are added
+- The uploaded file `user-uploads://WhatsApp_Image_2026-04-13_at_14.49.10.ico` will be copied to `public/favicon.ico`
+- A `<link rel="icon" href="/favicon.ico" type="image/x-icon">` tag will be added to the `<head>` in `index.html`
 
