@@ -1,28 +1,21 @@
 
-Add social media icons (Instagram, Facebook, TikTok, LinkedIn) to the Footer component, positioned in the bottom bar next to the copyright text.
+The user wants the social media icons in the footer to display in their brand colors instead of the current muted gray. Good call — brand colors make social icons more recognizable and inviting.
 
-## Plan: Add Social Media Links to Footer
+## Plan: Color the social icons with brand colors
 
-### What to build
-Add four social media icon links to `src/components/Footer.tsx` using Lucide React icons. TikTok isn't in Lucide, so I'll use a small inline SVG for it.
+### Approach
+Update `src/components/Footer.tsx` so each social icon renders in its brand color, with a subtle hover effect (slight opacity change) instead of the current grayscale → foreground color transition.
 
-### Layout
-Update the bottom bar (currently just the copyright line) into a flex row:
-- Left: copyright text
-- Right: row of 4 icon links (Instagram, Facebook, TikTok, LinkedIn)
+### Brand colors
+- Instagram → gradient (pink/orange/purple). Since a true Instagram gradient on an SVG stroke icon is tricky, use Instagram's signature pink `#E4405F` for a clean solid look. (Alternative: apply a CSS gradient background behind the icon — happy to do that if preferred.)
+- Facebook → `#1877F2`
+- TikTok → keep it black/white-aware, OR use its signature cyan + pink. Cleanest is solid `#000000` (light mode) / white (dark mode) since TikTok's brand is monochrome with accent. I'll use `currentColor` mapped to foreground so it adapts to theme.
+- LinkedIn → `#0A66C3`
 
-On mobile, stack vertically and center.
+### Implementation
+- Replace the shared `text-muted-foreground hover:text-foreground` class with a per-icon inline `style={{ color: brandColor }}` (or a `color` prop).
+- Add `hover:opacity-80 transition-opacity` for a consistent hover feedback.
+- Keep TikTok using `currentColor` and class `text-foreground` so it stays legible in both light/dark mode.
 
-### Icons & links
-- Instagram → `Instagram` from lucide-react
-- Facebook → `Facebook` from lucide-react
-- LinkedIn → `Linkedin` from lucide-react
-- TikTok → inline SVG (not available in lucide-react)
-
-Each will be an `<a>` with `target="_blank"`, `rel="noopener noreferrer"`, an `aria-label`, and hover color transition matching existing footer link styles (`text-muted-foreground hover:text-foreground`).
-
-### URLs
-I'll use placeholder `#` URLs initially. The user should provide the actual profile URLs so I can wire them up — but I'll add the structure now so it's visible immediately.
-
-### Question for the user
-After approval, please share the actual profile URLs for each platform so I can replace the placeholders.
+### Optional upgrade (ask user)
+If they want a true Instagram gradient, I can wrap the Instagram icon in a `bg-gradient-to-tr from-yellow-400 via-pink-500 to-purple-600` rounded square with the icon in white inside. Let me know if you'd prefer that look.
