@@ -8,10 +8,10 @@ const TikTokIcon = ({ className }: { className?: string }) => (
 );
 
 const socials = [
-  { label: 'Instagram', href: '#', Icon: Instagram },
-  { label: 'Facebook', href: '#', Icon: Facebook },
-  { label: 'TikTok', href: '#', Icon: TikTokIcon },
-  { label: 'LinkedIn', href: '#', Icon: Linkedin },
+  { label: 'Instagram', href: '#', Icon: Instagram, color: '#E4405F' },
+  { label: 'Facebook', href: '#', Icon: Facebook, color: '#1877F2' },
+  { label: 'TikTok', href: '#', Icon: TikTokIcon, color: undefined },
+  { label: 'LinkedIn', href: '#', Icon: Linkedin, color: '#0A66C3' },
 ];
 
 const Footer = () => {
@@ -46,14 +46,15 @@ const Footer = () => {
         <div className="mt-10 pt-6 border-t border-border flex flex-col sm:flex-row items-center justify-between gap-4">
           <p className="text-xs text-muted-foreground text-center sm:text-left">© 2026 Fala Production Ltd. All rights reserved.</p>
           <div className="flex items-center gap-4">
-            {socials.map(({ label, href, Icon }) => (
+            {socials.map(({ label, href, Icon, color }) => (
               <a
                 key={label}
                 href={href}
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label={label}
-                className="text-muted-foreground hover:text-foreground transition-colors"
+                style={color ? { color } : undefined}
+                className={`hover:opacity-80 transition-opacity ${color ? '' : 'text-foreground'}`}
               >
                 <Icon className="h-5 w-5" />
               </a>
