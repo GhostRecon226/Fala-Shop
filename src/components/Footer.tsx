@@ -8,10 +8,10 @@ const TikTokIcon = ({ className }: { className?: string }) => (
 );
 
 const socials = [
-  { label: 'Instagram', href: '#', Icon: Instagram, color: '#E4405F' },
-  { label: 'Facebook', href: '#', Icon: Facebook, color: '#1877F2' },
-  { label: 'TikTok', href: '#', Icon: TikTokIcon, color: undefined },
-  { label: 'LinkedIn', href: '#', Icon: Linkedin, color: '#0A66C3' },
+  { label: 'Instagram', href: '#', Icon: Instagram, gradient: true, color: undefined },
+  { label: 'Facebook', href: '#', Icon: Facebook, gradient: false, color: '#1877F2' },
+  { label: 'TikTok', href: '#', Icon: TikTokIcon, gradient: false, color: undefined },
+  { label: 'LinkedIn', href: '#', Icon: Linkedin, gradient: false, color: '#0A66C3' },
 ];
 
 const Footer = () => {
@@ -46,7 +46,7 @@ const Footer = () => {
         <div className="mt-10 pt-6 border-t border-border flex flex-col sm:flex-row items-center justify-between gap-4">
           <p className="text-xs text-muted-foreground text-center sm:text-left">© 2026 Fala Production Ltd. All rights reserved.</p>
           <div className="flex items-center gap-4">
-            {socials.map(({ label, href, Icon, color }) => (
+            {socials.map(({ label, href, Icon, color, gradient }) => (
               <a
                 key={label}
                 href={href}
@@ -54,9 +54,13 @@ const Footer = () => {
                 rel="noopener noreferrer"
                 aria-label={label}
                 style={color ? { color } : undefined}
-                className={`hover:opacity-80 transition-opacity ${color ? '' : 'text-foreground'}`}
+                className={
+                  gradient
+                    ? 'hover:opacity-80 transition-opacity inline-flex items-center justify-center h-7 w-7 rounded-md text-white bg-gradient-to-tr from-yellow-400 via-pink-500 to-purple-600'
+                    : `hover:opacity-80 transition-opacity ${color ? '' : 'text-foreground'}`
+                }
               >
-                <Icon className="h-5 w-5" />
+                <Icon className={gradient ? 'h-4 w-4' : 'h-5 w-5'} />
               </a>
             ))}
           </div>
