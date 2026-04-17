@@ -1,24 +1,14 @@
-import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
-import { useAuth } from '@/contexts/AuthContext';
+import { useRole } from './useRole';
 
+/**
+ * Backwards-compatible hook. Returns `true` for any admin-tier role
+ * (super_admin or admin). For moderator-only checks, use `useRole()`.
+ */
 export const useIsAdmin = () => {
-  const { user } = useAuth();
-  return useQuery({
-    queryKey: ['is-admin', user?.id],
-    queryFn: async () => {
-      if (!user) return false;
-      const { data } = await supabase
-        .from('user_roles')
-        .select('role')
-        .eq('user_id', user.id)
-        .eq('role', 'admin')
-        .maybeSingle();
-      return !!data;
-    },
-    enabled: !!user,
-    staleTime: 30_000,
-    refetchInterval: 60_000,
-    refetchOnWindowFocus: true,
-  });
+  const { isAdmin, isLoading, isFetching } = useRole();
+  return {
+    data: isAdmin,
+    isLoading,
+    isFetching,
+  };
 };

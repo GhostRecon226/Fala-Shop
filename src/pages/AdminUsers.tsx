@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { useIsAdmin } from '@/hooks/useIsAdmin';
+import { useRole } from '@/hooks/useRole';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 import { logAdminAction } from '@/hooks/useAdminLog';
@@ -39,6 +39,8 @@ const ROLES = ['user', 'moderator', 'admin'] as const;
 
 const roleBadgeVariant = (role: string | null) => {
   switch (role) {
+    case 'super_admin':
+      return 'default';
     case 'admin':
       return 'destructive';
     case 'moderator':
@@ -48,9 +50,15 @@ const roleBadgeVariant = (role: string | null) => {
   }
 };
 
+const formatRole = (role: string | null) => {
+  if (role === 'super_admin') return 'Super Admin';
+  return role || 'user';
+};
+
 const AdminUsers = () => {
   const { user, loading: authLoading } = useAuth();
-  const { data: isAdmin, isLoading: adminLoading } = useIsAdmin();
+  const { isSuperAdmin, isLoading: adminLoading } = useRole();
+  const isAdmin = isSuperAdmin; // only super_admin can access user management
   const [users, setUsers] = useState<UserWithRole[]>([]);
   const [loading, setLoading] = useState(true);
   const [updatingId, setUpdatingId] = useState<string | null>(null);
@@ -263,6 +271,8 @@ const AdminUsers = () => {
                 {paginatedUsers.map(u => {
                   const effectiveRole = u.role || 'user';
                   const isSelf = u.user_id === user?.id;
+                  const isProtectedSuperAdmin = u.role === 'super_admin';
+                  const locked = isSelf || isProtectedSuperAdmin;
 
                   return (
                     <tr key={u.user_id} className={`border-b border-border last:border-0 hover:bg-muted/30 transition-colors ${u.is_banned ? 'opacity-60' : ''}`}>
@@ -275,12 +285,14 @@ const AdminUsers = () => {
                       </td>
                       <td className="px-4 py-3">
                         <Badge variant={roleBadgeVariant(u.role)} className="capitalize">
-                          {effectiveRole}
+                          {formatRole(u.role)}
                         </Badge>
                       </td>
                       <td className="px-4 py-3">
                         {isSelf ? (
                           <span className="text-xs text-muted-foreground">Cannot change own role</span>
+                        ) : isProtectedSuperAdmin ? (
+                          <span className="text-xs text-muted-foreground">Protected (SQL only)</span>
                         ) : (
                           <Select
                             value={effectiveRole}
@@ -301,7 +313,7 @@ const AdminUsers = () => {
                         )}
                       </td>
                       <td className="px-4 py-3">
-                        {!isSelf && (
+                        {!locked && (
                           <div className="flex gap-1">
                             <Button
                               variant="ghost"

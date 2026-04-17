@@ -3,7 +3,7 @@ import { formatPrice } from '@/lib/utils';
 import { Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
-import { useIsAdmin } from '@/hooks/useIsAdmin';
+import { useRole } from '@/hooks/useRole';
 import { ShieldAlert, Package, ChevronDown } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { logAdminAction } from '@/hooks/useAdminLog';
@@ -34,7 +34,8 @@ type OrderItemRow = {
 
 const AdminOrders = () => {
   const { user, loading: authLoading } = useAuth();
-  const { data: isAdmin, isLoading: adminLoading } = useIsAdmin();
+  const { isModerator, isLoading: adminLoading } = useRole();
+  const isAdmin = isModerator; // moderator+ may access orders
   const [orders, setOrders] = useState<OrderRow[]>([]);
   const [orderItems, setOrderItems] = useState<OrderItemRow[]>([]);
   const [loading, setLoading] = useState(true);
