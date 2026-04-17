@@ -1,16 +1,28 @@
 
+Add social media icons (Instagram, Facebook, TikTok, LinkedIn) to the Footer component, positioned in the bottom bar next to the copyright text.
 
-## Plan: Replace Favicon with Company Logo
+## Plan: Add Social Media Links to Footer
 
-The user has uploaded their company's `.ico` file to replace the default Lovable favicon.
+### What to build
+Add four social media icon links to `src/components/Footer.tsx` using Lucide React icons. TikTok isn't in Lucide, so I'll use a small inline SVG for it.
 
-### Steps
+### Layout
+Update the bottom bar (currently just the copyright line) into a flex row:
+- Left: copyright text
+- Right: row of 4 icon links (Instagram, Facebook, TikTok, LinkedIn)
 
-1. **Copy the uploaded `.ico` file** to `public/favicon.ico`, replacing the existing Lovable favicon
-2. **Update `index.html`** to add an explicit `<link rel="icon">` tag pointing to `/favicon.ico`
+On mobile, stack vertically and center.
 
-### Technical Details
+### Icons & links
+- Instagram → `Instagram` from lucide-react
+- Facebook → `Facebook` from lucide-react
+- LinkedIn → `Linkedin` from lucide-react
+- TikTok → inline SVG (not available in lucide-react)
 
-- The uploaded file `user-uploads://WhatsApp_Image_2026-04-13_at_14.49.10.ico` will be copied to `public/favicon.ico`
-- A `<link rel="icon" href="/favicon.ico" type="image/x-icon">` tag will be added to the `<head>` in `index.html`
+Each will be an `<a>` with `target="_blank"`, `rel="noopener noreferrer"`, an `aria-label`, and hover color transition matching existing footer link styles (`text-muted-foreground hover:text-foreground`).
 
+### URLs
+I'll use placeholder `#` URLs initially. The user should provide the actual profile URLs so I can wire them up — but I'll add the structure now so it's visible immediately.
+
+### Question for the user
+After approval, please share the actual profile URLs for each platform so I can replace the placeholders.
