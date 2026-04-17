@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { useIsAdmin } from '@/hooks/useIsAdmin';
+import { useRole } from '@/hooks/useRole';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 import { logAdminAction } from '@/hooks/useAdminLog';
@@ -39,6 +39,8 @@ const ROLES = ['user', 'moderator', 'admin'] as const;
 
 const roleBadgeVariant = (role: string | null) => {
   switch (role) {
+    case 'super_admin':
+      return 'default';
     case 'admin':
       return 'destructive';
     case 'moderator':
@@ -48,9 +50,15 @@ const roleBadgeVariant = (role: string | null) => {
   }
 };
 
+const formatRole = (role: string | null) => {
+  if (role === 'super_admin') return 'Super Admin';
+  return role || 'user';
+};
+
 const AdminUsers = () => {
   const { user, loading: authLoading } = useAuth();
-  const { data: isAdmin, isLoading: adminLoading } = useIsAdmin();
+  const { isSuperAdmin, isLoading: adminLoading } = useRole();
+  const isAdmin = isSuperAdmin; // only super_admin can access user management
   const [users, setUsers] = useState<UserWithRole[]>([]);
   const [loading, setLoading] = useState(true);
   const [updatingId, setUpdatingId] = useState<string | null>(null);
