@@ -526,6 +526,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      ban_user_by_admin: {
+        Args: { _target_user_id: string }
+        Returns: undefined
+      }
       delete_email: {
         Args: { message_id: number; queue_name: string }
         Returns: boolean
@@ -537,6 +541,13 @@ export type Database = {
       enqueue_email: {
         Args: { payload: Json; queue_name: string }
         Returns: number
+      }
+      has_min_role: {
+        Args: {
+          _min_role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
       }
       has_role: {
         Args: {
@@ -590,6 +601,10 @@ export type Database = {
           _role: Database["public"]["Enums"]["app_role"]
           _target_user_id: string
         }
+        Returns: undefined
+      }
+      unban_user_by_admin: {
+        Args: { _target_user_id: string }
         Returns: undefined
       }
       validate_coupon:
