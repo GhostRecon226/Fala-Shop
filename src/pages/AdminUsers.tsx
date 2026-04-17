@@ -271,6 +271,8 @@ const AdminUsers = () => {
                 {paginatedUsers.map(u => {
                   const effectiveRole = u.role || 'user';
                   const isSelf = u.user_id === user?.id;
+                  const isProtectedSuperAdmin = u.role === 'super_admin';
+                  const locked = isSelf || isProtectedSuperAdmin;
 
                   return (
                     <tr key={u.user_id} className={`border-b border-border last:border-0 hover:bg-muted/30 transition-colors ${u.is_banned ? 'opacity-60' : ''}`}>
@@ -283,12 +285,14 @@ const AdminUsers = () => {
                       </td>
                       <td className="px-4 py-3">
                         <Badge variant={roleBadgeVariant(u.role)} className="capitalize">
-                          {effectiveRole}
+                          {formatRole(u.role)}
                         </Badge>
                       </td>
                       <td className="px-4 py-3">
                         {isSelf ? (
                           <span className="text-xs text-muted-foreground">Cannot change own role</span>
+                        ) : isProtectedSuperAdmin ? (
+                          <span className="text-xs text-muted-foreground">Protected (SQL only)</span>
                         ) : (
                           <Select
                             value={effectiveRole}
@@ -309,7 +313,7 @@ const AdminUsers = () => {
                         )}
                       </td>
                       <td className="px-4 py-3">
-                        {!isSelf && (
+                        {!locked && (
                           <div className="flex gap-1">
                             <Button
                               variant="ghost"
