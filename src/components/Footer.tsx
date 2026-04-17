@@ -8,10 +8,10 @@ const TikTokIcon = ({ className }: { className?: string }) => (
 );
 
 const socials = [
-  { label: 'Instagram', href: '#', Icon: Instagram, color: '#E4405F' },
-  { label: 'Facebook', href: '#', Icon: Facebook, color: '#1877F2' },
-  { label: 'TikTok', href: '#', Icon: TikTokIcon, color: undefined },
-  { label: 'LinkedIn', href: '#', Icon: Linkedin, color: '#0A66C3' },
+  { label: 'Instagram', href: '#', Icon: Instagram, gradient: true, color: undefined },
+  { label: 'Facebook', href: '#', Icon: Facebook, gradient: false, color: '#1877F2' },
+  { label: 'TikTok', href: '#', Icon: TikTokIcon, gradient: false, color: undefined },
+  { label: 'LinkedIn', href: '#', Icon: Linkedin, gradient: false, color: '#0A66C3' },
 ];
 
 const Footer = () => {
