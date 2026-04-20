@@ -325,6 +325,48 @@ export type Database = {
         }
         Relationships: []
       }
+      page_views: {
+        Row: {
+          duration_seconds: number | null
+          id: string
+          last_seen_at: string
+          left_at: string | null
+          page_title: string | null
+          path: string
+          referrer: string | null
+          session_id: string
+          user_agent: string | null
+          user_id: string | null
+          viewed_at: string
+        }
+        Insert: {
+          duration_seconds?: number | null
+          id?: string
+          last_seen_at?: string
+          left_at?: string | null
+          page_title?: string | null
+          path: string
+          referrer?: string | null
+          session_id: string
+          user_agent?: string | null
+          user_id?: string | null
+          viewed_at?: string
+        }
+        Update: {
+          duration_seconds?: number | null
+          id?: string
+          last_seen_at?: string
+          left_at?: string | null
+          page_title?: string | null
+          path?: string
+          referrer?: string | null
+          session_id?: string
+          user_agent?: string | null
+          user_id?: string | null
+          viewed_at?: string
+        }
+        Relationships: []
+      }
       product_images: {
         Row: {
           created_at: string
@@ -584,6 +626,7 @@ export type Database = {
         }
         Returns: number
       }
+      purge_old_page_views: { Args: { _days?: number }; Returns: number }
       read_email_batch: {
         Args: { batch_size: number; queue_name: string; vt: number }
         Returns: {
@@ -605,6 +648,16 @@ export type Database = {
       }
       unban_user_by_admin: {
         Args: { _target_user_id: string }
+        Returns: undefined
+      }
+      update_page_view: {
+        Args: {
+          _duration_seconds?: number
+          _heartbeat?: boolean
+          _id: string
+          _left_at?: string
+          _session_id: string
+        }
         Returns: undefined
       }
       validate_coupon:

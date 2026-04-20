@@ -7,6 +7,7 @@ type Tab = { label: string; path: string; minRole: AppRole };
 const tabs: Tab[] = [
   { label: 'Dashboard', path: '/admin', minRole: 'moderator' },
   { label: 'Orders', path: '/admin/orders', minRole: 'moderator' },
+  { label: 'Live Customers', path: '/admin/live', minRole: 'admin' },
   { label: 'Products', path: '/admin/products', minRole: 'admin' },
   { label: 'Coupons', path: '/admin/coupons', minRole: 'admin' },
   { label: 'Activity Log', path: '/admin/activity', minRole: 'admin' },
