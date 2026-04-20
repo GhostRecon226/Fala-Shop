@@ -9,7 +9,7 @@ const TikTokIcon = ({ className }: { className?: string }) => (
 
 const socials = [
   { label: 'Instagram', href: 'https://www.instagram.com/falaproducts?igsh=Ym0zZGV1b29rM2hu', Icon: Instagram, gradient: true, color: undefined },
-  { label: 'Facebook', href: 'https://www.facebook.com/share/17U79VL1us/?mibextid=wwXIfr', Icon: Facebook, gradient: false, color: '#1877F2' },
+  { label: 'Facebook', href: 'https://www.facebook.com/share/1Ht627KNyC/?mibextid=wwXIfr', Icon: Facebook, gradient: false, color: '#1877F2' },
   { label: 'TikTok', href: '#', Icon: TikTokIcon, gradient: false, color: undefined },
   { label: 'LinkedIn', href: '#', Icon: Linkedin, gradient: false, color: '#0A66C3' },
 ];
