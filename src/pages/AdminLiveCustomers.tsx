@@ -148,6 +148,187 @@ const AdminLiveCustomers = () => {
   if (!isAdmin) return <div className="container py-8">Not authorized.</div>;
 
   return (
+    <AdminLiveCustomersInner
+      activeBySession={activeBySession}
+      recentRows={recentQuery.data ?? []}
+      emails={emails}
+      filterFn={filterFn}
+      search={search}
+      setSearch={setSearch}
+      handlePurge={handlePurge}
+    />
+  );
+};
+
+type InnerProps = {
+  activeBySession: PageView[];
+  recentRows: PageView[];
+  emails: Record<string, string>;
+  filterFn: (r: PageView) => boolean;
+  search: string;
+  setSearch: (s: string) => void;
+  handlePurge: () => void;
+};
+
+const AbandonedCartsPanel = ({ emails }: { emails: Record<string, string> }) => {
+  const [sending, setSending] = useState<Record<string, boolean>>({});
+
+  const abandoned = useQuery({
+    queryKey: ['abandoned-carts'],
+    queryFn: async () => {
+      const oneHourAgo = new Date(Date.now() - 60 * 60_000).toISOString();
+
+      // Latest page view per logged-in user within last hour
+      const { data: pv, error: pvErr } = await supabase
+        .from('page_views')
+        .select('user_id, path, viewed_at, last_seen_at')
+        .not('user_id', 'is', null)
+        .gte('viewed_at', oneHourAgo)
+        .order('viewed_at', { ascending: false })
+        .limit(500);
+      if (pvErr) throw pvErr;
+
+      const latestByUser = new Map<string, { path: string; viewed_at: string; last_seen_at: string }>();
+      for (const row of pv ?? []) {
+        if (!row.user_id) continue;
+        if (!latestByUser.has(row.user_id)) {
+          latestByUser.set(row.user_id, {
+            path: row.path,
+            viewed_at: row.viewed_at,
+            last_seen_at: row.last_seen_at,
+          });
+        }
+      }
+
+      // Filter to those whose latest path is /cart or /checkout
+      const candidateIds: string[] = [];
+      latestByUser.forEach((v, uid) => {
+        if (v.path === '/cart' || v.path === '/checkout') candidateIds.push(uid);
+      });
+      if (candidateIds.length === 0) return [];
+
+      // Exclude users who have placed an order in the last hour
+      const { data: recentOrders } = await supabase
+        .from('orders')
+        .select('user_id')
+        .gte('created_at', oneHourAgo)
+        .in('user_id', candidateIds);
+      const ordered = new Set((recentOrders ?? []).map(o => o.user_id));
+
+      const finalIds = candidateIds.filter(id => !ordered.has(id));
+      if (finalIds.length === 0) return [];
+
+      // Fetch cart items for each
+      const { data: cartItems } = await supabase
+        .from('cart_items')
+        .select('user_id, quantity')
+        .in('user_id', finalIds);
+      const cartByUser = new Map<string, number>();
+      for (const ci of cartItems ?? []) {
+        cartByUser.set(ci.user_id, (cartByUser.get(ci.user_id) ?? 0) + (ci.quantity ?? 0));
+      }
+
+      return finalIds
+        .map(uid => {
+          const meta = latestByUser.get(uid)!;
+          return {
+            user_id: uid,
+            path: meta.path,
+            last_seen_at: meta.last_seen_at,
+            item_count: cartByUser.get(uid) ?? 0,
+          };
+        })
+        .filter(r => r.item_count > 0)
+        .sort((a, b) => +new Date(b.last_seen_at) - +new Date(a.last_seen_at));
+    },
+    refetchInterval: 30_000,
+  });
+
+  const sendReminder = async (userId: string, itemCount: number) => {
+    const email = emails[userId];
+    if (!email) {
+      toast.error('Customer email not loaded yet — try again in a moment');
+      return;
+    }
+    setSending(s => ({ ...s, [userId]: true }));
+    try {
+      const customerName = email.split('@')[0];
+      const { error } = await supabase.functions.invoke('send-transactional-email', {
+        body: {
+          templateName: 'cart-reminder',
+          recipientEmail: email,
+          idempotencyKey: `cart-reminder-${userId}-${Math.floor(Date.now() / (60 * 60_000))}`,
+          templateData: { customerName, itemCount },
+        },
+      });
+      if (error) throw error;
+      toast.success(`Reminder sent to ${email}`);
+    } catch (e: any) {
+      toast.error(e?.message ?? 'Failed to send reminder');
+    } finally {
+      setSending(s => ({ ...s, [userId]: false }));
+    }
+  };
+
+  const rows = abandoned.data ?? [];
+
+  return (
+    <Card className="p-4 mb-8">
+      <div className="flex items-center justify-between mb-3">
+        <div>
+          <h2 className="font-semibold">Abandoned carts</h2>
+          <p className="text-xs text-muted-foreground">
+            Customers whose last page was Cart or Checkout in the past hour, with items still in cart and no recent order.
+          </p>
+        </div>
+        <Badge variant="secondary">{rows.length}</Badge>
+      </div>
+      {rows.length === 0 ? (
+        <p className="text-sm text-muted-foreground">No abandoned carts right now.</p>
+      ) : (
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Customer</TableHead>
+              <TableHead>Last page</TableHead>
+              <TableHead>Items in cart</TableHead>
+              <TableHead>Last seen</TableHead>
+              <TableHead></TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {rows.map(row => {
+              const email = emails[row.user_id] ?? 'Loading…';
+              const ago = Math.round((Date.now() - new Date(row.last_seen_at).getTime()) / 60_000);
+              return (
+                <TableRow key={row.user_id}>
+                  <TableCell className="font-medium">{email}</TableCell>
+                  <TableCell><code className="text-xs">{row.path}</code></TableCell>
+                  <TableCell>{row.item_count}</TableCell>
+                  <TableCell>{ago < 1 ? 'just now' : `${ago}m ago`}</TableCell>
+                  <TableCell>
+                    <Button
+                      size="sm"
+                      onClick={() => sendReminder(row.user_id, row.item_count)}
+                      disabled={!!sending[row.user_id] || !emails[row.user_id]}
+                    >
+                      {sending[row.user_id] ? 'Sending…' : 'Send reminder'}
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              );
+            })}
+          </TableBody>
+        </Table>
+      )}
+    </Card>
+  );
+};
+
+const AdminLiveCustomersInner = ({
+  activeBySession, recentRows, emails, filterFn, search, setSearch, handlePurge,
+}: InnerProps) => {
+  return (
     <div className="container py-8">
       <AdminNav />
 
