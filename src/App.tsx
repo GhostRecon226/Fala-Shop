@@ -25,14 +25,50 @@ import AdminDashboard from "./pages/AdminDashboard";
 import AdminUsers from "./pages/AdminUsers";
 import AdminActivityLog from "./pages/AdminActivityLog";
 import AdminCoupons from "./pages/AdminCoupons";
+import AdminLiveCustomers from "./pages/AdminLiveCustomers";
+import AdminCustomerJourney from "./pages/AdminCustomerJourney";
 import AccountSettings from "./pages/AccountSettings";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
 import ShippingReturns from "./pages/ShippingReturns";
 import Unsubscribe from "./pages/Unsubscribe";
 import ResetPassword from "./pages/ResetPassword";
+import { usePageTracking } from "./hooks/usePageTracking";
 
 const queryClient = new QueryClient();
+
+const TrackedRoutes = () => {
+  usePageTracking();
+  return (
+    <Routes>
+      <Route path="/" element={<Index />} />
+      <Route path="/shop" element={<Shop />} />
+      <Route path="/sale" element={<Sale />} />
+      <Route path="/product/:id" element={<ProductDetail />} />
+      <Route path="/cart" element={<Cart />} />
+      <Route path="/checkout" element={<Checkout />} />
+      <Route path="/order-confirmation" element={<OrderConfirmation />} />
+      <Route path="/auth" element={<Auth />} />
+      <Route path="/orders" element={<Orders />} />
+      <Route path="/admin" element={<AdminDashboard />} />
+      <Route path="/admin/orders" element={<AdminOrders />} />
+      <Route path="/admin/products" element={<AdminProducts />} />
+      <Route path="/admin/users" element={<AdminUsers />} />
+      <Route path="/admin/activity" element={<AdminActivityLog />} />
+      <Route path="/admin/coupons" element={<AdminCoupons />} />
+      <Route path="/admin/live" element={<AdminLiveCustomers />} />
+      <Route path="/admin/live/:userId" element={<AdminCustomerJourney />} />
+      <Route path="/account/settings" element={<AccountSettings />} />
+      <Route path="/wishlist" element={<Wishlist />} />
+      <Route path="/about" element={<About />} />
+      <Route path="/contact" element={<Contact />} />
+      <Route path="/shipping-returns" element={<ShippingReturns />} />
+      <Route path="/unsubscribe" element={<Unsubscribe />} />
+      <Route path="/reset-password" element={<ResetPassword />} />
+      <Route path="*" element={<NotFound />} />
+    </Routes>
+  );
+};
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -46,31 +82,7 @@ const App = () => (
           <div className="flex min-h-screen flex-col">
             <Navbar />
             <main className="flex-1">
-              <Routes>
-                <Route path="/" element={<Index />} />
-                <Route path="/shop" element={<Shop />} />
-                <Route path="/sale" element={<Sale />} />
-                <Route path="/product/:id" element={<ProductDetail />} />
-                <Route path="/cart" element={<Cart />} />
-                <Route path="/checkout" element={<Checkout />} />
-                <Route path="/order-confirmation" element={<OrderConfirmation />} />
-                <Route path="/auth" element={<Auth />} />
-                <Route path="/orders" element={<Orders />} />
-                <Route path="/admin" element={<AdminDashboard />} />
-                <Route path="/admin/orders" element={<AdminOrders />} />
-                <Route path="/admin/products" element={<AdminProducts />} />
-                <Route path="/admin/users" element={<AdminUsers />} />
-                <Route path="/admin/activity" element={<AdminActivityLog />} />
-                <Route path="/admin/coupons" element={<AdminCoupons />} />
-                <Route path="/account/settings" element={<AccountSettings />} />
-                <Route path="/wishlist" element={<Wishlist />} />
-                <Route path="/about" element={<About />} />
-                <Route path="/contact" element={<Contact />} />
-                <Route path="/shipping-returns" element={<ShippingReturns />} />
-                <Route path="/unsubscribe" element={<Unsubscribe />} />
-                <Route path="/reset-password" element={<ResetPassword />} />
-                <Route path="*" element={<NotFound />} />
-              </Routes>
+              <TrackedRoutes />
             </main>
             <Footer />
           </div>
