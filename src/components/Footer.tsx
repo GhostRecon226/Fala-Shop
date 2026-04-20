@@ -44,7 +44,9 @@ const Footer = () => {
           </div>
         </div>
         <div className="mt-10 pt-6 border-t border-border flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p className="text-xs text-muted-foreground text-center sm:text-left">© 2026 Fala Production Ltd. All rights reserved.</p>
+          <p className="text-xs text-muted-foreground text-center sm:text-left">
+            © 2026 Fala Production Ltd. All rights reserved. <span className="block sm:inline opacity-80">We track page views to improve service and provide support.</span>
+          </p>
           <div className="flex items-center gap-4">
             {socials.map(({ label, href, Icon, color, gradient }) => (
               <a
