@@ -254,6 +254,7 @@ const AdminLiveCustomers = () => {
             })}
           </TableBody>
         </Table>
+        </div>
       </Card>
     </div>
   );
