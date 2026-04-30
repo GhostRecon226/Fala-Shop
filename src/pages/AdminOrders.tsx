@@ -123,19 +123,19 @@ const AdminOrders = () => {
   }, {});
 
   return (
-    <div className="container py-10">
+    <div className="container px-4 sm:px-6 py-6 sm:py-10">
       <div className="flex items-center gap-3 mb-4">
         <ShieldAlert size={24} className="text-primary" />
-        <h1 className="text-3xl font-bold tracking-tight text-foreground">Admin Panel</h1>
+        <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground">Admin Panel</h1>
       </div>
 
       <AdminNav />
 
       {/* Summary cards */}
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mb-8">
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-2 sm:gap-3 mb-8">
         <button
           onClick={() => setFilterStatus('all')}
-          className={`rounded-lg border p-4 text-left transition-colors ${filterStatus === 'all' ? 'border-primary bg-primary/5' : 'border-border hover:border-primary/40'}`}
+          className={`rounded-lg border p-3 sm:p-4 text-left transition-colors ${filterStatus === 'all' ? 'border-primary bg-primary/5' : 'border-border hover:border-primary/40'}`}
         >
           <p className="text-2xl font-bold text-foreground tabular-nums">{orders.length}</p>
           <p className="text-xs text-muted-foreground">All Orders</p>
@@ -144,7 +144,7 @@ const AdminOrders = () => {
           <button
             key={s}
             onClick={() => setFilterStatus(s)}
-            className={`rounded-lg border p-4 text-left transition-colors ${filterStatus === s ? 'border-primary bg-primary/5' : 'border-border hover:border-primary/40'}`}
+            className={`rounded-lg border p-3 sm:p-4 text-left transition-colors ${filterStatus === s ? 'border-primary bg-primary/5' : 'border-border hover:border-primary/40'}`}
           >
             <p className="text-2xl font-bold text-foreground tabular-nums">{statusCounts[s] || 0}</p>
             <p className="text-xs text-muted-foreground capitalize">{s}</p>
@@ -166,8 +166,8 @@ const AdminOrders = () => {
             const addr = order.shipping_address || {};
             return (
               <div key={order.id} className="border border-border rounded-lg overflow-hidden">
-                <div className="flex flex-wrap items-center justify-between gap-4 px-5 py-4 bg-muted/50">
-                  <div className="flex flex-wrap gap-6 text-sm">
+                <div className="flex flex-wrap items-center justify-between gap-3 sm:gap-4 px-4 sm:px-5 py-4 bg-muted/50">
+                  <div className="flex flex-wrap gap-3 sm:gap-6 text-sm">
                     <div>
                       <span className="text-muted-foreground">Date</span>
                       <p className="font-medium text-foreground">{new Date(order.created_at).toLocaleDateString()}</p>
@@ -199,7 +199,7 @@ const AdminOrders = () => {
                   </div>
 
                   {/* Status selector */}
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-3 w-full sm:w-auto">
                     <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium capitalize ${
                       order.status === 'confirmed' || order.status === 'delivered'
                         ? 'bg-green-500/10 text-green-600'
@@ -209,12 +209,12 @@ const AdminOrders = () => {
                         ? 'bg-yellow-500/10 text-yellow-600'
                         : 'bg-primary/10 text-primary'
                     }`}>{order.status}</span>
-                    <div className="relative">
+                    <div className="relative flex-1 sm:flex-none">
                       <select
                         value={order.status}
                         onChange={e => updateStatus(order.id, e.target.value)}
                         disabled={updatingId === order.id}
-                        className="appearance-none pl-3 pr-8 py-1.5 rounded-md border border-border bg-background text-sm font-medium text-foreground capitalize cursor-pointer focus:ring-2 focus:ring-ring outline-none disabled:opacity-50"
+                        className="appearance-none w-full sm:w-auto pl-3 pr-8 py-1.5 rounded-md border border-border bg-background text-sm font-medium text-foreground capitalize cursor-pointer focus:ring-2 focus:ring-ring outline-none disabled:opacity-50"
                       >
                         {STATUSES.map(s => (
                           <option key={s} value={s}>{s}</option>
@@ -228,7 +228,7 @@ const AdminOrders = () => {
                 {/* Items */}
                 <div className="divide-y divide-border">
                   {items.map(item => (
-                    <div key={item.id} className="flex items-center justify-between px-5 py-3 text-sm">
+                    <div key={item.id} className="flex items-center justify-between px-4 sm:px-5 py-3 text-sm gap-3">
                       <span className="text-foreground">{item.product_name || 'Unknown'}{item.size ? ` (${item.size})` : ''} <span className="text-muted-foreground">× {item.quantity}</span></span>
                       <span className="font-medium text-foreground tabular-nums">{formatPrice(Number(item.price) * item.quantity)}</span>
                     </div>

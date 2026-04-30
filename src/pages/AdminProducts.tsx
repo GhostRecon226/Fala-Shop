@@ -294,17 +294,17 @@ const AdminProducts = () => {
   }
 
   return (
-    <div className="container py-10">
+    <div className="container px-4 sm:px-6 py-6 sm:py-10">
       <div className="flex items-center gap-3 mb-4">
         <ShieldAlert size={24} className="text-primary" />
-        <h1 className="text-3xl font-bold tracking-tight text-foreground">Admin Panel</h1>
+        <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground">Admin Panel</h1>
       </div>
 
       <AdminNav />
 
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
         <h2 className="text-xl font-semibold text-foreground">Products ({products.length})</h2>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           {selectedIds.size > 0 && (
             <Button variant="outline" size="sm" onClick={() => { setBulkMode('set'); setBulkDialogOpen(true); }}>
               <Tag size={14} className="mr-1" /> Set Sale Price ({selectedIds.size})
@@ -320,7 +320,8 @@ const AdminProducts = () => {
         <div className="text-center py-10 text-muted-foreground">Loading products...</div>
       ) : (
         <div className="border border-border rounded-lg overflow-hidden">
-          <Table>
+          <div className="overflow-x-auto">
+          <Table className="min-w-[720px]">
             <TableHeader>
               <TableRow>
                 <TableHead className="w-10">
@@ -381,12 +382,13 @@ const AdminProducts = () => {
               ))}
             </TableBody>
           </Table>
+          </div>
         </div>
       )}
 
       {/* Add / Edit Dialog */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="max-w-md sm:max-w-lg max-h-[90vh] flex flex-col">
+        <DialogContent className="w-[calc(100vw-2rem)] max-w-md sm:max-w-lg max-h-[90vh] flex flex-col p-4 sm:p-6">
           <DialogHeader>
             <DialogTitle>{editingId ? 'Edit Product' : 'Add Product'}</DialogTitle>
             <DialogDescription>
@@ -407,7 +409,7 @@ const AdminProducts = () => {
                 </SelectContent>
               </Select>
             </div>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
               <div>
                 <label className="text-sm font-medium text-foreground">Price *</label>
                 <Input type="number" step="0.01" value={form.price} onChange={e => setForm(f => ({ ...f, price: e.target.value }))} />
@@ -578,16 +580,16 @@ const AdminProducts = () => {
               <label htmlFor="featured" className="text-sm font-medium text-foreground cursor-pointer">Featured product</label>
             </div>
           </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setDialogOpen(false)}>Cancel</Button>
-            <Button onClick={handleSave} disabled={saving || uploading}>{saving ? 'Saving...' : 'Save'}</Button>
+          <DialogFooter className="gap-2">
+            <Button variant="outline" className="w-full sm:w-auto" onClick={() => setDialogOpen(false)}>Cancel</Button>
+            <Button className="w-full sm:w-auto" onClick={handleSave} disabled={saving || uploading}>{saving ? 'Saving...' : 'Save'}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
       {/* Delete Confirmation */}
       <Dialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
-        <DialogContent className="max-w-sm">
+        <DialogContent className="w-[calc(100vw-2rem)] max-w-sm">
           <DialogHeader>
             <DialogTitle>Delete Product</DialogTitle>
             <DialogDescription>This action cannot be undone. Are you sure?</DialogDescription>
@@ -601,7 +603,7 @@ const AdminProducts = () => {
 
       {/* Bulk Compare-at-Price Dialog */}
       <Dialog open={bulkDialogOpen} onOpenChange={setBulkDialogOpen}>
-        <DialogContent className="max-w-sm">
+        <DialogContent className="w-[calc(100vw-2rem)] max-w-sm">
           <DialogHeader>
             <DialogTitle>Bulk Set Compare-at-Price</DialogTitle>
             <DialogDescription>

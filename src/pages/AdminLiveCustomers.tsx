@@ -173,7 +173,8 @@ const AdminLiveCustomers = () => {
         {activeBySession.length === 0 ? (
           <p className="text-sm text-muted-foreground">No active visitors right now.</p>
         ) : (
-          <Table>
+          <div className="overflow-x-auto">
+          <Table className="min-w-[640px]">
             <TableHeader>
               <TableRow>
                 <TableHead>Visitor</TableHead>
@@ -208,21 +209,23 @@ const AdminLiveCustomers = () => {
               })}
             </TableBody>
           </Table>
+          </div>
         )}
       </Card>
 
       {/* Recent activity */}
       <Card className="p-4">
-        <div className="flex items-center justify-between mb-3 gap-3">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-3 gap-3">
           <h2 className="font-semibold">Recent activity</h2>
           <Input
             placeholder="Filter by email, path, or session…"
             value={search}
             onChange={e => setSearch(e.target.value)}
-            className="max-w-xs"
+            className="w-full sm:max-w-xs"
           />
         </div>
-        <Table>
+        <div className="overflow-x-auto">
+        <Table className="min-w-[560px]">
           <TableHeader>
             <TableRow>
               <TableHead>Visitor</TableHead>
@@ -372,7 +375,8 @@ const AbandonedCartsPanel = ({ emails }: { emails: Record<string, string> }) => 
       {rows.length === 0 ? (
         <p className="text-sm text-muted-foreground">No abandoned carts right now.</p>
       ) : (
-        <Table>
+        <div className="overflow-x-auto">
+        <Table className="min-w-[600px]">
           <TableHeader>
             <TableRow>
               <TableHead>Customer</TableHead>
@@ -406,6 +410,7 @@ const AbandonedCartsPanel = ({ emails }: { emails: Record<string, string> }) => 
             })}
           </TableBody>
         </Table>
+        </div>
       )}
     </Card>
   );
