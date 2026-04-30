@@ -20,13 +20,13 @@ const AdminNav = () => {
   const visibleTabs = tabs.filter(t => hasMinRole(t.minRole));
 
   return (
-    <div className="flex gap-1 mb-8 border-b border-border overflow-x-auto">
+    <div className="flex gap-1 mb-6 sm:mb-8 border-b border-border overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0 scrollbar-thin">
       {visibleTabs.map(tab => (
         <Link
           key={tab.path}
           to={tab.path}
           className={cn(
-            'px-4 py-2 text-sm font-medium transition-colors border-b-2 -mb-px',
+            'px-4 py-2 text-sm font-medium transition-colors border-b-2 -mb-px whitespace-nowrap shrink-0',
             pathname === tab.path
               ? 'border-primary text-primary'
               : 'border-transparent text-muted-foreground hover:text-foreground'

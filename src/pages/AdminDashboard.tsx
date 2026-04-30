@@ -139,10 +139,10 @@ const AdminDashboard = () => {
   ];
 
   return (
-    <div className="container py-10">
+    <div className="container px-4 sm:px-6 py-6 sm:py-10">
       <div className="flex items-center gap-3 mb-4">
         <ShieldAlert size={24} className="text-primary" />
-        <h1 className="text-3xl font-bold tracking-tight text-foreground">Admin Panel</h1>
+        <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground">Admin Panel</h1>
       </div>
 
       <AdminNav />
@@ -152,9 +152,9 @@ const AdminDashboard = () => {
       ) : (
         <>
           {/* Metric cards */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mb-8">
             {metricCards.map(card => (
-              <div key={card.label} className="rounded-lg border border-border bg-card p-5">
+              <div key={card.label} className="rounded-lg border border-border bg-card p-4 sm:p-5">
                 <div className="flex items-center justify-between mb-3">
                   <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">{card.label}</span>
                   <card.icon size={18} className={card.color} />
@@ -192,7 +192,7 @@ const AdminDashboard = () => {
           </div>
 
           {/* Revenue chart */}
-          <div className="rounded-lg border border-border bg-card p-5 mb-8">
+          <div className="rounded-lg border border-border bg-card p-3 sm:p-5 mb-8">
             <h2 className="text-sm font-medium text-muted-foreground uppercase tracking-wide mb-4">Revenue — Last 30 Days</h2>
             <div className="h-52">
               <ResponsiveContainer width="100%" height="100%">
@@ -239,12 +239,12 @@ const AdminDashboard = () => {
                 {recentOrders.map(order => {
                   const addr = order.shipping_address || {};
                   return (
-                    <div key={order.id} className="flex items-center justify-between px-5 py-3 text-sm">
-                      <div>
-                        <p className="font-medium text-foreground">{addr.firstName} {addr.lastName}</p>
+                    <div key={order.id} className="flex items-center justify-between px-4 sm:px-5 py-3 text-sm gap-3">
+                      <div className="min-w-0 flex-1">
+                        <p className="font-medium text-foreground truncate">{addr.firstName} {addr.lastName}</p>
                         <p className="text-xs text-muted-foreground">{new Date(order.created_at).toLocaleDateString()}</p>
                       </div>
-                      <div className="text-right">
+                      <div className="text-right shrink-0">
                         <p className="font-medium text-foreground tabular-nums">{formatPrice(Number(order.total))}</p>
                         <p className="text-xs text-muted-foreground capitalize">{order.status}</p>
                       </div>
