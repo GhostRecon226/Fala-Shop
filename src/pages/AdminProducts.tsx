@@ -388,14 +388,14 @@ const AdminProducts = () => {
 
       {/* Add / Edit Dialog */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="w-[calc(100vw-2rem)] max-w-md sm:max-w-lg max-h-[90vh] flex flex-col p-4 sm:p-6">
-          <DialogHeader>
+        <DialogContent className="p-0 gap-0 flex flex-col w-screen h-[100dvh] max-w-none rounded-none sm:w-[calc(100vw-2rem)] sm:max-w-lg sm:h-auto sm:max-h-[90vh] sm:rounded-lg">
+          <DialogHeader className="px-4 sm:px-6 pt-4 sm:pt-6 pb-3 border-b border-border shrink-0">
             <DialogTitle>{editingId ? 'Edit Product' : 'Add Product'}</DialogTitle>
             <DialogDescription>
               {editingId ? 'Update product details below.' : 'Fill in the details for the new product.'}
             </DialogDescription>
           </DialogHeader>
-          <div className="space-y-4 flex-1 overflow-y-auto pr-1 -mr-1">
+          <div className="space-y-4 flex-1 overflow-y-auto px-4 sm:px-6 py-4">
             <div>
               <label className="text-sm font-medium text-foreground">Name *</label>
               <Input value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} />
@@ -580,7 +580,7 @@ const AdminProducts = () => {
               <label htmlFor="featured" className="text-sm font-medium text-foreground cursor-pointer">Featured product</label>
             </div>
           </div>
-          <DialogFooter className="gap-2">
+          <DialogFooter className="gap-2 px-4 sm:px-6 py-3 border-t border-border shrink-0 bg-background">
             <Button variant="outline" className="w-full sm:w-auto" onClick={() => setDialogOpen(false)}>Cancel</Button>
             <Button className="w-full sm:w-auto" onClick={handleSave} disabled={saving || uploading}>{saving ? 'Saving...' : 'Save'}</Button>
           </DialogFooter>
