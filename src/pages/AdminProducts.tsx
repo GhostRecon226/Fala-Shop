@@ -386,14 +386,14 @@ const AdminProducts = () => {
 
       {/* Add / Edit Dialog */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="max-w-md">
+        <DialogContent className="max-w-md sm:max-w-lg max-h-[90vh] flex flex-col">
           <DialogHeader>
             <DialogTitle>{editingId ? 'Edit Product' : 'Add Product'}</DialogTitle>
             <DialogDescription>
               {editingId ? 'Update product details below.' : 'Fill in the details for the new product.'}
             </DialogDescription>
           </DialogHeader>
-          <div className="space-y-4">
+          <div className="space-y-4 flex-1 overflow-y-auto pr-1 -mr-1">
             <div>
               <label className="text-sm font-medium text-foreground">Name *</label>
               <Input value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} />
