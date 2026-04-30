@@ -178,22 +178,22 @@ const Checkout = () => {
     }`;
 
   return (
-    <div className="container py-10 relative">
+    <div className="container px-4 sm:px-6 py-6 sm:py-10 pb-32 lg:pb-10 relative">
       {submitting && (
         <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-background/80 backdrop-blur-sm">
           <div className="h-10 w-10 animate-spin rounded-full border-4 border-primary border-t-transparent" />
           <p className="mt-4 text-sm font-medium text-foreground">Initializing payment…</p>
         </div>
       )}
-      <h1 className="text-3xl font-bold tracking-display text-foreground mb-8">Checkout</h1>
+      <h1 className="text-2xl sm:text-3xl font-bold tracking-display text-foreground mb-6 sm:mb-8">Checkout</h1>
 
       <form onSubmit={handleSubmit}>
-        <div className="grid lg:grid-cols-3 gap-10">
+        <div className="grid lg:grid-cols-3 gap-6 lg:gap-10">
           {/* Form */}
           <div className="lg:col-span-2 space-y-6">
             <div>
               <h2 className="text-lg font-semibold text-foreground mb-4">Shipping Details</h2>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="text-xs font-medium text-muted-foreground mb-1 block">First Name</label>
                   <input className={inputClass('firstName')} value={form.firstName} onChange={e => handleChange('firstName', e.target.value)} />
@@ -205,37 +205,37 @@ const Checkout = () => {
                   {errors.lastName && <p className="text-xs text-primary mt-1">{errors.lastName}</p>}
                 </div>
               </div>
-              <div className="grid grid-cols-2 gap-4 mt-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
                 <div>
                   <label className="text-xs font-medium text-muted-foreground mb-1 block">Email</label>
-                  <input type="email" className={inputClass('email')} value={form.email} onChange={e => handleChange('email', e.target.value)} />
+                  <input type="email" inputMode="email" autoComplete="email" className={inputClass('email')} value={form.email} onChange={e => handleChange('email', e.target.value)} />
                   {errors.email && <p className="text-xs text-primary mt-1">{errors.email}</p>}
                 </div>
                 <div>
                   <label className="text-xs font-medium text-muted-foreground mb-1 block">Phone</label>
-                  <input className={inputClass('phone')} value={form.phone} onChange={e => handleChange('phone', e.target.value)} />
+                  <input type="tel" inputMode="tel" autoComplete="tel" className={inputClass('phone')} value={form.phone} onChange={e => handleChange('phone', e.target.value)} />
                   {errors.phone && <p className="text-xs text-primary mt-1">{errors.phone}</p>}
                 </div>
               </div>
               <div className="mt-4">
                 <label className="text-xs font-medium text-muted-foreground mb-1 block">Address</label>
-                <input className={inputClass('address')} value={form.address} onChange={e => handleChange('address', e.target.value)} />
+                <input autoComplete="street-address" className={inputClass('address')} value={form.address} onChange={e => handleChange('address', e.target.value)} />
                 {errors.address && <p className="text-xs text-primary mt-1">{errors.address}</p>}
               </div>
-              <div className="grid grid-cols-3 gap-4 mt-4">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-4">
                 <div>
                   <label className="text-xs font-medium text-muted-foreground mb-1 block">City</label>
-                  <input className={inputClass('city')} value={form.city} onChange={e => handleChange('city', e.target.value)} />
+                  <input autoComplete="address-level2" className={inputClass('city')} value={form.city} onChange={e => handleChange('city', e.target.value)} />
                   {errors.city && <p className="text-xs text-primary mt-1">{errors.city}</p>}
                 </div>
                 <div>
                   <label className="text-xs font-medium text-muted-foreground mb-1 block">State</label>
-                  <input className={inputClass('state')} value={form.state} onChange={e => handleChange('state', e.target.value)} />
+                  <input autoComplete="address-level1" className={inputClass('state')} value={form.state} onChange={e => handleChange('state', e.target.value)} />
                   {errors.state && <p className="text-xs text-primary mt-1">{errors.state}</p>}
                 </div>
                 <div>
                   <label className="text-xs font-medium text-muted-foreground mb-1 block">ZIP Code</label>
-                  <input className={inputClass('zip')} value={form.zip} onChange={e => handleChange('zip', e.target.value)} />
+                  <input inputMode="numeric" autoComplete="postal-code" className={inputClass('zip')} value={form.zip} onChange={e => handleChange('zip', e.target.value)} />
                   {errors.zip && <p className="text-xs text-primary mt-1">{errors.zip}</p>}
                 </div>
               </div>
@@ -244,32 +244,32 @@ const Checkout = () => {
 
           {/* Order Summary */}
           <div className="lg:sticky lg:top-[88px] h-fit">
-            <div className="p-6 rounded-lg card-shadow space-y-4">
+            <div className="p-4 sm:p-6 rounded-lg card-shadow space-y-4">
               <h2 className="text-lg font-semibold text-foreground">Order Summary</h2>
               <div className="space-y-3">
                 {items.map(({ product, quantity, size, color }) => (
-                  <div key={`${product.id}::${size || ''}::${color || ''}`} className="flex justify-between text-sm">
-                    <span className="text-muted-foreground truncate mr-2">
+                  <div key={`${product.id}::${size || ''}::${color || ''}`} className="flex justify-between text-sm gap-2">
+                    <span className="text-muted-foreground truncate min-w-0">
                       {product.name}{size ? ` (${size})` : ''}{color ? ` · ${color}` : ''} × {quantity}
                     </span>
-                    <span className="font-medium tabular-nums">{formatPrice(product.price * quantity)}</span>
+                    <span className="font-medium tabular-nums shrink-0">{formatPrice(product.price * quantity)}</span>
                   </div>
                 ))}
               </div>
               {/* Coupon input */}
               <div className="border-t border-border pt-4">
                 {appliedCoupon ? (
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-muted-foreground">
+                  <div className="flex items-center justify-between text-sm gap-2">
+                    <span className="text-muted-foreground min-w-0 truncate">
                       Coupon <span className="font-mono font-semibold text-foreground">{appliedCoupon.code}</span>
                       {' '}({appliedCoupon.discount_type === 'percentage' ? `${appliedCoupon.discount_value}%` : formatPrice(appliedCoupon.discount_value)})
                     </span>
-                    <button type="button" onClick={handleRemoveCoupon} className="text-xs text-destructive hover:underline">Remove</button>
+                    <button type="button" onClick={handleRemoveCoupon} className="text-xs text-destructive hover:underline shrink-0">Remove</button>
                   </div>
                 ) : (
                   <div className="flex gap-2">
                     <input
-                      className="flex-1 px-3 py-2 rounded-md border border-input text-sm bg-background text-foreground uppercase placeholder:normal-case"
+                      className="flex-1 min-w-0 px-3 py-2 rounded-md border border-input text-sm bg-background text-foreground uppercase placeholder:normal-case"
                       placeholder="Coupon code"
                       value={couponCode}
                       onChange={e => { setCouponCode(e.target.value.toUpperCase()); setCouponError(''); }}
@@ -278,7 +278,7 @@ const Checkout = () => {
                       type="button"
                       onClick={handleApplyCoupon}
                       disabled={couponLoading || !couponCode.trim()}
-                      className="px-3 py-2 rounded-md border border-input text-sm font-medium hover:bg-accent transition-colors disabled:opacity-50"
+                      className="px-3 py-2 rounded-md border border-input text-sm font-medium hover:bg-accent transition-colors disabled:opacity-50 shrink-0"
                     >
                       {couponLoading ? '…' : 'Apply'}
                     </button>
@@ -308,15 +308,34 @@ const Checkout = () => {
                   Payment failed. Your form details have been preserved — try again when you're ready.
                 </div>
               )}
+              {/* Desktop pay button (hidden on mobile, sticky bar handles it) */}
               <button
                 type="submit"
                 disabled={submitting}
                 onClick={() => setPaymentFailed(false)}
-                className="block w-full text-center bg-primary text-primary-foreground py-3 rounded-md text-sm font-semibold hover:opacity-90 transition-all disabled:opacity-50"
+                className="hidden lg:block w-full text-center bg-primary text-primary-foreground py-3 rounded-md text-sm font-semibold hover:opacity-90 transition-all disabled:opacity-50"
               >
                 {submitting ? 'Redirecting to Payment…' : paymentFailed ? 'Retry Payment' : 'Pay with Flutterwave'}
               </button>
             </div>
+          </div>
+        </div>
+
+        {/* Mobile sticky pay bar */}
+        <div className="lg:hidden fixed bottom-0 inset-x-0 z-40 bg-background/95 backdrop-blur border-t border-border px-4 py-3 shadow-[0_-4px_12px_rgba(0,0,0,0.06)]">
+          <div className="flex items-center gap-3">
+            <div className="flex-1 min-w-0">
+              <p className="text-[11px] text-muted-foreground leading-tight">Total</p>
+              <p className="text-base font-bold text-primary tabular-nums leading-tight">{formatPrice(finalTotal)}</p>
+            </div>
+            <button
+              type="submit"
+              disabled={submitting}
+              onClick={() => setPaymentFailed(false)}
+              className="flex-1 text-center bg-primary text-primary-foreground py-3 rounded-md text-sm font-semibold hover:opacity-90 transition-all disabled:opacity-50"
+            >
+              {submitting ? 'Redirecting…' : paymentFailed ? 'Retry' : 'Pay Now'}
+            </button>
           </div>
         </div>
       </form>
