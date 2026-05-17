@@ -8,6 +8,7 @@ import { WishlistProvider } from "@/contexts/WishlistContext";
 import { AuthProvider } from "@/contexts/AuthContext";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import WhatsAppWidget from "@/components/WhatsAppWidget";
 import Index from "./pages/Index";
 import Shop from "./pages/Shop";
 import Sale from "./pages/Sale";
@@ -85,6 +86,7 @@ const App = () => (
               <TrackedRoutes />
             </main>
             <Footer />
+            <WhatsAppWidget />
           </div>
         </BrowserRouter>
       </CartProvider>
