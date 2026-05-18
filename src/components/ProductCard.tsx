@@ -28,7 +28,7 @@ const ProductCard = ({ product, variant = 'default' }: { product: Product; varia
   
 
   return (
-    <div className={`group relative ${isLight ? 'bg-white rounded-xl p-3 shadow-sm' : ''}`}>
+    <div className={`group relative flex flex-col min-w-0 ${isLight ? 'bg-white rounded-xl p-2.5 sm:p-3 shadow-sm' : ''}`}>
       <Link to={`/product/${product.id}`}>
         <div className="relative aspect-square overflow-hidden rounded-lg bg-muted card-shadow transition-all duration-150 ease-[cubic-bezier(0.4,0,0.2,1)] group-hover:card-shadow-hover">
           <img
