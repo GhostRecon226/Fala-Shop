@@ -100,7 +100,7 @@ const Contact = () => {
           <div className="space-y-3">
             <div className="flex items-center gap-3 text-sm text-muted-foreground">
               <Mail className="h-4 w-4 shrink-0" />
-              <span>support@falaproduction.com</span>
+              <a href="mailto:info@falaproduction.com" className="hover:text-foreground transition-colors">info@falaproduction.com</a>
             </div>
             <div className="flex items-center gap-3 text-sm text-muted-foreground">
               <Phone className="h-4 w-4 shrink-0" />
