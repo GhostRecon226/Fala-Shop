@@ -25,7 +25,7 @@ const ProductCard = ({ product, variant = 'default' }: { product: Product; varia
   const subtleClass = isLight ? 'text-neutral-600' : 'text-muted-foreground';
   const priceClass = isLight ? 'text-neutral-900' : 'text-primary';
   const strikeClass = isLight ? 'text-neutral-400' : 'text-muted-foreground';
-  const ctaClass = isLight ? 'text-neutral-900 hover:text-primary' : 'text-primary hover:text-accent';
+  
 
   return (
     <div className={`group relative ${isLight ? 'bg-white rounded-xl p-3 shadow-sm' : ''}`}>
@@ -109,7 +109,7 @@ const ProductCard = ({ product, variant = 'default' }: { product: Product; varia
           </div>
         )}
 
-        <div className="flex flex-wrap items-center gap-x-2 gap-y-1 pt-1">
+        <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-y-2 gap-x-2 pt-1">
           <div className="flex items-center gap-1.5">
             {product.compare_at_price && product.compare_at_price > product.price && (
               <span className={`text-xs line-through tabular-nums ${strikeClass}`}>
@@ -122,7 +122,7 @@ const ProductCard = ({ product, variant = 'default' }: { product: Product; varia
           </div>
           <button
             onClick={() => addItem(product)}
-            className={`text-xs font-medium transition-colors duration-150 ${ctaClass}`}
+            className="w-full sm:w-auto text-xs font-semibold bg-[#5C1340] text-white rounded-md px-3 py-2 transition-all duration-150 hover:opacity-90 active:scale-[0.97]"
           >
             {product.category === 'Solar Fans' ? 'Equip Now' : 'Add to Cart'}
           </button>
