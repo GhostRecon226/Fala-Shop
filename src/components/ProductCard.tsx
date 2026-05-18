@@ -109,7 +109,7 @@ const ProductCard = ({ product, variant = 'default' }: { product: Product; varia
           </div>
         )}
 
-        <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-y-2 gap-x-2 pt-1">
+        <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-y-2 gap-x-2 pt-1 mt-auto">
           <div className="flex items-center gap-1.5">
             {product.compare_at_price && product.compare_at_price > product.price && (
               <span className={`text-xs line-through tabular-nums ${strikeClass}`}>
