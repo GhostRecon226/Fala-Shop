@@ -61,7 +61,7 @@ const Sale = () => {
           <div className="absolute top-4 left-8 text-[120px] font-black text-white/20 select-none rotate-[-8deg]">%</div>
           <div className="absolute bottom-2 right-12 text-[80px] font-black text-white/20 select-none rotate-[12deg]">SALE</div>
         </div>
-        <div className="container relative py-16 md:py-24 text-center">
+        <div className="container relative py-10 md:py-24 text-center">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/20 backdrop-blur-sm text-white/90 text-sm font-medium mb-6">
             <Tag size={14} />
             Limited Time Deals
