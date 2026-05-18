@@ -55,9 +55,9 @@ const ProductCard = ({ product }: { product: Product }) => {
           className={wishlisted ? 'fill-destructive text-destructive' : 'text-muted-foreground hover:text-destructive'}
         />
       </button>
-      <div className="mt-3 space-y-1">
+      <div className="mt-3 space-y-2 pb-3">
         <Link to={`/product/${product.id}`}>
-          <h3 className="text-sm font-semibold text-foreground leading-tight">{product.name}</h3>
+          <h3 className="text-sm font-semibold text-foreground leading-tight line-clamp-2">{product.name}</h3>
         </Link>
         {stats && (
           <div className="flex items-center gap-1">
@@ -71,7 +71,7 @@ const ProductCard = ({ product }: { product: Product }) => {
         {/* Color swatches */}
         {colors.length > 0 && (
           <div className="flex items-center gap-1 flex-wrap">
-            {colors.slice(0, 6).map(color => (
+            {colors.slice(0, 4).map(color => (
               <span
                 key={color}
                 title={color}
@@ -79,8 +79,8 @@ const ProductCard = ({ product }: { product: Product }) => {
                 style={{ backgroundColor: COLOR_SWATCHES[color] || '#9CA3AF' }}
               />
             ))}
-            {colors.length > 6 && (
-              <span className="text-[10px] text-muted-foreground">+{colors.length - 6}</span>
+            {colors.length > 4 && (
+              <span className="text-[10px] text-muted-foreground">+{colors.length - 4}</span>
             )}
           </div>
         )}
@@ -88,7 +88,7 @@ const ProductCard = ({ product }: { product: Product }) => {
         {/* Size badges */}
         {sizes.length > 0 && (
           <div className="flex items-center gap-1 flex-wrap">
-            {sizes.slice(0, 5).map(size => (
+            {sizes.slice(0, 3).map(size => (
               <span
                 key={size}
                 className="text-[10px] font-medium px-1.5 py-0.5 rounded bg-muted text-muted-foreground"
@@ -96,13 +96,13 @@ const ProductCard = ({ product }: { product: Product }) => {
                 {size}
               </span>
             ))}
-            {sizes.length > 5 && (
-              <span className="text-[10px] text-muted-foreground">+{sizes.length - 5}</span>
+            {sizes.length > 3 && (
+              <span className="text-[10px] text-muted-foreground">+{sizes.length - 3}</span>
             )}
           </div>
         )}
 
-        <div className="flex items-center justify-between">
+        <div className="flex flex-wrap items-center gap-x-2 gap-y-1 pt-1">
           <div className="flex items-center gap-1.5">
             {product.compare_at_price && product.compare_at_price > product.price && (
               <span className="text-xs text-muted-foreground line-through tabular-nums">
