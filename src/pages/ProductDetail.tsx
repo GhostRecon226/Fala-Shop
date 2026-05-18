@@ -201,7 +201,7 @@ const ProductDetail = () => {
                 ? 'Out of Stock'
                 : product.category === 'Solar Fans'
                 ? 'Equip Now'
-                : 'Add to Collection'}
+                : 'Add to Cart'}
             </button>
             <button
               onClick={() => toggleItem(product)}

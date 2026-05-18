@@ -117,7 +117,7 @@ const ProductCard = ({ product }: { product: Product }) => {
             onClick={() => addItem(product)}
             className="text-xs font-medium text-primary hover:text-accent transition-colors duration-150"
           >
-            {product.category === 'Solar Fans' ? 'Equip Now' : 'Add to Collection'}
+            {product.category === 'Solar Fans' ? 'Equip Now' : 'Add to Cart'}
           </button>
         </div>
       </div>
