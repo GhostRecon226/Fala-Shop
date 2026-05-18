@@ -41,7 +41,7 @@ const Index = () => {
     <div>
       {/* Hero */}
       <section className="relative overflow-hidden bg-secondary">
-        <div className="container grid md:grid-cols-2 items-center gap-8 py-16 md:py-24">
+        <div className="container grid md:grid-cols-2 items-center gap-6 md:gap-8 py-10 md:py-24">
           <div className="space-y-6">
             <h1 className="text-4xl md:text-5xl font-bold tracking-display leading-tight text-foreground">
               Engineered Utility.<br />Refined Style.
