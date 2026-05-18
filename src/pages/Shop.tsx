@@ -46,7 +46,7 @@ const Shop = () => {
   };
 
   return (
-    <div className="container py-10">
+    <div className="container py-6 md:py-10">
       <h1 className="text-3xl font-bold tracking-display text-foreground mb-2">Shop</h1>
       <p className="text-sm text-muted-foreground mb-8">Browse our complete collection.</p>
 
