@@ -5,7 +5,7 @@ const faqs = [
     value: 'shipping-rates',
     title: 'Shipping Rates',
     content:
-      'Standard shipping is calculated at checkout based on your location and order weight. Orders over ₦50,000 qualify for free standard shipping within Nigeria.',
+      'Standard shipping is calculated at checkout based on your location and order weight. Orders over ₦100,000 qualify for free standard shipping within Nigeria.',
   },
   {
     value: 'delivery-times',
