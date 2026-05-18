@@ -75,9 +75,9 @@ const Index = () => {
       </section>
 
       {/* Categories */}
-      <section className="container py-16">
-        <h2 className="text-2xl font-bold tracking-display text-foreground mb-8">Categories</h2>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <section className="container py-10 md:py-16">
+        <h2 className="text-2xl font-bold tracking-display text-foreground mb-6 md:mb-8">Categories</h2>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
           {categories.map(cat => (
             <Link
               key={cat.name}
