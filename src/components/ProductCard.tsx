@@ -28,7 +28,7 @@ const ProductCard = ({ product, variant = 'default' }: { product: Product; varia
   
 
   return (
-    <div className={`group relative ${isLight ? 'bg-white rounded-xl p-3 shadow-sm' : ''}`}>
+    <div className={`group relative flex flex-col min-w-0 ${isLight ? 'bg-white rounded-xl p-2.5 sm:p-3 shadow-sm' : ''}`}>
       <Link to={`/product/${product.id}`}>
         <div className="relative aspect-square overflow-hidden rounded-lg bg-muted card-shadow transition-all duration-150 ease-[cubic-bezier(0.4,0,0.2,1)] group-hover:card-shadow-hover">
           <img
@@ -62,9 +62,9 @@ const ProductCard = ({ product, variant = 'default' }: { product: Product; varia
           className={wishlisted ? 'fill-destructive text-destructive' : 'text-muted-foreground hover:text-destructive'}
         />
       </button>
-      <div className={`mt-3 space-y-2 ${isLight ? '' : 'pb-3'}`}>
-        <Link to={`/product/${product.id}`}>
-          <h3 className={`text-sm font-semibold leading-tight line-clamp-2 ${nameClass}`}>{product.name}</h3>
+      <div className={`mt-3 space-y-2 flex flex-col flex-1 min-w-0 ${isLight ? '' : 'pb-3'}`}>
+        <Link to={`/product/${product.id}`} className="min-w-0">
+          <h3 className={`text-sm font-semibold leading-tight line-clamp-2 break-words ${nameClass}`}>{product.name}</h3>
         </Link>
         {stats && (
           <div className="flex items-center gap-1">
@@ -109,7 +109,7 @@ const ProductCard = ({ product, variant = 'default' }: { product: Product; varia
           </div>
         )}
 
-        <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-y-2 gap-x-2 pt-1">
+        <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-y-2 gap-x-2 pt-1 mt-auto">
           <div className="flex items-center gap-1.5">
             {product.compare_at_price && product.compare_at_price > product.price && (
               <span className={`text-xs line-through tabular-nums ${strikeClass}`}>

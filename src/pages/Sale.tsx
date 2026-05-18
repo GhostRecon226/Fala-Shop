@@ -61,7 +61,7 @@ const Sale = () => {
           <div className="absolute top-4 left-8 text-[120px] font-black text-white/20 select-none rotate-[-8deg]">%</div>
           <div className="absolute bottom-2 right-12 text-[80px] font-black text-white/20 select-none rotate-[12deg]">SALE</div>
         </div>
-        <div className="container relative py-16 md:py-24 text-center">
+        <div className="container relative py-10 md:py-24 text-center">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/20 backdrop-blur-sm text-white/90 text-sm font-medium mb-6">
             <Tag size={14} />
             Limited Time Deals
@@ -84,9 +84,9 @@ const Sale = () => {
       </div>
 
       {/* Content */}
-      <div className="container py-10">
+      <div className="container py-6 md:py-10">
         {isLoading ? (
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
             {[...Array(8)].map((_, i) => (
               <div key={i} className="space-y-3 animate-pulse">
                 <div className="aspect-square rounded-lg bg-muted" />
@@ -113,7 +113,7 @@ const Sale = () => {
               </div>
             </div>
 
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
               {saleProducts.map((product) => (
                 <ProductCard key={product.id} product={product} />
               ))}

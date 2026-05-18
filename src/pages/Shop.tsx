@@ -46,7 +46,7 @@ const Shop = () => {
   };
 
   return (
-    <div className="container py-10">
+    <div className="container py-6 md:py-10">
       <h1 className="text-3xl font-bold tracking-display text-foreground mb-2">Shop</h1>
       <p className="text-sm text-muted-foreground mb-8">Browse our complete collection.</p>
 
@@ -97,7 +97,7 @@ const Shop = () => {
 
       {/* Products Grid */}
       {isLoading ? (
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
           {[...Array(8)].map((_, i) => (
             <div key={i} className="space-y-3 animate-pulse">
               <div className="aspect-square rounded-lg bg-muted" />
@@ -107,7 +107,7 @@ const Shop = () => {
           ))}
         </div>
       ) : sortedProducts.length > 0 ? (
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
           {sortedProducts.map(product => (
             <ProductCard key={product.id} product={product} />
           ))}

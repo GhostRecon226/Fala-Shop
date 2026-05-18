@@ -41,7 +41,7 @@ const Index = () => {
     <div>
       {/* Hero */}
       <section className="relative overflow-hidden bg-secondary">
-        <div className="container grid md:grid-cols-2 items-center gap-8 py-16 md:py-24">
+        <div className="container grid md:grid-cols-2 items-center gap-6 md:gap-8 py-10 md:py-24">
           <div className="space-y-6">
             <h1 className="text-4xl md:text-5xl font-bold tracking-display leading-tight text-foreground">
               Engineered Utility.<br />Refined Style.
@@ -75,9 +75,9 @@ const Index = () => {
       </section>
 
       {/* Categories */}
-      <section className="container py-16">
-        <h2 className="text-2xl font-bold tracking-display text-foreground mb-8">Categories</h2>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <section className="container py-10 md:py-16">
+        <h2 className="text-2xl font-bold tracking-display text-foreground mb-6 md:mb-8">Categories</h2>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
           {categories.map(cat => (
             <Link
               key={cat.name}
@@ -140,7 +140,7 @@ const Index = () => {
                 View All Deals <ArrowRight size={14} />
               </Link>
             </div>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-6">
               {saleProducts.map(product => (
                 <ProductCard key={product.id} product={product} variant="light" />
               ))}
@@ -150,15 +150,15 @@ const Index = () => {
       )}
 
       {/* Featured Products */}
-      <section className="container pb-16">
-        <div className="flex items-center justify-between mb-8">
+      <section className="container pb-10 md:pb-16">
+        <div className="flex items-center justify-between mb-6 md:mb-8">
           <h2 className="text-2xl font-bold tracking-display text-foreground">Featured</h2>
           <Link to="/shop" className="text-sm font-medium text-primary hover:text-accent transition-colors">
             View All
           </Link>
         </div>
         {(loadingFeatured || loadingAll) ? (
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-6">
             {[...Array(4)].map((_, i) => (
               <div key={i} className="space-y-3 animate-pulse">
                 <div className="aspect-square rounded-lg bg-muted" />
@@ -168,7 +168,7 @@ const Index = () => {
             ))}
           </div>
         ) : displayProducts && displayProducts.length > 0 ? (
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-6">
             {displayProducts.map(product => (
               <ProductCard key={product.id} product={product} />
             ))}
