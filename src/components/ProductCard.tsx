@@ -62,9 +62,9 @@ const ProductCard = ({ product, variant = 'default' }: { product: Product; varia
           className={wishlisted ? 'fill-destructive text-destructive' : 'text-muted-foreground hover:text-destructive'}
         />
       </button>
-      <div className={`mt-3 space-y-2 ${isLight ? '' : 'pb-3'}`}>
-        <Link to={`/product/${product.id}`}>
-          <h3 className={`text-sm font-semibold leading-tight line-clamp-2 ${nameClass}`}>{product.name}</h3>
+      <div className={`mt-3 space-y-2 flex flex-col flex-1 min-w-0 ${isLight ? '' : 'pb-3'}`}>
+        <Link to={`/product/${product.id}`} className="min-w-0">
+          <h3 className={`text-sm font-semibold leading-tight line-clamp-2 break-words ${nameClass}`}>{product.name}</h3>
         </Link>
         {stats && (
           <div className="flex items-center gap-1">
