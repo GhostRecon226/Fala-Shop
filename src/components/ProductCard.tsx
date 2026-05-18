@@ -25,7 +25,7 @@ const ProductCard = ({ product, variant = 'default' }: { product: Product; varia
   const subtleClass = isLight ? 'text-neutral-600' : 'text-muted-foreground';
   const priceClass = isLight ? 'text-neutral-900' : 'text-primary';
   const strikeClass = isLight ? 'text-neutral-400' : 'text-muted-foreground';
-  const ctaClass = isLight ? 'text-neutral-900 hover:text-primary' : 'text-primary hover:text-accent';
+  
 
   return (
     <div className={`group relative ${isLight ? 'bg-white rounded-xl p-3 shadow-sm' : ''}`}>
