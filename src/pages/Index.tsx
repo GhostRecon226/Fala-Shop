@@ -150,8 +150,8 @@ const Index = () => {
       )}
 
       {/* Featured Products */}
-      <section className="container pb-16">
-        <div className="flex items-center justify-between mb-8">
+      <section className="container pb-10 md:pb-16">
+        <div className="flex items-center justify-between mb-6 md:mb-8">
           <h2 className="text-2xl font-bold tracking-display text-foreground">Featured</h2>
           <Link to="/shop" className="text-sm font-medium text-primary hover:text-accent transition-colors">
             View All
