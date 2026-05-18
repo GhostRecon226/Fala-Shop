@@ -122,7 +122,7 @@ const ProductCard = ({ product, variant = 'default' }: { product: Product; varia
           </div>
           <button
             onClick={() => addItem(product)}
-            className="w-full sm:w-auto text-xs font-semibold bg-[#5C1340] text-white rounded-md px-3 py-2 transition-all duration-150 hover:opacity-90 active:scale-[0.97]"
+            className="w-full sm:w-auto min-h-[44px] text-sm font-semibold bg-[#5C1340] text-white rounded-md px-4 py-2.5 transition-all duration-150 hover:opacity-90 active:scale-[0.97]"
           >
             {product.category === 'Solar Fans' ? 'Equip Now' : 'Add to Cart'}
           </button>
