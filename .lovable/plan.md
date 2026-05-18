@@ -1,9 +1,14 @@
 ## Plan
 
-### 1. Update Contact Page Phone Number
-In `src/pages/Contact.tsx`, change the displayed phone number from `+234 800 000 0000` to `+2349066064421`.
+Remove sizing from the Bags category so bag products no longer show a size selector on the storefront or in the admin product form.
 
-### 2. Add Floating WhatsApp Widget
-Create a reusable `WhatsAppWidget` component that renders as a fixed floating button in the bottom-right corner of every page. It will use the WhatsApp brand green color with a chat icon and link to `https://wa.me/2349066064421` (international format without +). The component will be added to the shared layout in `src/App.tsx`, appearing above all page content.
+### Change
+- In `src/lib/sizes.ts`, remove `'Bags'` from the `SIZE_CATEGORIES` array (keep it in `COLOR_CATEGORIES` so bags still support color selection).
 
-No other pages or data changes are required.
+This single source-of-truth change automatically:
+- Hides the "Select Size" block on the Product Detail page for bags.
+- Hides the sizes section in the Admin Add/Edit Product modal when category is Bags.
+- Allows bags to be added to cart without selecting a size.
+
+### Optional cleanup
+Existing bag products in the database may already have `available_sizes` stored from before. Since the UI will no longer surface them, they are harmless. No migration is needed unless you want me to also clear those legacy values — let me know and I'll add a one-time SQL update.
