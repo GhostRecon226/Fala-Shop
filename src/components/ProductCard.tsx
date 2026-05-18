@@ -7,7 +7,7 @@ import { useWishlist } from '@/contexts/WishlistContext';
 import { useReviewStats } from '@/hooks/useReviewStats';
 import { COLOR_SWATCHES } from '@/lib/sizes';
 
-const ProductCard = ({ product }: { product: Product }) => {
+const ProductCard = ({ product, variant = 'default' }: { product: Product; variant?: 'default' | 'light' }) => {
   const { addItem } = useCart();
   const { toggleItem, isWishlisted } = useWishlist();
   const { data: reviewStats } = useReviewStats();
@@ -20,8 +20,15 @@ const ProductCard = ({ product }: { product: Product }) => {
   const hasDiscount = product.compare_at_price && product.compare_at_price > product.price;
   const discountPct = hasDiscount ? Math.round((1 - product.price / product.compare_at_price!) * 100) : 0;
 
+  const isLight = variant === 'light';
+  const nameClass = isLight ? 'text-neutral-900' : 'text-foreground';
+  const subtleClass = isLight ? 'text-neutral-600' : 'text-muted-foreground';
+  const priceClass = isLight ? 'text-neutral-900' : 'text-primary';
+  const strikeClass = isLight ? 'text-neutral-400' : 'text-muted-foreground';
+  const ctaClass = isLight ? 'text-neutral-900 hover:text-primary' : 'text-primary hover:text-accent';
+
   return (
-    <div className="group relative">
+    <div className={`group relative ${isLight ? 'bg-white rounded-xl p-3 shadow-sm' : ''}`}>
       <Link to={`/product/${product.id}`}>
         <div className="relative aspect-square overflow-hidden rounded-lg bg-muted card-shadow transition-all duration-150 ease-[cubic-bezier(0.4,0,0.2,1)] group-hover:card-shadow-hover">
           <img
@@ -47,7 +54,7 @@ const ProductCard = ({ product }: { product: Product }) => {
       {/* Wishlist button */}
       <button
         onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleItem(product); }}
-        className="absolute top-2 right-2 p-1.5 rounded-full bg-background/80 backdrop-blur-sm hover:bg-background transition-colors z-10"
+        className={`absolute ${isLight ? 'top-5 right-5' : 'top-2 right-2'} p-1.5 rounded-full bg-background/80 backdrop-blur-sm hover:bg-background transition-colors z-10`}
         aria-label={wishlisted ? 'Remove from wishlist' : 'Add to wishlist'}
       >
         <Heart
@@ -55,18 +62,18 @@ const ProductCard = ({ product }: { product: Product }) => {
           className={wishlisted ? 'fill-destructive text-destructive' : 'text-muted-foreground hover:text-destructive'}
         />
       </button>
-      <div className="mt-3 space-y-2 pb-3">
+      <div className={`mt-3 space-y-2 ${isLight ? '' : 'pb-3'}`}>
         <Link to={`/product/${product.id}`}>
-          <h3 className="text-sm font-semibold text-foreground leading-tight line-clamp-2">{product.name}</h3>
+          <h3 className={`text-sm font-semibold leading-tight line-clamp-2 ${nameClass}`}>{product.name}</h3>
         </Link>
         {stats && (
           <div className="flex items-center gap-1">
             <Star size={12} className="fill-primary text-primary" />
-            <span className="text-xs font-medium text-foreground tabular-nums">{stats.avg.toFixed(1)}</span>
-            <span className="text-xs text-muted-foreground">({stats.count})</span>
+            <span className={`text-xs font-medium tabular-nums ${nameClass}`}>{stats.avg.toFixed(1)}</span>
+            <span className={`text-xs ${subtleClass}`}>({stats.count})</span>
           </div>
         )}
-        <p className="text-xs text-muted-foreground">{product.category}</p>
+        <p className={`text-xs ${subtleClass}`}>{product.category}</p>
 
         {/* Color swatches */}
         {colors.length > 0 && (
@@ -80,7 +87,7 @@ const ProductCard = ({ product }: { product: Product }) => {
               />
             ))}
             {colors.length > 4 && (
-              <span className="text-[10px] text-muted-foreground">+{colors.length - 4}</span>
+              <span className={`text-[10px] ${subtleClass}`}>+{colors.length - 4}</span>
             )}
           </div>
         )}
@@ -97,7 +104,7 @@ const ProductCard = ({ product }: { product: Product }) => {
               </span>
             ))}
             {sizes.length > 3 && (
-              <span className="text-[10px] text-muted-foreground">+{sizes.length - 3}</span>
+              <span className={`text-[10px] ${subtleClass}`}>+{sizes.length - 3}</span>
             )}
           </div>
         )}
@@ -105,17 +112,17 @@ const ProductCard = ({ product }: { product: Product }) => {
         <div className="flex flex-wrap items-center gap-x-2 gap-y-1 pt-1">
           <div className="flex items-center gap-1.5">
             {product.compare_at_price && product.compare_at_price > product.price && (
-              <span className="text-xs text-muted-foreground line-through tabular-nums">
+              <span className={`text-xs line-through tabular-nums ${strikeClass}`}>
                 {formatPrice(product.compare_at_price)}
               </span>
             )}
-            <p className="text-sm font-semibold text-primary tabular-nums">
+            <p className={`text-sm font-semibold tabular-nums ${priceClass}`}>
               {formatPrice(product.price)}
             </p>
           </div>
           <button
             onClick={() => addItem(product)}
-            className="text-xs font-medium text-primary hover:text-accent transition-colors duration-150"
+            className={`text-xs font-medium transition-colors duration-150 ${ctaClass}`}
           >
             {product.category === 'Solar Fans' ? 'Equip Now' : 'Add to Cart'}
           </button>
