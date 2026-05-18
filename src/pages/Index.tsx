@@ -158,7 +158,7 @@ const Index = () => {
           </Link>
         </div>
         {(loadingFeatured || loadingAll) ? (
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-6">
             {[...Array(4)].map((_, i) => (
               <div key={i} className="space-y-3 animate-pulse">
                 <div className="aspect-square rounded-lg bg-muted" />
